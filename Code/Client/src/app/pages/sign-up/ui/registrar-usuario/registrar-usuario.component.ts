@@ -5,8 +5,10 @@ import { Router } from '@angular/router';
 import { Carrera } from '@entities/admin';
 import { CarreraService } from '@entities/career';
 import { Usuario, UsuarioService, UsuarioServiceAPI } from '@entities/user';
+import { AuthService } from '@features/auth-session';
 import { extractErrorMessage } from '@shared/lib/error';
 import { AvisoExitoComponent, MostrarerrorComponent } from '@shared/ui';
+import { switchMap } from 'rxjs';
 @Component({
   selector: 'app-registrar-usuario',
   imports: [
@@ -28,6 +30,7 @@ export class RegistrarUsuarioComponent {
   isOpen: boolean = false;
   isHovered: boolean = false;
   submitted: boolean = false;
+  registrando: boolean = false;
   error: WritableSignal<boolean> = signal(false);
   mensajeerror: string = '';
   aviso: WritableSignal<boolean> = signal(false);
@@ -38,6 +41,7 @@ export class RegistrarUsuarioComponent {
     private router: Router,
     private registrarcuenta: UsuarioServiceAPI,
     private carrerasS: CarreraService,
+    private readonly authService: AuthService,
   ) {}
   toggleDropdown() {
     this.isOpen = !this.isOpen;
@@ -69,6 +73,7 @@ export class RegistrarUsuarioComponent {
   }
   registrar(form: NgForm) {
     this.submitted = true;
+    if (this.registrando) return;
     if (
       form.invalid ||
       this.password !== this.confirmPassword ||
@@ -77,27 +82,55 @@ export class RegistrarUsuarioComponent {
     ) {
       return;
     }
+    const correo = this.nuevoUsuario.correo ?? '';
+    let registroCompletado = false;
+
+    this.registrando = true;
+    this.error.set(false);
+    this.aviso.set(false);
     this.nuevoUsuario.rol = 'usuario';
     this.registrarcuenta
       .registrarCuenta(this.nuevoUsuario, this.password, 'estudiante')
+      .pipe(
+        switchMap(() => {
+          registroCompletado = true;
+
+          return this.registrarcuenta.iniciarSesion(correo, this.password);
+        }),
+      )
       .subscribe({
-        next: (_response) => {
+        next: (data) => {
+          this.authService.setSession(
+            data.accessToken,
+            data.refreshToken,
+            data.usuario,
+          );
+          this.usuarioS.guardarSesion(data.usuario);
           this.mensajeaviso = 'Usuario registrado exitosamente';
-          this.usuarioS.guardarSesion(this.nuevoUsuario);
           this.aviso.set(true);
+          this.registrando = false;
+          this.router.navigate(['/home']);
         },
         error: (err) => {
+          const mensajePorDefecto = registroCompletado
+            ? 'Tu cuenta fue creada, pero no se pudo iniciar sesión automáticamente. Intenta iniciar sesión manualmente.'
+            : 'Error al registrar el usuario intente mas tarde';
           const errorMsg = extractErrorMessage(
             err,
-            'Error al registrar el usuario intente mas tarde',
+            mensajePorDefecto,
           );
           this.mensajeerror = errorMsg;
           this.error.set(true);
+          this.registrando = false;
         },
       });
   }
   irALogin() {
     this.router.navigate(['/Iniciar-Sesion']);
+  }
+
+  irAHome() {
+    this.router.navigate(['/home']);
   }
 
   alternarVisibilidadPassword(): void {

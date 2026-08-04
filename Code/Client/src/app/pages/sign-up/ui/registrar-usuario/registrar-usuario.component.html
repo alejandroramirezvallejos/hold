@@ -321,8 +321,11 @@
           }
         </div>
       </div>
-      <button type="submit" class="register-button">
-        <span>Crear Cuenta</span>
+      <button type="submit" class="register-button" [disabled]="registrando">
+        @if (registrando) {
+          <span class="spinner" aria-hidden="true"></span>
+        }
+        <span>{{ registrando ? "Creando cuenta..." : "Crear Cuenta" }}</span>
       </button>
       <div class="additional-options">
         <p class="login-link">
@@ -339,6 +342,6 @@
   <app-aviso-exito
     [mensaje]="mensajeaviso"
     [exito]="aviso"
-    (accion)="irALogin()"
+    (accion)="irAHome()"
   ></app-aviso-exito>
 }
