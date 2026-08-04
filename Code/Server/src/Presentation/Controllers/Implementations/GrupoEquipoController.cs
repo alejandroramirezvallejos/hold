@@ -10,8 +10,13 @@ namespace IMT_Reservas.Server.Presentation.Controllers.Implementations;
 public class GrupoEquipoController : Controller
 {
     private readonly GrupoEquipoService _service;
+    private readonly ComentarioEquipoService _comentarios;
 
-    public GrupoEquipoController(GrupoEquipoService service) => _service = service;
+    public GrupoEquipoController(GrupoEquipoService service, ComentarioEquipoService comentarios)
+    {
+        _service = service;
+        _comentarios = comentarios;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAll() => ToResponse(await _service.GetAll());
@@ -24,6 +29,16 @@ public class GrupoEquipoController : Controller
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(int id) => ToResponse(await _service.Get(id));
+
+    [HttpGet("{id:int}/comentarios")]
+    public async Task<IActionResult> GetComentarios(int id) =>
+        ToResponse(await _comentarios.GetByGrupo(id));
+
+    [HttpPost("{id:int}/comentarios")]
+    public async Task<IActionResult> CreateComentario(
+        int id,
+        [FromBody] CrearComentarioEquipoDto? dto
+    ) => ToResponse(await _comentarios.Create(id, CurrentCarnet, dto));
 
     [Authorize(Roles = "administrador")]
     [HttpPost]
@@ -42,4 +57,6 @@ public class GrupoEquipoController : Controller
     [Authorize(Roles = "administrador")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id) => ToDeleteResponse(await _service.Delete(id));
+
+    private string CurrentCarnet => User.Identity?.Name ?? string.Empty;
 }

@@ -101,6 +101,92 @@
       </div>
     </div>
   </div>
+
+  <section class="comentarios-equipo" aria-labelledby="comentarios-equipo-title">
+    <div class="comentarios-equipo__header">
+      <div>
+        <h3 id="comentarios-equipo-title" class="comentarios-equipo__title">
+          Comentarios del equipo
+        </h3>
+        <p class="comentarios-equipo__subtitle">
+          Tu comentario se publicará con tu usuario registrado.
+        </p>
+      </div>
+      <span class="comentarios-equipo__count"
+        >{{ comentarios.length }} comentario{{
+          comentarios.length !== 1 ? "s" : ""
+        }}</span
+      >
+    </div>
+
+    <form class="comentarios-equipo__form" (ngSubmit)="publicarComentario()">
+      <label class="comentarios-equipo__label" for="comentario-equipo">
+        Agregar comentario
+      </label>
+      <textarea
+        id="comentario-equipo"
+        name="comentario-equipo"
+        class="comentarios-equipo__textarea"
+        [(ngModel)]="comentarioTexto"
+        [attr.maxlength]="maxCommentLength"
+        rows="4"
+        placeholder="Escribe una observación útil sobre este equipo"
+      ></textarea>
+      <div class="comentarios-equipo__form-footer">
+        <span class="comentarios-equipo__limit">
+          {{ comentarioTexto.length }}/{{ maxCommentLength }}
+        </span>
+        <button
+          type="submit"
+          class="comentarios-equipo__submit"
+          [disabled]="
+            publicandoComentario || comentarioTexto.trim().length === 0
+          "
+        >
+          {{
+            publicandoComentario ? "Publicando..." : "Publicar comentario"
+          }}
+        </button>
+      </div>
+      @if (comentarioError) {
+        <p class="comentarios-equipo__error">{{ comentarioError }}</p>
+      }
+    </form>
+
+    <div class="comentarios-equipo__list">
+      @if (cargandoComentarios) {
+        <p class="comentarios-equipo__empty">Cargando comentarios...</p>
+      } @else if (comentarios.length === 0) {
+        <p class="comentarios-equipo__empty">
+          Aún no hay comentarios para este equipo.
+        </p>
+      } @else {
+        @for (comentario of comentarios; track comentario.id) {
+          <article class="comentarios-equipo__item">
+            <div class="comentarios-equipo__item-header">
+              <div>
+                <strong class="comentarios-equipo__author">
+                  {{ comentario.nombreUsuario }}
+                </strong>
+                <span class="comentarios-equipo__carnet">
+                  {{ comentario.carnetUsuario }}
+                </span>
+              </div>
+              <time
+                class="comentarios-equipo__date"
+                [attr.datetime]="comentario.fechaCreacion"
+              >
+                {{ comentario.fechaCreacion | date: "dd/MM/yyyy HH:mm" }}
+              </time>
+            </div>
+            <p class="comentarios-equipo__content">
+              {{ comentario.contenido }}
+            </p>
+          </article>
+        }
+      }
+    </div>
+  </section>
 }
 
 @if (showCalendarioModal) {

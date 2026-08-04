@@ -13,7 +13,11 @@ import {
   DisponibilidadService,
 } from '@entities/availability';
 import { Carrito } from '@entities/cart';
-import { GrupoEquipo, GrupoequipoService } from '@entities/equipment-group';
+import {
+  ComentarioEquipo,
+  GrupoEquipo,
+  GrupoequipoService,
+} from '@entities/equipment-group';
 import { CalendarioComponent } from '@features/availability-selector';
 import { CarritoService } from '@features/cart';
 import { ImageCacheService } from '@shared/lib/image/image-cache.service';
@@ -24,6 +28,7 @@ import {
 
 const MINIMUM_CART_QUANTITY = 1;
 const FALLBACK_MAXIMUM_QUANTITY = 99;
+const MAX_COMMENT_LENGTH = 1024;
 
 @Component({
   selector: 'app-objeto',
@@ -41,6 +46,7 @@ const FALLBACK_MAXIMUM_QUANTITY = 99;
 })
 export class ObjetoComponent {
   readonly minimumCartQuantity = MINIMUM_CART_QUANTITY;
+  readonly maxCommentLength = MAX_COMMENT_LENGTH;
   id: string = '';
   producto: GrupoEquipo = new GrupoEquipo();
   cantidadDisponible: number = 0;
@@ -62,6 +68,11 @@ export class ObjetoComponent {
   showAvisoModal = false;
   avisoFecha = '';
   avisoRegistrado = false;
+  comentarios: ComentarioEquipo[] = [];
+  comentarioTexto = '';
+  comentarioError = '';
+  cargandoComentarios = false;
+  publicandoComentario = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -97,6 +108,7 @@ export class ObjetoComponent {
             },
           };
           this.obtenerDisponibilidad();
+          this.cargarComentarios();
         } else {
           this.cargando = false;
         }
@@ -182,6 +194,55 @@ export class ObjetoComponent {
           this.showAvisoModal = false;
         },
       });
+  }
+
+  cargarComentarios(): void {
+    if (!this.producto.id) return;
+
+    this.cargandoComentarios = true;
+    this.comentarioError = '';
+
+    this.servicio.obtenerComentarios(this.producto.id).subscribe({
+      next: (comentarios) => {
+        this.comentarios = comentarios;
+        this.cargandoComentarios = false;
+      },
+      error: () => {
+        this.comentarioError = 'No se pudieron cargar los comentarios.';
+        this.cargandoComentarios = false;
+      },
+    });
+  }
+
+  publicarComentario(): void {
+    if (!this.producto.id) return;
+
+    const contenido = this.comentarioTexto.trim();
+
+    if (!contenido) {
+      this.comentarioError = 'Escribe un comentario antes de publicar.';
+      return;
+    }
+
+    if (contenido.length > MAX_COMMENT_LENGTH) {
+      this.comentarioError = `El comentario no puede superar ${MAX_COMMENT_LENGTH} caracteres.`;
+      return;
+    }
+
+    this.publicandoComentario = true;
+    this.comentarioError = '';
+
+    this.servicio.crearComentario(this.producto.id, contenido).subscribe({
+      next: (comentario) => {
+        this.comentarios = [comentario, ...this.comentarios];
+        this.comentarioTexto = '';
+        this.publicandoComentario = false;
+      },
+      error: () => {
+        this.comentarioError = 'No se pudo publicar el comentario.';
+        this.publicandoComentario = false;
+      },
+    });
   }
 
   cerrarAvisoModal(): void {

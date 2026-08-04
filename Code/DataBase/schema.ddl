@@ -476,6 +476,25 @@ create index idx_usuarios_email
 create index ix_usuarios_refresh_token
     on usuarios (refresh_token);
 
+create table comentarios_equipos
+(
+    id_comentario_equipo integer generated always as identity
+        primary key,
+    id_grupo_equipo      integer                                not null
+        references grupos_equipos,
+    carnet_usuario       varchar(20)                            not null
+        references usuarios,
+    contenido            varchar(1024)                          not null,
+    fecha_creacion       timestamp with time zone default now() not null,
+    estado_eliminado     boolean                  default false not null
+);
+
+alter table comentarios_equipos
+    owner to postgres;
+
+create index ix_comentarios_equipos_grupo_fecha
+    on comentarios_equipos (id_grupo_equipo, fecha_creacion, estado_eliminado);
+
 create table audit_logs
 (
     id               serial

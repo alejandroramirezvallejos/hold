@@ -3,7 +3,9 @@ import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import { ApiResponse, extractApiValue } from '@shared/api';
 import { map, Observable, of, tap } from 'rxjs';
+import { ComentarioEquipo } from '../model/comentario-equipo';
 import { GrupoEquipo } from '../model/grupo-equipo';
+import { ComentarioEquipoApiItem } from './comentario-equipo-api-item';
 import { GrupoEquipoApiItem } from './grupo-equipo-api-item';
 @Injectable({
   providedIn: 'root',
@@ -13,6 +15,14 @@ export class GrupoequipoService {
   private readonly grupoEquipoApiVacio: GrupoEquipoApiItem = {
     Id: 0,
     Nombre: null,
+  };
+  private readonly comentarioEquipoApiVacio: ComentarioEquipoApiItem = {
+    Id: 0,
+    IdGrupoEquipo: 0,
+    CarnetUsuario: '',
+    NombreUsuario: '',
+    Contenido: '',
+    FechaCreacion: '',
   };
   private readonly cache = new Map<string, GrupoEquipo[]>();
   paginaGuardada: number = 0;
@@ -35,6 +45,17 @@ export class GrupoequipoService {
       nombreCategoria: item.NombreCategoria || '',
       Cantidad: item.Cantidad || 0,
       CostoPromedio: item.CostoPromedio || 0,
+    };
+  }
+
+  private mapearComentario(item: ComentarioEquipoApiItem): ComentarioEquipo {
+    return {
+      id: item.Id,
+      idGrupoEquipo: item.IdGrupoEquipo,
+      carnetUsuario: item.CarnetUsuario,
+      nombreUsuario: item.NombreUsuario,
+      contenido: item.Contenido,
+      fechaCreacion: item.FechaCreacion,
     };
   }
 
@@ -108,6 +129,38 @@ export class GrupoequipoService {
         map((data) =>
           this.mapearGrupoEquipo(
             extractApiValue(data, this.grupoEquipoApiVacio),
+          ),
+        ),
+      );
+  }
+
+  obtenerComentarios(idGrupoEquipo: number): Observable<ComentarioEquipo[]> {
+    return this.http
+      .get<ApiResponse<ComentarioEquipoApiItem[]>>(
+        `${this.apiUrl}/${idGrupoEquipo}/comentarios`,
+      )
+      .pipe(
+        map((data) =>
+          extractApiValue(data, []).map((item) =>
+            this.mapearComentario(item),
+          ),
+        ),
+      );
+  }
+
+  crearComentario(
+    idGrupoEquipo: number,
+    contenido: string,
+  ): Observable<ComentarioEquipo> {
+    return this.http
+      .post<ApiResponse<ComentarioEquipoApiItem>>(
+        `${this.apiUrl}/${idGrupoEquipo}/comentarios`,
+        { Contenido: contenido },
+      )
+      .pipe(
+        map((data) =>
+          this.mapearComentario(
+            extractApiValue(data, this.comentarioEquipoApiVacio),
           ),
         ),
       );

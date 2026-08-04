@@ -29,6 +29,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<AuditLog> AuditLogs { get; set; }
     public DbSet<Notificacion> Notificaciones { get; set; }
     public DbSet<AvisoDisponibilidad> AvisosDisponibilidad { get; set; }
+    public DbSet<ComentarioEquipo> ComentariosEquipos { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options) { }
@@ -503,6 +504,35 @@ public class ApplicationDbContext : DbContext
             {
                 e.Entidad,
                 e.EntidadId,
+                e.EstadoEliminado,
+            });
+            entity.HasQueryFilter(e => !e.EstadoEliminado);
+        });
+
+        modelBuilder.Entity<ComentarioEquipo>(entity =>
+        {
+            entity.ToTable("comentarios_equipos");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("id_comentario_equipo");
+            entity.Property(e => e.IdGrupoEquipo).HasColumnName("id_grupo_equipo");
+            entity.Property(e => e.CarnetUsuario).HasColumnName("carnet_usuario").HasMaxLength(20);
+            entity.Property(e => e.Contenido).HasColumnName("contenido").HasMaxLength(1024);
+            entity.Property(e => e.FechaCreacion).HasColumnName("fecha_creacion");
+            entity.Property(e => e.EstadoEliminado).HasColumnName(EstadoEliminadoCol);
+            entity
+                .HasOne(e => e.GrupoEquipo)
+                .WithMany()
+                .HasForeignKey(e => e.IdGrupoEquipo)
+                .IsRequired();
+            entity
+                .HasOne(e => e.Usuario)
+                .WithMany()
+                .HasForeignKey(e => e.CarnetUsuario)
+                .IsRequired();
+            entity.HasIndex(e => new
+            {
+                e.IdGrupoEquipo,
+                e.FechaCreacion,
                 e.EstadoEliminado,
             });
             entity.HasQueryFilter(e => !e.EstadoEliminado);

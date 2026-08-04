@@ -237,6 +237,193 @@
   }
 }
 
+.comentarios-equipo {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto 2.5rem;
+  padding: 0 2rem;
+}
+.comentarios-equipo__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.comentarios-equipo__title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.comentarios-equipo__subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.comentarios-equipo__count {
+  flex: 0 0 auto;
+  color: var(--ink-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--sidebar);
+}
+.comentarios-equipo__form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+.comentarios-equipo__label {
+  color: var(--ink-secondary);
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+.comentarios-equipo__textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 7rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  box-sizing: border-box;
+  transition:
+    border-color var(--t-fast),
+    box-shadow var(--t-fast);
+}
+.comentarios-equipo__textarea::placeholder {
+  color: #64748b;
+}
+.comentarios-equipo__textarea:focus {
+  outline: none;
+  border-color: var(--interactive-text);
+  box-shadow: 0 0 0 3px rgba(0, 69, 123, 0.12);
+}
+.comentarios-equipo__form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.comentarios-equipo__limit {
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.comentarios-equipo__submit {
+  min-height: 38px;
+  padding: 0 1.2rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--brand);
+  color: var(--brand-text);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.84rem;
+  font-weight: 800;
+  transition:
+    background-color var(--t-fast),
+    transform var(--t-fast);
+}
+.comentarios-equipo__submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.comentarios-equipo__submit:not(:disabled):hover {
+  background: var(--brand-hover);
+  transform: translateY(-1px);
+}
+.comentarios-equipo__error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.comentarios-equipo__list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.comentarios-equipo__empty {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--ink-muted);
+  background: var(--sidebar);
+  font-size: 0.85rem;
+}
+.comentarios-equipo__item {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.comentarios-equipo__item-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.comentarios-equipo__author {
+  display: block;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.comentarios-equipo__carnet {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--ink-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+.comentarios-equipo__date {
+  flex: 0 0 auto;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.comentarios-equipo__content {
+  margin: 0.75rem 0 0;
+  color: var(--ink-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 992px) {
+  .comentarios-equipo {
+    padding: 0 1.5rem;
+  }
+}
+@media (max-width: 480px) {
+  .comentarios-equipo {
+    padding: 0 1rem;
+  }
+  .comentarios-equipo__header,
+  .comentarios-equipo__item-header,
+  .comentarios-equipo__form-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .comentarios-equipo__count,
+  .comentarios-equipo__date {
+    align-self: flex-start;
+  }
+  .comentarios-equipo__submit {
+    width: 100%;
+  }
+}
+
 .disponibilidad-overlay {
   position: fixed;
   inset: 0;

@@ -289,6 +289,8 @@ builder.Services.AddScoped<NotificacionRepository>();
 builder.Services.AddScoped<NotificacionService>();
 builder.Services.AddScoped<AvisoDisponibilidadRepository>();
 builder.Services.AddScoped<AvisoDisponibilidadService>();
+builder.Services.AddScoped<ComentarioEquipoRepository>();
+builder.Services.AddScoped<ComentarioEquipoService>();
 
 builder.Services.AddHangfire(config =>
     config.UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString))
