@@ -13,13 +13,15 @@ namespace IMT_Reservas.Tests.Unit.Controllers;
 public class GrupoEquipoControllerTests
 {
     private Mock<GrupoEquipoService> _serviceMock = null!;
+    private Mock<ComentarioEquipoService> _comentariosMock = null!;
     private GrupoEquipoController _controller = null!;
 
     [SetUp]
     public void SetUp()
     {
         _serviceMock = new Mock<GrupoEquipoService>(null!, null!, null!, null!, null!, null!);
-        _controller = new GrupoEquipoController(_serviceMock.Object);
+        _comentariosMock = new Mock<ComentarioEquipoService>(null!);
+        _controller = new GrupoEquipoController(_serviceMock.Object, _comentariosMock.Object);
     }
 
     [Test]
