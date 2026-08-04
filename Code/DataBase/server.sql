@@ -4432,6 +4432,36 @@ ALTER TABLE public.carreras ALTER COLUMN id_carrera ADD GENERATED ALWAYS AS IDEN
 
 
 --
+-- Name: comentarios_equipos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.comentarios_equipos (
+    id_comentario_equipo integer NOT NULL,
+    id_grupo_equipo integer NOT NULL,
+    carnet_usuario character varying(20) NOT NULL,
+    contenido character varying(1024) NOT NULL,
+    fecha_creacion timestamp with time zone DEFAULT now() NOT NULL,
+    estado_eliminado boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.comentarios_equipos OWNER TO postgres;
+
+--
+-- Name: comentarios_equipos_id_comentario_equipo_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.comentarios_equipos ALTER COLUMN id_comentario_equipo ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.comentarios_equipos_id_comentario_equipo_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: contratos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -4720,26 +4750,15 @@ ALTER TABLE ONLY public.audit_logs ALTER COLUMN id SET DEFAULT nextval('public.a
 --
 
 COPY hangfire.aggregatedcounter (id, key, value, expireat) FROM stdin;
-556	stats:succeeded:2026-07-02-15	5	2026-07-03 11:50:05.010268-04
-277	stats:succeeded:2026-06-07	5	2026-07-06 23:40:07.965354-04
-294	stats:succeeded:2026-06-11	1	2026-07-11 19:56:32.601991-04
-189	stats:succeeded:2026-06-05	22	2026-07-05 19:57:25.730095-04
-398	stats:succeeded:2026-06-13	7	2026-07-12 21:40:13.066799-04
-7	stats:succeeded:2026-06-03	9	2026-07-03 19:02:15.151647-04
-572	stats:succeeded:2026-07-02-16	4	2026-07-03 12:30:07.822425-04
-584	stats:succeeded:2026-07-02-17	1	2026-07-03 13:51:31.046399-04
-587	stats:succeeded:2026-07-02-18	4	2026-07-03 14:58:18.197062-04
-503	stats:succeeded:2026-07-01	17	2026-08-01 14:50:12.654047-04
-3	stats:succeeded	222	\N
-546	stats:succeeded:2026-07-02-04	1	2026-07-03 00:16:49.808061-04
-243	stats:succeeded:2026-06-06	11	2026-07-05 23:46:25.802054-04
-594	stats:succeeded:2026-07-02-19	3	2026-07-03 15:20:11.392289-04
-547	stats:succeeded:2026-07-02	24	2026-08-02 15:20:10.392289-04
-551	stats:succeeded:2026-07-02-05	5	2026-07-03 01:40:11.653728-04
-419	stats:succeeded:2026-06-14	29	2026-07-14 14:20:00.385235-04
-557	stats:succeeded:2026-07-02-06	1	2026-07-03 02:54:37.180028-04
-291	stats:succeeded:2026-06-12	38	2026-07-12 19:58:49.950992-04
-24	stats:succeeded:2026-06-04	56	2026-07-04 19:30:05.605239-04
+605	stats:succeeded:2026-07-14	12	2026-08-14 17:20:01.391787-04
+629	stats:succeeded:2026-08-04-11	1	2026-08-05 07:51:27.22131-04
+632	stats:succeeded:2026-08-04-12	2	2026-08-05 08:10:04.506288-04
+636	stats:succeeded:2026-08-04-17	2	2026-08-05 13:10:13.559936-04
+640	stats:succeeded:2026-08-04-18	1	2026-08-05 14:25:04.438258-04
+642	stats:succeeded:2026-08-04-21	2	2026-08-05 17:50:04.55889-04
+627	stats:succeeded:2026-08-04	9	2026-09-04 18:00:18.481712-04
+3	stats:succeeded	243	\N
+649	stats:succeeded:2026-08-04-22	1	2026-08-05 18:00:19.481712-04
 \.
 
 
@@ -4762,9 +4781,9 @@ COPY hangfire.hash (id, key, field, value, expireat, updatecount) FROM stdin;
 4	recurring-job:estado-prestamo	Job	{"Type":"IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","Method":"Execute","ParameterTypes":"[]","Arguments":"[]"}	\N	0
 5	recurring-job:estado-prestamo	CreatedAt	2026-06-01T02:32:59.4235310Z	\N	0
 7	recurring-job:estado-prestamo	V	2	\N	0
-8	recurring-job:estado-prestamo	LastExecution	2026-07-02T19:20:11.3045214Z	\N	0
-6	recurring-job:estado-prestamo	NextExecution	2026-07-02T19:30:00.0000000Z	\N	0
-9	recurring-job:estado-prestamo	LastJobId	221	\N	0
+8	recurring-job:estado-prestamo	LastExecution	2026-08-04T22:00:13.0775076Z	\N	0
+6	recurring-job:estado-prestamo	NextExecution	2026-08-04T22:10:00.0000000Z	\N	0
+9	recurring-job:estado-prestamo	LastJobId	242	\N	0
 \.
 
 
@@ -4773,30 +4792,15 @@ COPY hangfire.hash (id, key, field, value, expireat, updatecount) FROM stdin;
 --
 
 COPY hangfire.job (id, stateid, statename, invocationdata, arguments, createdat, expireat, updatecount) FROM stdin;
-202	606	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 05:38:55.419643-04	2026-07-03 01:39:04.62077-04	0
-212	636	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 16:20:05.10734-04	2026-07-03 12:20:05.237954-04	0
-203	609	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 05:40:11.050632-04	2026-07-03 01:40:11.653728-04	0
-214	642	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 17:51:26.744468-04	2026-07-03 13:51:31.046399-04	0
-204	612	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 06:54:37.089134-04	2026-07-03 02:54:37.180028-04	0
-216	648	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 18:20:13.440868-04	2026-07-03 14:20:13.525004-04	0
-205	615	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 15:11:56.058119-04	2026-07-03 11:11:56.431335-04	0
-218	654	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 18:58:09.100019-04	2026-07-03 14:58:18.197062-04	0
-206	618	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 15:20:12.795867-04	2026-07-03 11:20:12.919476-04	0
-220	660	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 19:10:10.441047-04	2026-07-03 15:10:10.519907-04	0
-207	621	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 15:30:14.876326-04	2026-07-03 11:30:14.997825-04	0
-198	594	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 04:16:43.66472-04	2026-07-03 00:16:49.808061-04	0
-208	624	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 15:40:02.524986-04	2026-07-03 11:40:02.559152-04	0
-199	597	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 05:08:38.958652-04	2026-07-03 01:08:48.664866-04	0
-209	627	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 15:50:04.940201-04	2026-07-03 11:50:05.010268-04	0
-200	600	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 05:10:09.829402-04	2026-07-03 01:10:10.08869-04	0
-201	603	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 05:20:12.506398-04	2026-07-03 01:20:13.060574-04	0
-211	633	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 16:10:02.436412-04	2026-07-03 12:10:08.891821-04	0
-210	630	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 16:00:07.03528-04	2026-07-03 12:00:07.104895-04	0
-213	639	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 16:30:07.688386-04	2026-07-03 12:30:07.822425-04	0
-215	645	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 18:18:58.189398-04	2026-07-03 14:19:01.054274-04	0
-217	651	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 18:43:59.708007-04	2026-07-03 14:44:10.376817-04	0
-219	657	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 19:00:09.469312-04	2026-07-03 15:00:09.657226-04	0
-221	663	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-07-02 19:20:11.322085-04	2026-07-03 15:20:11.392289-04	0
+235	705	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 12:00:02.582595-04	2026-08-05 08:00:02.75234-04	0
+237	711	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 17:04:27.819045-04	2026-08-05 13:04:30.14577-04	0
+241	723	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 21:50:04.434542-04	2026-08-05 17:50:04.55889-04	0
+239	717	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 18:25:04.357098-04	2026-08-05 14:25:04.438258-04	0
+236	708	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 12:10:04.412681-04	2026-08-05 08:10:04.506288-04	0
+238	714	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 17:10:13.480003-04	2026-08-05 13:10:13.559936-04	0
+240	720	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 21:43:33.069779-04	2026-08-05 17:43:34.004639-04	0
+242	726	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 22:00:13.268772-04	2026-08-05 18:00:19.481712-04	0
+234	702	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 11:51:00.750074-04	2026-08-05 07:51:27.22131-04	0
 \.
 
 
@@ -4805,102 +4809,42 @@ COPY hangfire.job (id, stateid, statename, invocationdata, arguments, createdat,
 --
 
 COPY hangfire.jobparameter (id, jobid, name, value, updatecount) FROM stdin;
-873	219	RecurringJobId	"estado-prestamo"	0
-874	219	Time	1783018809	0
-875	219	CurrentCulture	"es-MX"	0
-876	219	CurrentUICulture	"es-MX"	0
-877	220	RecurringJobId	"estado-prestamo"	0
-878	220	Time	1783019410	0
-879	220	CurrentCulture	"es-MX"	0
-880	220	CurrentUICulture	"es-MX"	0
-881	221	RecurringJobId	"estado-prestamo"	0
-882	221	Time	1783020011	0
-883	221	CurrentCulture	"es-MX"	0
-884	221	CurrentUICulture	"es-MX"	0
-789	198	RecurringJobId	"estado-prestamo"	0
-790	198	Time	1782965803	0
-791	198	CurrentCulture	"es-MX"	0
-792	198	CurrentUICulture	"es-MX"	0
-793	199	RecurringJobId	"estado-prestamo"	0
-794	199	Time	1782968918	0
-795	199	CurrentCulture	"es-MX"	0
-796	199	CurrentUICulture	"es-MX"	0
-797	200	RecurringJobId	"estado-prestamo"	0
-798	200	Time	1782969009	0
-799	200	CurrentCulture	"es-MX"	0
-800	200	CurrentUICulture	"es-MX"	0
-801	201	RecurringJobId	"estado-prestamo"	0
-802	201	Time	1782969612	0
-803	201	CurrentCulture	"es-MX"	0
-804	201	CurrentUICulture	"es-MX"	0
-805	202	RecurringJobId	"estado-prestamo"	0
-806	202	Time	1782970735	0
-807	202	CurrentCulture	"es-MX"	0
-808	202	CurrentUICulture	"es-MX"	0
-809	203	RecurringJobId	"estado-prestamo"	0
-810	203	Time	1782970811	0
-811	203	CurrentCulture	"es-MX"	0
-812	203	CurrentUICulture	"es-MX"	0
-813	204	RecurringJobId	"estado-prestamo"	0
-814	204	Time	1782975277	0
-815	204	CurrentCulture	"es-MX"	0
-816	204	CurrentUICulture	"es-MX"	0
-817	205	RecurringJobId	"estado-prestamo"	0
-818	205	Time	1783005116	0
-819	205	CurrentCulture	"es-MX"	0
-820	205	CurrentUICulture	"es-MX"	0
-821	206	RecurringJobId	"estado-prestamo"	0
-822	206	Time	1783005612	0
-823	206	CurrentCulture	"es-MX"	0
-824	206	CurrentUICulture	"es-MX"	0
-825	207	RecurringJobId	"estado-prestamo"	0
-826	207	Time	1783006214	0
-827	207	CurrentCulture	"es-MX"	0
-828	207	CurrentUICulture	"es-MX"	0
-829	208	RecurringJobId	"estado-prestamo"	0
-830	208	Time	1783006802	0
-831	208	CurrentCulture	"es-MX"	0
-832	208	CurrentUICulture	"es-MX"	0
-833	209	RecurringJobId	"estado-prestamo"	0
-834	209	Time	1783007404	0
-835	209	CurrentCulture	"es-MX"	0
-836	209	CurrentUICulture	"es-MX"	0
-837	210	RecurringJobId	"estado-prestamo"	0
-838	210	Time	1783008007	0
-839	210	CurrentCulture	"es-MX"	0
-840	210	CurrentUICulture	"es-MX"	0
-841	211	RecurringJobId	"estado-prestamo"	0
-842	211	Time	1783008602	0
-843	211	CurrentCulture	"es-MX"	0
-844	211	CurrentUICulture	"es-MX"	0
-845	212	RecurringJobId	"estado-prestamo"	0
-846	212	Time	1783009205	0
-847	212	CurrentCulture	"es-MX"	0
-848	212	CurrentUICulture	"es-MX"	0
-849	213	RecurringJobId	"estado-prestamo"	0
-850	213	Time	1783009807	0
-851	213	CurrentCulture	"es-MX"	0
-852	213	CurrentUICulture	"es-MX"	0
-853	214	RecurringJobId	"estado-prestamo"	0
-854	214	Time	1783014686	0
-855	214	CurrentCulture	"es-MX"	0
-856	214	CurrentUICulture	"es-MX"	0
-857	215	RecurringJobId	"estado-prestamo"	0
-858	215	Time	1783016337	0
-859	215	CurrentCulture	"es-MX"	0
-860	215	CurrentUICulture	"es-MX"	0
-861	216	RecurringJobId	"estado-prestamo"	0
-862	216	Time	1783016413	0
-863	216	CurrentCulture	"es-MX"	0
-864	216	CurrentUICulture	"es-MX"	0
-865	217	RecurringJobId	"estado-prestamo"	0
-866	217	Time	1783017837	0
-867	217	CurrentCulture	"es-MX"	0
-868	217	CurrentUICulture	"es-MX"	0
-869	218	RecurringJobId	"estado-prestamo"	0
-870	218	Time	1783018688	0
-871	218	CurrentCulture	"es-MX"	0
-872	218	CurrentUICulture	"es-MX"	0
+933	234	RecurringJobId	"estado-prestamo"	0
+934	234	Time	1785844259	0
+935	234	CurrentCulture	"es-MX"	0
+936	234	CurrentUICulture	"es-MX"	0
+937	235	RecurringJobId	"estado-prestamo"	0
+938	235	Time	1785844802	0
+939	235	CurrentCulture	"es-MX"	0
+940	235	CurrentUICulture	"es-MX"	0
+941	236	RecurringJobId	"estado-prestamo"	0
+942	236	Time	1785845404	0
+943	236	CurrentCulture	"es-MX"	0
+944	236	CurrentUICulture	"es-MX"	0
+945	237	RecurringJobId	"estado-prestamo"	0
+946	237	Time	1785863067	0
+947	237	CurrentCulture	"es-MX"	0
+948	237	CurrentUICulture	"es-MX"	0
+949	238	RecurringJobId	"estado-prestamo"	0
+950	238	Time	1785863413	0
+951	238	CurrentCulture	"es-MX"	0
+952	238	CurrentUICulture	"es-MX"	0
+953	239	RecurringJobId	"estado-prestamo"	0
+954	239	Time	1785867904	0
+955	239	CurrentCulture	"es-MX"	0
+956	239	CurrentUICulture	"es-MX"	0
+957	240	RecurringJobId	"estado-prestamo"	0
+958	240	Time	1785879813	0
+959	240	CurrentCulture	"es-MX"	0
+960	240	CurrentUICulture	"es-MX"	0
+961	241	RecurringJobId	"estado-prestamo"	0
+962	241	Time	1785880204	0
+963	241	CurrentCulture	"es-MX"	0
+964	241	CurrentUICulture	"es-MX"	0
+965	242	RecurringJobId	"estado-prestamo"	0
+966	242	Time	1785880813	0
+967	242	CurrentCulture	"es-MX"	0
+968	242	CurrentUICulture	"es-MX"	0
 \.
 
 
@@ -4942,6 +4886,7 @@ COPY hangfire.schema (version) FROM stdin;
 --
 
 COPY hangfire.server (id, data, lastheartbeat, updatecount) FROM stdin;
+x:31848:4b7b2440-fdd5-4a28-9853-8c5105c3942d	{"Queues": ["default"], "StartedAt": "2026-08-04T21:59:57.5069284Z", "WorkerCount": 20}	2026-08-04 18:06:58.136398-04	0
 \.
 
 
@@ -4950,7 +4895,7 @@ COPY hangfire.server (id, data, lastheartbeat, updatecount) FROM stdin;
 --
 
 COPY hangfire.set (id, key, score, value, expireat, updatecount) FROM stdin;
-1	recurring-jobs	1783020600	estado-prestamo	\N	0
+1	recurring-jobs	1785881400	estado-prestamo	\N	0
 \.
 
 
@@ -4959,78 +4904,33 @@ COPY hangfire.set (id, key, score, value, expireat, updatecount) FROM stdin;
 --
 
 COPY hangfire.state (id, jobid, name, reason, createdat, data, updatecount) FROM stdin;
-594	198	Succeeded	\N	2026-07-02 04:16:49.826916-04	{"Latency": "281", "SucceededAt": "2026-07-02T04:16:49.7852545Z", "PerformanceDuration": "5838"}	0
-597	199	Succeeded	\N	2026-07-02 05:08:48.686724-04	{"Latency": "502", "SucceededAt": "2026-07-02T05:08:48.3828784Z", "PerformanceDuration": "8919"}	0
-598	200	Enqueued	Triggered by recurring job scheduler	2026-07-02 05:10:09.839864-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T05:10:09.8392210Z"}	0
-601	201	Enqueued	Triggered by recurring job scheduler	2026-07-02 05:20:12.521891-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T05:20:12.5214282Z"}	0
-602	201	Processing	\N	2026-07-02 05:20:12.561125-04	{"ServerId": "x:38508:4f69c811-fbe7-4bfe-8173-52ed869a9873", "WorkerId": "d494a03c-112e-4782-b860-8bcbdb2f9c20", "StartedAt": "2026-07-02T05:20:12.5560175Z"}	0
-603	201	Succeeded	\N	2026-07-02 05:20:13.063715-04	{"Latency": "59", "SucceededAt": "2026-07-02T05:20:12.9866742Z", "PerformanceDuration": "420"}	0
-606	202	Succeeded	\N	2026-07-02 05:39:04.630091-04	{"Latency": "482", "SucceededAt": "2026-07-02T05:39:04.5590405Z", "PerformanceDuration": "8654"}	0
-609	203	Succeeded	\N	2026-07-02 05:40:11.658021-04	{"Latency": "80", "SucceededAt": "2026-07-02T05:40:11.5577374Z", "PerformanceDuration": "426"}	0
-612	204	Succeeded	\N	2026-07-02 06:54:37.181724-04	{"Latency": "56", "SucceededAt": "2026-07-02T06:54:37.1701911Z", "PerformanceDuration": "24"}	0
-613	205	Enqueued	Triggered by recurring job scheduler	2026-07-02 15:11:56.085346-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T15:11:56.0850026Z"}	0
-619	207	Enqueued	Triggered by recurring job scheduler	2026-07-02 15:30:14.895845-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T15:30:14.8954557Z"}	0
-622	208	Enqueued	Triggered by recurring job scheduler	2026-07-02 15:40:02.530931-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T15:40:02.5306337Z"}	0
-624	208	Succeeded	\N	2026-07-02 15:40:02.571487-04	{"Latency": "21", "SucceededAt": "2026-07-02T15:40:02.5552502Z", "PerformanceDuration": "8"}	0
-625	209	Enqueued	Triggered by recurring job scheduler	2026-07-02 15:50:04.949341-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T15:50:04.9487524Z"}	0
-629	210	Processing	\N	2026-07-02 16:00:07.067573-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "85c5d056-a2ce-4b7e-bc1d-12bfffac1062", "StartedAt": "2026-07-02T16:00:07.0640379Z"}	0
-631	211	Enqueued	Triggered by recurring job scheduler	2026-07-02 16:10:02.748462-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T16:10:02.6869668Z"}	0
-634	212	Enqueued	Triggered by recurring job scheduler	2026-07-02 16:20:05.180283-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T16:20:05.1795739Z"}	0
-635	212	Processing	\N	2026-07-02 16:20:05.205149-04	{"ServerId": "x:35052:74d12a0b-b856-4c43-ac6b-e8f70e6883f1", "WorkerId": "33880127-1b62-47bc-8c40-895d300cc116", "StartedAt": "2026-07-02T16:20:05.1991647Z"}	0
-636	212	Succeeded	\N	2026-07-02 16:20:05.240621-04	{"Latency": "103", "SucceededAt": "2026-07-02T16:20:05.2297608Z", "PerformanceDuration": "19"}	0
-638	213	Processing	\N	2026-07-02 16:30:07.765745-04	{"ServerId": "x:35052:74d12a0b-b856-4c43-ac6b-e8f70e6883f1", "WorkerId": "270b9d17-94a7-41f9-830d-734a6d6f8f1c", "StartedAt": "2026-07-02T16:30:07.7513938Z"}	0
-641	214	Processing	\N	2026-07-02 17:51:27.259052-04	{"ServerId": "x:27004:a29913a3-b9df-4813-a3cc-35c917b2b8d9", "WorkerId": "48861a7b-c9c7-4e02-b389-2530c818ff37", "StartedAt": "2026-07-02T17:51:27.1725549Z"}	0
-644	215	Processing	\N	2026-07-02 18:18:58.368052-04	{"ServerId": "x:21600:c8627ef7-39fc-4060-8a70-a35b3d2d08e2", "WorkerId": "7e58ad67-c28f-477d-bc9b-010845fadabe", "StartedAt": "2026-07-02T18:18:58.3384225Z"}	0
-647	216	Processing	\N	2026-07-02 18:20:13.475159-04	{"ServerId": "x:21600:c8627ef7-39fc-4060-8a70-a35b3d2d08e2", "WorkerId": "7e58ad67-c28f-477d-bc9b-010845fadabe", "StartedAt": "2026-07-02T18:20:13.4647286Z"}	0
-651	217	Succeeded	\N	2026-07-02 18:44:10.398024-04	{"Latency": "635", "SucceededAt": "2026-07-02T18:44:10.0810176Z", "PerformanceDuration": "9729"}	0
-654	218	Succeeded	\N	2026-07-02 18:58:18.206757-04	{"Latency": "234", "SucceededAt": "2026-07-02T18:58:18.0620283Z", "PerformanceDuration": "8724"}	0
-655	219	Enqueued	Triggered by recurring job scheduler	2026-07-02 19:00:09.537356-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T19:00:09.5367998Z"}	0
-658	220	Enqueued	Triggered by recurring job scheduler	2026-07-02 19:10:10.45722-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T19:10:10.4567880Z"}	0
-659	220	Processing	\N	2026-07-02 19:10:10.480893-04	{"ServerId": "x:39192:3fba42cd-17ce-4213-9e2c-d6447f87ba77", "WorkerId": "dd9645a9-0966-4c77-8da2-b49bfa47c575", "StartedAt": "2026-07-02T19:10:10.4743809Z"}	0
-660	220	Succeeded	\N	2026-07-02 19:10:10.523634-04	{"Latency": "45", "SucceededAt": "2026-07-02T19:10:10.5123260Z", "PerformanceDuration": "25"}	0
-592	198	Enqueued	Triggered by recurring job scheduler	2026-07-02 04:16:43.793863-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T04:16:43.7671104Z"}	0
-595	199	Enqueued	Triggered by recurring job scheduler	2026-07-02 05:08:39.280366-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T05:08:39.2339611Z"}	0
-599	200	Processing	\N	2026-07-02 05:10:09.85913-04	{"ServerId": "x:38508:4f69c811-fbe7-4bfe-8173-52ed869a9873", "WorkerId": "dd15c805-82f2-448d-899b-f4c313ca8ded", "StartedAt": "2026-07-02T05:10:09.8505699Z"}	0
-604	202	Enqueued	Triggered by recurring job scheduler	2026-07-02 05:38:55.714734-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T05:38:55.6560123Z"}	0
-607	203	Enqueued	Triggered by recurring job scheduler	2026-07-02 05:40:11.07685-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T05:40:11.0757463Z"}	0
-610	204	Enqueued	Triggered by recurring job scheduler	2026-07-02 06:54:37.105275-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T06:54:37.1048963Z"}	0
-614	205	Processing	\N	2026-07-02 15:11:56.122739-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "bd2387d1-e04f-4471-8780-3acdf6cffca3", "StartedAt": "2026-07-02T15:11:56.1023650Z"}	0
-615	205	Succeeded	\N	2026-07-02 15:11:56.434962-04	{"Latency": "69", "SucceededAt": "2026-07-02T15:11:56.3557930Z", "PerformanceDuration": "227"}	0
-620	207	Processing	\N	2026-07-02 15:30:14.962652-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "cc37134c-fe44-4bc9-ac8e-3215d2d31615", "StartedAt": "2026-07-02T15:30:14.9513494Z"}	0
-621	207	Succeeded	\N	2026-07-02 15:30:15.002018-04	{"Latency": "96", "SucceededAt": "2026-07-02T15:30:14.9882268Z", "PerformanceDuration": "15"}	0
-623	208	Processing	\N	2026-07-02 15:40:02.544402-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "e753781d-1ce6-4fcc-aa22-4190c3cff2ec", "StartedAt": "2026-07-02T15:40:02.5413675Z"}	0
-626	209	Processing	\N	2026-07-02 15:50:04.967174-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "61082c0f-6921-4b08-bfec-6d102ee66487", "StartedAt": "2026-07-02T15:50:04.9620739Z"}	0
-627	209	Succeeded	\N	2026-07-02 15:50:05.011573-04	{"Latency": "29", "SucceededAt": "2026-07-02T15:50:05.0050529Z", "PerformanceDuration": "34"}	0
-632	211	Processing	\N	2026-07-02 16:10:02.943296-04	{"ServerId": "x:35052:74d12a0b-b856-4c43-ac6b-e8f70e6883f1", "WorkerId": "33880127-1b62-47bc-8c40-895d300cc116", "StartedAt": "2026-07-02T16:10:02.8980979Z"}	0
-637	213	Enqueued	Triggered by recurring job scheduler	2026-07-02 16:30:07.728128-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T16:30:07.7274988Z"}	0
-639	213	Succeeded	\N	2026-07-02 16:30:07.825101-04	{"Latency": "85", "SucceededAt": "2026-07-02T16:30:07.8146835Z", "PerformanceDuration": "41"}	0
-642	214	Succeeded	\N	2026-07-02 17:51:31.050259-04	{"Latency": "539", "SucceededAt": "2026-07-02T17:51:31.0074068Z", "PerformanceDuration": "3722"}	0
-645	215	Succeeded	\N	2026-07-02 18:19:01.059156-04	{"Latency": "189", "SucceededAt": "2026-07-02T18:19:01.0206443Z", "PerformanceDuration": "2641"}	0
-649	217	Enqueued	Triggered by recurring job scheduler	2026-07-02 18:44:00.025281-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T18:43:59.9250827Z"}	0
-652	218	Enqueued	Triggered by recurring job scheduler	2026-07-02 18:58:09.201842-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T18:58:09.1725331Z"}	0
-656	219	Processing	\N	2026-07-02 19:00:09.601886-04	{"ServerId": "x:39192:3fba42cd-17ce-4213-9e2c-d6447f87ba77", "WorkerId": "6c905f06-6041-41a8-8058-7a6550a8e7b3", "StartedAt": "2026-07-02T19:00:09.5827653Z"}	0
-661	221	Enqueued	Triggered by recurring job scheduler	2026-07-02 19:20:11.340118-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T19:20:11.3397957Z"}	0
-593	198	Processing	\N	2026-07-02 04:16:43.931278-04	{"ServerId": "x:20300:38dc0033-3d41-4f4d-bc47-e41f08dcbdae", "WorkerId": "f2139875-7cf1-43e5-915f-af8483d6ff1b", "StartedAt": "2026-07-02T04:16:43.8916585Z"}	0
-596	199	Processing	\N	2026-07-02 05:08:39.441676-04	{"ServerId": "x:38508:4f69c811-fbe7-4bfe-8173-52ed869a9873", "WorkerId": "dd15c805-82f2-448d-899b-f4c313ca8ded", "StartedAt": "2026-07-02T05:08:39.3902125Z"}	0
-600	200	Succeeded	\N	2026-07-02 05:10:10.092688-04	{"Latency": "34", "SucceededAt": "2026-07-02T05:10:10.0024494Z", "PerformanceDuration": "138"}	0
-605	202	Processing	\N	2026-07-02 05:38:55.883883-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "8ecbc6f2-e833-4855-8c35-bf2eb4a06e70", "StartedAt": "2026-07-02T05:38:55.8232034Z"}	0
-608	203	Processing	\N	2026-07-02 05:40:11.121656-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "8ecbc6f2-e833-4855-8c35-bf2eb4a06e70", "StartedAt": "2026-07-02T05:40:11.1144666Z"}	0
-611	204	Processing	\N	2026-07-02 06:54:37.137718-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "8ecbc6f2-e833-4855-8c35-bf2eb4a06e70", "StartedAt": "2026-07-02T06:54:37.1228426Z"}	0
-616	206	Enqueued	Triggered by recurring job scheduler	2026-07-02 15:20:12.843912-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T15:20:12.8435072Z"}	0
-617	206	Processing	\N	2026-07-02 15:20:12.88888-04	{"ServerId": "x:2652:7525cdbe-7f5f-4fb3-9520-732b1615d3df", "WorkerId": "164cf906-3cde-4714-b02f-1632a760c8b3", "StartedAt": "2026-07-02T15:20:12.8856747Z"}	0
-618	206	Succeeded	\N	2026-07-02 15:20:12.943258-04	{"Latency": "99", "SucceededAt": "2026-07-02T15:20:12.9107121Z", "PerformanceDuration": "15"}	0
-628	210	Enqueued	Triggered by recurring job scheduler	2026-07-02 16:00:07.049299-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T16:00:07.0487946Z"}	0
-630	210	Succeeded	\N	2026-07-02 16:00:07.10656-04	{"Latency": "37", "SucceededAt": "2026-07-02T16:00:07.0975773Z", "PerformanceDuration": "24"}	0
-633	211	Succeeded	\N	2026-07-02 16:10:08.898359-04	{"Latency": "526", "SucceededAt": "2026-07-02T16:10:08.7699750Z", "PerformanceDuration": "5805"}	0
-640	214	Enqueued	Triggered by recurring job scheduler	2026-07-02 17:51:27.026166-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T17:51:26.9313665Z"}	0
-643	215	Enqueued	Triggered by recurring job scheduler	2026-07-02 18:18:58.283323-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T18:18:58.2588749Z"}	0
-646	216	Enqueued	Triggered by recurring job scheduler	2026-07-02 18:20:13.452216-04	{"Queue": "default", "EnqueuedAt": "2026-07-02T18:20:13.4520402Z"}	0
-648	216	Succeeded	\N	2026-07-02 18:20:13.526513-04	{"Latency": "38", "SucceededAt": "2026-07-02T18:20:13.5165278Z", "PerformanceDuration": "37"}	0
-650	217	Processing	\N	2026-07-02 18:44:00.317509-04	{"ServerId": "x:36520:da0c8a71-f09a-4245-94bd-c4ffb5a7ce86", "WorkerId": "8022ea5d-f35b-466d-85f9-e258f1eeb05f", "StartedAt": "2026-07-02T18:44:00.2172675Z"}	0
-653	218	Processing	\N	2026-07-02 18:58:09.317927-04	{"ServerId": "x:39192:3fba42cd-17ce-4213-9e2c-d6447f87ba77", "WorkerId": "6c905f06-6041-41a8-8058-7a6550a8e7b3", "StartedAt": "2026-07-02T18:58:09.2704619Z"}	0
-657	219	Succeeded	\N	2026-07-02 19:00:09.660668-04	{"Latency": "142", "SucceededAt": "2026-07-02T19:00:09.6364448Z", "PerformanceDuration": "24"}	0
-662	221	Processing	\N	2026-07-02 19:20:11.364824-04	{"ServerId": "x:39192:3fba42cd-17ce-4213-9e2c-d6447f87ba77", "WorkerId": "8659dc12-a3b4-467c-b0a9-838f32e92c26", "StartedAt": "2026-07-02T19:20:11.3563829Z"}	0
-663	221	Succeeded	\N	2026-07-02 19:20:11.394078-04	{"Latency": "48", "SucceededAt": "2026-07-02T19:20:11.3839703Z", "PerformanceDuration": "13"}	0
+700	234	Enqueued	Triggered by recurring job scheduler	2026-08-04 11:51:01.299837-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T11:51:01.1510649Z"}	0
+703	235	Enqueued	Triggered by recurring job scheduler	2026-08-04 12:00:02.644247-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T12:00:02.6433980Z"}	0
+706	236	Enqueued	Triggered by recurring job scheduler	2026-08-04 12:10:04.457323-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T12:10:04.4569531Z"}	0
+707	236	Processing	\N	2026-08-04 12:10:04.473628-04	{"ServerId": "x:20404:c2bcf028-d0b9-4063-9882-6776a45d5b16", "WorkerId": "288faaad-6abc-4e2e-a33b-d434d1fb7bae", "StartedAt": "2026-08-04T12:10:04.4704221Z"}	0
+710	237	Processing	\N	2026-08-04 17:04:28.070249-04	{"ServerId": "x:34840:4a6d56ae-5f61-4d55-926b-ee0f89ff99bb", "WorkerId": "4efea134-f051-4aab-a636-c1ba8faa1c68", "StartedAt": "2026-08-04T17:04:28.0433164Z"}	0
+713	238	Processing	\N	2026-08-04 17:10:13.518335-04	{"ServerId": "x:34840:4a6d56ae-5f61-4d55-926b-ee0f89ff99bb", "WorkerId": "4efea134-f051-4aab-a636-c1ba8faa1c68", "StartedAt": "2026-08-04T17:10:13.5118269Z"}	0
+716	239	Processing	\N	2026-08-04 18:25:04.395762-04	{"ServerId": "x:34840:4a6d56ae-5f61-4d55-926b-ee0f89ff99bb", "WorkerId": "6333acc8-4d20-4cd1-8f46-5734e3e76352", "StartedAt": "2026-08-04T18:25:04.3850820Z"}	0
+718	240	Enqueued	Triggered by recurring job scheduler	2026-08-04 21:43:33.543241-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T21:43:33.5428626Z"}	0
+723	241	Succeeded	\N	2026-08-04 21:50:04.561359-04	{"Latency": "59", "SucceededAt": "2026-08-04T21:50:04.5383102Z", "PerformanceDuration": "43"}	0
+726	242	Succeeded	\N	2026-08-04 22:00:19.486619-04	{"Latency": "271", "SucceededAt": "2026-08-04T22:00:19.4333127Z", "PerformanceDuration": "5892"}	0
+701	234	Processing	\N	2026-08-04 11:51:01.650211-04	{"ServerId": "x:20404:c2bcf028-d0b9-4063-9882-6776a45d5b16", "WorkerId": "11511e1d-ed6a-4a2e-83ee-e70e07c2a821", "StartedAt": "2026-08-04T11:51:01.5611580Z"}	0
+704	235	Processing	\N	2026-08-04 12:00:02.658193-04	{"ServerId": "x:20404:c2bcf028-d0b9-4063-9882-6776a45d5b16", "WorkerId": "11511e1d-ed6a-4a2e-83ee-e70e07c2a821", "StartedAt": "2026-08-04T12:00:02.6537205Z"}	0
+708	236	Succeeded	\N	2026-08-04 12:10:04.507586-04	{"Latency": "64", "SucceededAt": "2026-08-04T12:10:04.4991874Z", "PerformanceDuration": "21"}	0
+711	237	Succeeded	\N	2026-08-04 17:04:30.163146-04	{"Latency": "259", "SucceededAt": "2026-08-04T17:04:30.1293145Z", "PerformanceDuration": "2050"}	0
+714	238	Succeeded	\N	2026-08-04 17:10:13.561989-04	{"Latency": "43", "SucceededAt": "2026-08-04T17:10:13.5473476Z", "PerformanceDuration": "23"}	0
+717	239	Succeeded	\N	2026-08-04 18:25:04.440114-04	{"Latency": "45", "SucceededAt": "2026-08-04T18:25:04.4215208Z", "PerformanceDuration": "19"}	0
+720	240	Succeeded	\N	2026-08-04 21:43:34.006816-04	{"Latency": "652", "SucceededAt": "2026-08-04T21:43:33.9620806Z", "PerformanceDuration": "240"}	0
+722	241	Processing	\N	2026-08-04 21:50:04.48651-04	{"ServerId": "x:34840:4a6d56ae-5f61-4d55-926b-ee0f89ff99bb", "WorkerId": "0d2a4e7b-bb8e-404f-8b00-246e94309ec1", "StartedAt": "2026-08-04T21:50:04.4774151Z"}	0
+724	242	Enqueued	Triggered by recurring job scheduler	2026-08-04 22:00:13.388682-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T22:00:13.3615353Z"}	0
+702	234	Succeeded	\N	2026-08-04 11:51:27.258776-04	{"Latency": "920", "SucceededAt": "2026-08-04T11:51:27.1382247Z", "PerformanceDuration": "25464"}	0
+705	235	Succeeded	\N	2026-08-04 12:00:02.754262-04	{"Latency": "79", "SucceededAt": "2026-08-04T12:00:02.7416043Z", "PerformanceDuration": "79"}	0
+709	237	Enqueued	Triggered by recurring job scheduler	2026-08-04 17:04:27.945024-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T17:04:27.9281472Z"}	0
+712	238	Enqueued	Triggered by recurring job scheduler	2026-08-04 17:10:13.498288-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T17:10:13.4978354Z"}	0
+715	239	Enqueued	Triggered by recurring job scheduler	2026-08-04 18:25:04.370814-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T18:25:04.3704450Z"}	0
+719	240	Processing	\N	2026-08-04 21:43:33.715755-04	{"ServerId": "x:34840:4a6d56ae-5f61-4d55-926b-ee0f89ff99bb", "WorkerId": "59fa228a-f81e-4115-8c10-7a3465aa2880", "StartedAt": "2026-08-04T21:43:33.7068580Z"}	0
+721	241	Enqueued	Triggered by recurring job scheduler	2026-08-04 21:50:04.457227-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T21:50:04.4566434Z"}	0
+725	242	Processing	\N	2026-08-04 22:00:13.522975-04	{"ServerId": "x:31848:4b7b2440-fdd5-4a28-9853-8c5105c3942d", "WorkerId": "e94845a4-1c3a-4a1e-9ee7-58237bb365eb", "StartedAt": "2026-08-04T22:00:13.4678003Z"}	0
 \.
 
 
@@ -5137,6 +5037,16 @@ COPY public.audit_logs (id, admin_carnet, admin_nombre, accion, entidad, entidad
 73	sistema		AtrasadoAutomatico	PrestamoEntity	258	\N	2026-07-01 04:38:12.134118-04	f
 74	sistema		Rechazar	PrestamoEntity	257	Auto-rechazado por exceder fecha de inicio	2026-07-01 04:38:12.831687-04	f
 75	12890061	Fernando	Devolver	Prestamo	258	{"observacion":null,"equipos":[{"codigo":240000012,"nombre":"L\\u00E1mpara de Aumento (nueva)","estado":"operativo"}]}	2026-07-01 04:44:46.323334-04	f
+76	12890061	Fernando	Crear	Prestamo	259	\N	2026-07-14 18:22:06.844677-04	f
+77	12890061	Fernando	Aprobar	Prestamo	259	\N	2026-07-14 18:23:14.10455-04	f
+78	12890061	Fernando	Recoger	Prestamo	259	\N	2026-07-14 18:23:43.838845-04	f
+79	12890061	Fernando	Devolver	Prestamo	259	{"observacion":"mal","equipos":[{"codigo":240000011,"nombre":"Mini Dron (de 3 h\\u00E9lices)","estado":"parcialmente_operativo"}]}	2026-07-14 18:23:58.775357-04	f
+80	12890061	Fernando	Crear	Prestamo	260	\N	2026-07-14 18:42:48.837861-04	f
+81	12890061	Fernando	Aprobar	Prestamo	260	\N	2026-07-14 18:43:12.876932-04	f
+82	12890061	Fernando	Recoger	Prestamo	260	\N	2026-07-14 18:43:17.086777-04	f
+83	12890061	Fernando	Devolver	Prestamo	260	{"observacion":null,"equipos":[{"codigo":270000001,"nombre":"Cable conector","estado":"operativo"}]}	2026-07-14 18:44:22.634785-04	f
+84	12890061	Fernando	Crear	Prestamo	261	\N	2026-07-14 20:57:54.88284-04	f
+85	sistema		Rechazar	PrestamoEntity	261	Auto-rechazado por exceder fecha de inicio	2026-08-04 11:51:23.706052-04	f
 \.
 
 
@@ -5145,6 +5055,7 @@ COPY public.audit_logs (id, admin_carnet, admin_nombre, accion, entidad, entidad
 --
 
 COPY public.avisos_disponibilidad (id_aviso, carnet_usuario, id_grupo_equipo, fecha, cantidad, notificado, fecha_creacion, estado_eliminado) FROM stdin;
+1	12890061	85	2026-07-14	1	t	2026-07-14 18:44:11.162893-04	f
 \.
 
 
@@ -5224,6 +5135,14 @@ COPY public.categorias (id_categoria, nombre, estado_eliminado) FROM stdin;
 
 
 --
+-- Data for Name: comentarios_equipos; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.comentarios_equipos (id_comentario_equipo, id_grupo_equipo, carnet_usuario, contenido, fecha_creacion, estado_eliminado) FROM stdin;
+\.
+
+
+--
 -- Data for Name: componentes; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -5276,11 +5195,14 @@ COPY public.detalles_mantenimientos (id_detalle_mantenimiento, id_mantenimiento,
 --
 
 COPY public.detalles_prestamos (id_detalle_prestamo, id_equipo, id_prestamo, estado_eliminado, id_grupo_equipo, estado_equipo_retorno) FROM stdin;
+216	214	260	f	85	operativo
+217	\N	261	f	61	\N
 207	\N	251	f	28	\N
 208	131	252	f	28	operativo
 212	\N	256	f	28	\N
 213	132	257	f	29	\N
 214	133	258	f	30	operativo
+215	132	259	f	29	parcialmente_operativo
 \.
 
 
@@ -5344,7 +5266,6 @@ COPY public.equipos (id_equipo, id_grupo_equipo, codigo_imt, descripcion, estado
 129	27	240000008	Estación de soldadura y aire caliente KADA, totalmente funcional y equipada con fuente, cautín, soporte, pistola de aire y 3 boquillas. Ideal para trabajos electrónicos de precisión.	operativo	0000	Mueble Ventana - Part. Superior	0	9999	\N	9	f	2025-07-13	16693
 130	27	240000009	Estación de soldadura y aire caliente KADA, totalmente funcional y equipada con fuente, cautín, soporte, pistola de aire y 3 boquillas. Ideal para trabajos electrónicos de precisión.	operativo	0000	Mueble Ventana - Part. Superior	0	9999	\N	9	f	2025-07-13	16694
 133	30	240000012	Lámpara de aumento Takema, nueva y sin uso. Ideal para trabajos de precisión gracias a su lente ampliadora y luz integrada.	operativo	0000	Mueble Ventana - Part. Superior	0	9999	\N	9	f	2025-07-13	0000
-132	29	240000011	Mini Dron XT FLYER con control remoto, cable de carga y 3 hélices. Ideal para principiantes, con diseño ligero y fácil de operar para vuelos cortos.	operativo	XT001B201603010387	Mueble Ventana - Part. Superior	0	9999	Default	9	f	2025-07-13	0000
 122	27	240000001	Estación de soldadura y aire caliente KADA, totalmente funcional y equipada con fuente, cautín, soporte, pistola de aire y 3 boquillas. Ideal para trabajos electrónicos de precisión.	operativo	0000	Mueble Ventana - Part. Superior	0	9999	\N	9	t	2025-07-13	16685
 123	27	240000002	Estación de soldadura y aire caliente KADA, totalmente funcional y equipada con fuente, cautín, soporte, pistola de aire y 3 boquillas. Ideal para trabajos electrónicos de precisión.	operativo	0000	Mueble Ventana - Part. Superior	0	9	s	9	f	2025-07-13	16686
 124	27	240000003	Estación de soldadura y aire caliente KADA, totalmente funcional y equipada con fuente, cautín, soporte, pistola de aire y 3 boquillas. Ideal para trabajos electrónicos de precisión.	operativo	0000	Mueble Ventana - Part. Superior	0	9999	\N	9	t	2025-07-13	16688
@@ -5354,6 +5275,7 @@ COPY public.equipos (id_equipo, id_grupo_equipo, codigo_imt, descripcion, estado
 95	8	20000010	\N	operativo	62341	Frente al laboratorio	0	9999	Donado	2	t	2025-06-25	5234
 96	8	20000011	\N	operativo	31234	Frente al laboratorio	0	9999	Donado	7	t	2025-06-25	3124
 131	28	240000010	Mini Dron XT FLYER con control remoto, 2 baterías, cable USB, 4 hélices y manual incluidos. Compacto y fácil de manejar, perfecto para vuelos recreativos.	operativo	XT001B201603010372	Mueble Ventana - Part. Superior	3000	99	Default	9	f	2025-07-13	0000
+132	29	240000011	Mini Dron XT FLYER con control remoto, cable de carga y 3 hélices. Ideal para principiantes, con diseño ligero y fácil de operar para vuelos cortos.	parcialmente_operativo	XT001B201603010387	Mueble Ventana - Part. Superior	0	9999	Default	9	f	2025-07-13	0000
 97	10	30000015	\N	operativo	14123	Frente al laboratorio	0	9999	Donado	2	t	2025-06-25	3123
 98	4	10000093	\N	operativo	54132	Frente al laboratorio	0	9999	Donado	1	t	2025-06-25	4213123
 100	16	200000009	\N	operativo	31256	Frente al laboratorio	0	9999	Donado	1	t	2025-06-25	312356
@@ -6063,7 +5985,6 @@ COPY public.grupos_equipos (id_grupo_equipo, nombre, modelo, url_data_sheet, can
 14	Workstation Móvil	 Precision 5550	https://example.com/datasheet/5550.pdf	0	 Dell	21	t	https://hp.widen.net/content/iphnzbqotl/png/iphnzbqotl.png?w=800&h=600&dpi=72&color=ffffff00	Laptop workstation con Xeon y Quadro RTX	0.00
 1	Impresora	   prueba		0	   prueba	1	t	https://mediaserver.goepson.com/ImConvServlet/imconv/0b6b6f6b5bccbd9b2a89b0b1117c730e3bcab3a1/1200Wx1200H?use=banner&hybrisId=B2C&assetDescr=20Lio2_MBL_blk_01	Aqui entra un texto descriptivo del equipo	0.00
 20	Laptop	  Latitud		0	  DEL	22	t	https://intecsa.com.bo/wp-content/uploads/2024/07/DELL-NB-LATITUDE-7420-2.jpg	Laptop Latitud DEL.	0.00
-29	Mini Dron (de 3 hélices)	 Default		1	 Default	24	f	https://i.ebayimg.com/images/g/3TwAAOSwQv5i4wK4/s-l400.jpg	Mini Dron XT FLYER con control remoto, cable de carga y 3 hélices. Ideal para principiantes, con diseño ligero y fácil de operar para vuelos cortos.	0.00
 85	Cable conector	Default	\N	1	Default	27	f	https://duraled.com.mx/wp-content/uploads/2024/02/CONECTOR-TIRA-DE-LED-DURALED-127V-2835-IP44.jpg	Cable conector XP, diseñado para conexiones seguras y eficientes entre dispositivos electrónicos. Ideal para diversas aplicaciones tecnológicas.	0.00
 11	Disco Duro Externo	 WD Elements	https://example.com/datasheet/wd-elements.pdf	0	 Western Digital	1	t	https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQoZVZOZxYTo_V5do0MhUGBfmIRuEIt_Xupg&s	Disco duro portátil de 2TB USB 3.0	0.00
 10	Teclado Mecánico	  K95 RGB	https://example.com/datasheet/k95rgb.pdf	0	  Corsair	3	t	https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZbULX5JQZLIaU8iORvsX7hKSA9sSO9R1fTQ&s	Teclado gaming mecánico con switches Cherry MX	0.00
@@ -6085,6 +6006,7 @@ COPY public.grupos_equipos (id_grupo_equipo, nombre, modelo, url_data_sheet, can
 51	Driver para motor a pasos	Default	\N	6	Default	24	f	https://www.steren.com.mx/media/catalog/product/cache/295a12aacdcb0329a521cbf9876b29e7/image/19452484b/tarjeta-de-control-para-motor-a-pasos.jpg	Driver para motor a pasos, dispositivo que controla la corriente y dirección del motor para movimientos precisos en aplicaciones electrónicas y robóticas.	0.00
 52	Sensor Capacitivo	Default	\N	3	Default	24	f	https://i.ebayimg.com/images/g/sSoAAOSwnGRjq9a9/s-l400.jpg	Sensor capacitivo RHOMBERG.BRASLER con borneras para conexión, ideal para detección sin contacto de objetos sólidos o líquidos en aplicaciones industriales.	0.00
 28	Mini Dron	 Default		1	 Default	24	f	https://i.ebayimg.com/images/g/3TwAAOSwQv5i4wK4/s-l400.jpg	Mini Dron XT FLYER con control remoto, 2 baterías, cable USB, 4 hélices y manual incluidos. Compacto y fácil de manejar, perfecto para vuelos recreativos.	3000.00
+29	Mini Dron (de 3 hélices)	 Default		1	 Default	24	f	https://i.ebayimg.com/images/g/3TwAAOSwQv5i4wK4/s-l400.jpg	Mini Dron XT FLYER con control remoto, cable de carga y 3 hélices. Ideal para principiantes, con diseño ligero y fácil de operar para vuelos cortos.	0.00
 54	Cable MicroLogix	Default	https://es.rs-online.com/web/p/accesorios-para-controladores-y-automatas/7140085	2	Default	24	f	https://assetcloud.roccommerce.net/w458-h458-cpad/_smcelectric/6/7/9/rockwell_automation_1761_cbl_pm02.jpg	Cable MicroLogix Allen Bradley, utilizado para la programación y comunicación entre PLCs MicroLogix y computadoras. Esencial para automatización industrial.	0.00
 55	Cable banana - cocodrilo	Default	\N	4	Default	24	f	https://images.ledbox.es/subproductos/10519-51/grande/10519-51.jpg	Cable banana a cocodrilo, ideal para conexiones rápidas y seguras en pruebas eléctricas y de laboratorio. Versátil y fácil de usar.	0.00
 56	Cable banana - punta	Default	\N	2	Default	24	f	https://cdtechnologia.net/34328-large_default/cable-para-pruebas-punta-banana-a-banana-1-metro.jpg	Cable banana a punta, diseñado para realizar mediciones eléctricas precisas con multímetros y equipos de prueba. Seguro y fácil de manipular.	0.00
@@ -6231,6 +6153,14 @@ COPY public.muebles (id_mueble, nombre, tipo, ubicacion, numero_gaveteros, estad
 --
 
 COPY public.notificaciones (id_notificacion, carnet_usuario, tipo, titulo, contenido, detalle, leido, fecha_envio, estado_eliminado) FROM stdin;
+1	12890061	AdminNuevoPrestamo	Nueva reserva	El usuario 12890061 realizó una reserva.	\N	t	2026-07-14 18:22:07.025465-04	f
+2	12890061	PrestamoAprobado	Préstamo aprobado	Tu solicitud de préstamo fue aprobada.	\N	t	2026-07-14 18:23:14.120118-04	f
+3	12890061	EquipoObservacion	Estado de equipo actualizado	mal	{"observacion":"mal","equipos":[{"codigo":240000011,"nombre":"Mini Dron (de 3 h\\u00E9lices)","estado":"parcialmente_operativo"}]}	t	2026-07-14 18:23:58.782209-04	f
+5	12890061	PrestamoAprobado	Préstamo aprobado	Tu solicitud de préstamo fue aprobada. Ya puedes revisar los detalles de recogida.	\N	t	2026-07-14 18:43:12.899867-04	f
+4	12890061	AdminNuevoPrestamo	Nueva reserva	Fernando Terrazas Llanos realizó una reserva.	\N	t	2026-07-14 18:42:49.155905-04	f
+6	12890061	DisponibilidadLiberada	Disponibilidad liberada	Un equipo que esperabas está disponible para el 14/07/2026.	\N	t	2026-07-14 20:07:13.929327-04	f
+7	12890061	AdminNuevoPrestamo	Nueva reserva	Fernando Terrazas Llanos realizó una reserva.	\N	f	2026-07-14 20:57:55.191836-04	f
+8	12890061	PrestamoRechazado	Préstamo rechazado	Tu solicitud fue rechazada automáticamente por exceder la fecha de inicio.	\N	f	2026-08-04 11:51:26.33811-04	f
 \.
 
 
@@ -6242,8 +6172,11 @@ COPY public.prestamos (id_prestamo, fecha_solicitud, fecha_prestamo, fecha_devol
 251	2026-06-12 22:21:43.346402	2026-06-13 00:00:00	2026-06-14 00:00:00		cancelado	12890061	f	\N	2026-06-13 00:00:00	\N	f
 257	2026-06-14 16:20:23.932819	2026-06-14 00:00:00	2026-06-15 00:00:00		rechazado	12890061	f	\N	2026-06-14 00:00:00	\N	f
 258	2026-06-14 16:38:36.56072	2026-06-14 00:00:00	2026-06-15 00:00:00		finalizado	12890061	f	2026-07-01 04:44:45.618916	2026-06-14 00:00:00	\N	f
+259	2026-07-14 18:22:06.038539	2026-07-14 00:00:00	2026-07-15 00:00:00	mal	finalizado	12890061	f	2026-07-14 18:23:58.257909	2026-07-14 00:00:00	\N	f
+261	2026-07-14 20:57:53.818972	2026-07-16 00:00:00	2026-07-17 00:00:00		rechazado	12890061	f	\N	2026-07-16 00:00:00	\N	f
 252	2026-06-12 22:22:49.480858	2026-06-13 00:00:00	2026-06-14 00:00:00		finalizado	12890061	f	2026-06-12 22:25:54.205555	2026-06-13 00:00:00	\N	f
 256	2026-06-12 23:38:59.526079	2026-06-13 00:00:00	2026-06-14 00:00:00		rechazado	12890061	f	\N	2026-06-13 00:00:00	12	f
+260	2026-07-14 18:42:48.041828	2026-07-14 00:00:00	2026-07-15 00:00:00		finalizado	12890061	f	2026-07-14 18:44:21.958148	2026-07-14 00:00:00	\N	f
 \.
 
 
@@ -6252,7 +6185,7 @@ COPY public.prestamos (id_prestamo, fecha_solicitud, fecha_prestamo, fecha_devol
 --
 
 COPY public.usuarios (carnet, nombre, apellido_paterno, apellido_materno, rol, contrasena, email, telefono, telefono_referencia, nombre_referencia, email_referencia, estado_eliminado, id_carrera, imagen_frente_carnet, imagen_atras_carnet, refresh_token, refresh_token_expiry, bloqueado, motivo_bloqueo) FROM stdin;
-12890061	Fernando	Terrazas	Llanos	administrador	$2a$10$/8JV2T7ZgDGesA4Bd8J1Ne7YprDGYSOIS3vdcXZ9TBf2B4aifVe0G	fernando.terrazas@ucb.edu.bo	799430792	\N	\N	\N	f	2	\N	\N	d07mtHD3Npu0x5MA5V446qFRD0H6D6hw0apMwi3sWmRCBKl+qmENF/jZ8Y3g6oI/k47qtaXvgqrMkf72rGjNwg==	2026-07-09 19:23:07.756327-04	f	\N
+12890061	Fernando	Terrazas	Llanos	administrador	$2a$10$/8JV2T7ZgDGesA4Bd8J1Ne7YprDGYSOIS3vdcXZ9TBf2B4aifVe0G	fernando.terrazas@ucb.edu.bo	799430792	\N	\N	\N	f	2	\N	\N	hcOw3qUOZlS/9SQQDB6HZOWVEnnLNM3Zb/YU3g7qijzfoLzI9yNVYgYWWVsb4qpNIT1B2PiezanAcEEJn8uAYA==	2026-08-11 17:05:49.135075-04	f	\N
 \.
 
 
@@ -6260,14 +6193,14 @@ COPY public.usuarios (carnet, nombre, apellido_paterno, apellido_materno, rol, c
 -- Name: aggregatedcounter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.aggregatedcounter_id_seq', 602, true);
+SELECT pg_catalog.setval('hangfire.aggregatedcounter_id_seq', 649, true);
 
 
 --
 -- Name: counter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.counter_id_seq', 666, true);
+SELECT pg_catalog.setval('hangfire.counter_id_seq', 729, true);
 
 
 --
@@ -6281,21 +6214,21 @@ SELECT pg_catalog.setval('hangfire.hash_id_seq', 9, true);
 -- Name: job_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.job_id_seq', 221, true);
+SELECT pg_catalog.setval('hangfire.job_id_seq', 242, true);
 
 
 --
 -- Name: jobparameter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.jobparameter_id_seq', 884, true);
+SELECT pg_catalog.setval('hangfire.jobparameter_id_seq', 968, true);
 
 
 --
 -- Name: jobqueue_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.jobqueue_id_seq', 221, true);
+SELECT pg_catalog.setval('hangfire.jobqueue_id_seq', 242, true);
 
 
 --
@@ -6309,14 +6242,14 @@ SELECT pg_catalog.setval('hangfire.list_id_seq', 1, false);
 -- Name: set_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.set_id_seq', 222, true);
+SELECT pg_catalog.setval('hangfire.set_id_seq', 243, true);
 
 
 --
 -- Name: state_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.state_id_seq', 663, true);
+SELECT pg_catalog.setval('hangfire.state_id_seq', 726, true);
 
 
 --
@@ -6386,21 +6319,21 @@ SELECT pg_catalog.setval('public."Mueble_Id_Mueble_seq"', 16, true);
 -- Name: Prestamo_Id_Prestamo_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public."Prestamo_Id_Prestamo_seq"', 258, true);
+SELECT pg_catalog.setval('public."Prestamo_Id_Prestamo_seq"', 261, true);
 
 
 --
 -- Name: audit_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.audit_logs_id_seq', 75, true);
+SELECT pg_catalog.setval('public.audit_logs_id_seq', 85, true);
 
 
 --
 -- Name: avisos_disponibilidad_id_aviso_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.avisos_disponibilidad_id_aviso_seq', 1, false);
+SELECT pg_catalog.setval('public.avisos_disponibilidad_id_aviso_seq', 1, true);
 
 
 --
@@ -6415,6 +6348,13 @@ SELECT pg_catalog.setval('public.carrera_id_carrera_seq', 24, true);
 --
 
 SELECT pg_catalog.setval('public.carreras_id_carrera_seq', 48, true);
+
+
+--
+-- Name: comentarios_equipos_id_comentario_equipo_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.comentarios_equipos_id_comentario_equipo_seq', 1, false);
 
 
 --
@@ -6435,7 +6375,7 @@ SELECT pg_catalog.setval('public.detalles_mantenimientos_id_detalle_mantenimient
 -- Name: detalles_prestamos_id_detalle_prestamo_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.detalles_prestamos_id_detalle_prestamo_seq', 214, true);
+SELECT pg_catalog.setval('public.detalles_prestamos_id_detalle_prestamo_seq', 217, true);
 
 
 --
@@ -6449,7 +6389,7 @@ SELECT pg_catalog.setval('public.nombre_de_tu_tabla_id_seq', 12, true);
 -- Name: notificaciones_id_notificacion_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notificaciones_id_notificacion_seq', 1, false);
+SELECT pg_catalog.setval('public.notificaciones_id_notificacion_seq', 8, true);
 
 
 --
@@ -6684,6 +6624,14 @@ ALTER TABLE ONLY public.avisos_disponibilidad
 
 ALTER TABLE ONLY public.carreras
     ADD CONSTRAINT carrera_pkey PRIMARY KEY (id_carrera);
+
+
+--
+-- Name: comentarios_equipos comentarios_equipos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comentarios_equipos
+    ADD CONSTRAINT comentarios_equipos_pkey PRIMARY KEY (id_comentario_equipo);
 
 
 --
@@ -7008,6 +6956,13 @@ CREATE INDEX ix_avisos_disponibilidad_pendiente ON public.avisos_disponibilidad 
 
 
 --
+-- Name: ix_comentarios_equipos_grupo_fecha; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX ix_comentarios_equipos_grupo_fecha ON public.comentarios_equipos USING btree (id_grupo_equipo, fecha_creacion, estado_eliminado);
+
+
+--
 -- Name: ix_detalles_prestamos_id_equipo; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -7206,6 +7161,22 @@ ALTER TABLE ONLY public.avisos_disponibilidad
 
 ALTER TABLE ONLY public.avisos_disponibilidad
     ADD CONSTRAINT avisos_disponibilidad_id_grupo_equipo_fkey FOREIGN KEY (id_grupo_equipo) REFERENCES public.grupos_equipos(id_grupo_equipo);
+
+
+--
+-- Name: comentarios_equipos comentarios_equipos_carnet_usuario_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comentarios_equipos
+    ADD CONSTRAINT comentarios_equipos_carnet_usuario_fkey FOREIGN KEY (carnet_usuario) REFERENCES public.usuarios(carnet);
+
+
+--
+-- Name: comentarios_equipos comentarios_equipos_id_grupo_equipo_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comentarios_equipos
+    ADD CONSTRAINT comentarios_equipos_id_grupo_equipo_fkey FOREIGN KEY (id_grupo_equipo) REFERENCES public.grupos_equipos(id_grupo_equipo);
 
 
 --

@@ -38,14 +38,10 @@ create sequence "Prestamo_Id_Prestamo_seq";
 
 alter sequence "Prestamo_Id_Prestamo_seq" owner to postgres;
 
-create sequence carrera_id_carrera_seq;
-
-alter sequence carrera_id_carrera_seq owner to postgres;
-
-create sequence carreras_id_carrera_seq
+create sequence carrera_id_carrera_seq
     as integer;
 
-alter sequence carreras_id_carrera_seq owner to postgres;
+alter sequence carrera_id_carrera_seq owner to postgres;
 
 create sequence detalles_mantenimientos_id_detalle_mantenimiento_seq
     as integer;
@@ -332,8 +328,6 @@ create table carreras
 alter table carreras
     owner to postgres;
 
-alter sequence carrera_id_carrera_seq owned by carreras.id_carrera;
-
 create index idx_carreras_nombre
     on carreras (nombre, estado_eliminado);
 
@@ -476,25 +470,6 @@ create index idx_usuarios_email
 create index ix_usuarios_refresh_token
     on usuarios (refresh_token);
 
-create table comentarios_equipos
-(
-    id_comentario_equipo integer generated always as identity
-        primary key,
-    id_grupo_equipo      integer                                not null
-        references grupos_equipos,
-    carnet_usuario       varchar(20)                            not null
-        references usuarios,
-    contenido            varchar(1024)                          not null,
-    fecha_creacion       timestamp with time zone default now() not null,
-    estado_eliminado     boolean                  default false not null
-);
-
-alter table comentarios_equipos
-    owner to postgres;
-
-create index ix_comentarios_equipos_grupo_fecha
-    on comentarios_equipos (id_grupo_equipo, fecha_creacion, estado_eliminado);
-
 create table audit_logs
 (
     id               serial
@@ -559,6 +534,25 @@ alter table avisos_disponibilidad
 
 create index ix_avisos_disponibilidad_pendiente
     on avisos_disponibilidad (notificado, estado_eliminado);
+
+create table comentarios_equipos
+(
+    id_comentario_equipo integer generated always as identity
+        primary key,
+    id_grupo_equipo      integer                                not null
+        references grupos_equipos,
+    carnet_usuario       varchar(20)                            not null
+        references usuarios,
+    contenido            varchar(1024)                          not null,
+    fecha_creacion       timestamp with time zone default now() not null,
+    estado_eliminado     boolean                  default false not null
+);
+
+alter table comentarios_equipos
+    owner to postgres;
+
+create index ix_comentarios_equipos_grupo_fecha
+    on comentarios_equipos (id_grupo_equipo, fecha_creacion, estado_eliminado);
 
 create view vw_equipos_necesitan_mantenimiento
             (codigo_imt, grupo_equipo, estado_equipo, ubicacion, ultima_fecha_mantenimiento) as
