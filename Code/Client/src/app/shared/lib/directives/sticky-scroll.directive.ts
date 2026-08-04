@@ -58,6 +58,11 @@ export class StickyScrollDirective implements AfterViewInit, OnDestroy {
       this.syncing = false;
     };
     const update = () => {
+      if (this.shouldUseNativeScroll()) {
+        this.phantom.style.display = 'none';
+        return;
+      }
+
       const rect = host.getBoundingClientRect();
       const needsScroll = host.scrollWidth > host.clientWidth + 2;
       const isVisible =
@@ -91,5 +96,9 @@ export class StickyScrollDirective implements AfterViewInit, OnDestroy {
     this.listeners.forEach((fn) => fn());
     this.phantom?.remove();
     this.style?.remove();
+  }
+
+  private shouldUseNativeScroll(): boolean {
+    return window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
   }
 }
