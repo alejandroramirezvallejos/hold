@@ -42,19 +42,6 @@
         />
       </button>
     }
-  </div>
-  <div class="logo-container">
-    <img
-      (click)="botonhome()"
-      src="assets/logo_universidad.png"
-      alt="Logo UCB"
-      class="logo-image"
-      title="Ir al home"
-      width="58"
-      height="58"
-    />
-  </div>
-  <div class="right-section">
     @if (showCart()) {
       <button
         type="button"
@@ -70,16 +57,34 @@
         <span class="cart-count">{{ totalproductos() }}</span>
       </button>
     }
+  </div>
+  <div class="logo-container">
+    <img
+      (click)="botonhome()"
+      src="assets/logo_universidad.png"
+      alt="Logo UCB"
+      class="logo-image"
+      title="Ir al home"
+      width="58"
+      height="58"
+    />
+  </div>
+  <div class="right-section">
     @if (showProfile()) {
       <div class="notif">
         <button
           type="button"
           class="icon-button notif__button"
+          [class.notif__button--active]="showNotifications()"
           aria-label="Notificaciones"
           aria-haspopup="true"
+          [attr.aria-expanded]="showNotifications()"
           (click)="toggleNotifications()"
         >
-          <i class="fa-regular fa-bell notif__icon"></i>
+          <span class="notif__icon-stack" aria-hidden="true">
+            <i class="fa-regular fa-bell notif__icon notif__icon--outline"></i>
+            <i class="fa-solid fa-bell notif__icon notif__icon--filled"></i>
+          </span>
           @if (notifStore.noLeidas() > 0) {
             <span class="notif__badge">{{ notifStore.noLeidas() }}</span>
           }
@@ -88,15 +93,25 @@
           <div class="notif__dropdown" role="menu">
             <div class="notif__header">
               <span>Notificaciones</span>
-              @if (noLeidasVisibles() > 0) {
+              <div class="notif__header-actions">
+                @if (noLeidasVisibles() > 0) {
+                  <button
+                    type="button"
+                    class="notif__mark-all"
+                    (click)="marcarTodasLeidas()"
+                  >
+                    Marcar todas
+                  </button>
+                }
                 <button
                   type="button"
-                  class="notif__mark-all"
-                  (click)="marcarTodasLeidas()"
+                  class="notif__close"
+                  aria-label="Cerrar notificaciones"
+                  (click)="cerrarNotificaciones($event)"
                 >
-                  Marcar todas
+                  <img src="assets/x.png" alt="" />
                 </button>
-              }
+              </div>
             </div>
             @if (esAdministrador()) {
               <div class="notif__tabs" role="tablist">

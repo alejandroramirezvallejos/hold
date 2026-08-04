@@ -135,6 +135,12 @@ export class NavbarComponent {
     if (next) this.notifStore.refrescar();
   }
 
+  cerrarNotificaciones(event: MouseEvent) {
+    event.stopPropagation();
+    this.showNotifications.set(false);
+    this.expandedNotificationId.set(null);
+  }
+
   abrirNotificacion(notificacion: Notificacion) {
     if (!notificacion.Leido) {
       this.notifStore.marcarLeida(notificacion.Id);
