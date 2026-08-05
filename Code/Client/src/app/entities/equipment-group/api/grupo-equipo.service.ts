@@ -141,9 +141,7 @@ export class GrupoequipoService {
       )
       .pipe(
         map((data) =>
-          extractApiValue(data, []).map((item) =>
-            this.mapearComentario(item),
-          ),
+          extractApiValue(data, []).map((item) => this.mapearComentario(item)),
         ),
       );
   }

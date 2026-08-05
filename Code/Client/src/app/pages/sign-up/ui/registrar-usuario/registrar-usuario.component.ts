@@ -115,10 +115,7 @@ export class RegistrarUsuarioComponent {
           const mensajePorDefecto = registroCompletado
             ? 'Tu cuenta fue creada, pero no se pudo iniciar sesión automáticamente. Intenta iniciar sesión manualmente.'
             : 'Error al registrar el usuario intente mas tarde';
-          const errorMsg = extractErrorMessage(
-            err,
-            mensajePorDefecto,
-          );
+          const errorMsg = extractErrorMessage(err, mensajePorDefecto);
           this.mensajeerror = errorMsg;
           this.error.set(true);
           this.registrando = false;
