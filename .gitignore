@@ -7,14 +7,14 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 *.lnk
-Code/.sonarqube
-Code/coveragereport
-Code/Server/.sonarqube
-Code/Tests/coveragereport
-Code/Tests/TestResults/
-Code/QualityReports/*
-!Code/QualityReports/
-!Code/QualityReports/generate-quality-report.js
+code/.sonarqube
+code/coveragereport
+code/server/.sonarqube
+code/tests/coveragereport
+code/tests/TestResults/
+code/tools/quality-reports/*
+!code/tools/quality-reports/
+!code/tools/quality-reports/generate-quality-report.js
 .vs/
 .vscode/
 .agents
@@ -93,8 +93,11 @@ testem.log
 logs/
 /libpeerconnection.log
 
-!DataBase/backup.backup
-!DataBase/server.sql
+code/database/*.backup
+code/database/*.dump
+code/database/backups/
+!code/database/init.sql
+!code/database/schema.sql
 
 *.log
 *.tlog
@@ -122,4 +125,4 @@ secrets/
 **/https/*.pem
 **/https/*.key
 
-Code/Server/publish/
+code/server/publish/

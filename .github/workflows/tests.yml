@@ -31,14 +31,14 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-          cache-dependency-path: Code/Client/package-lock.json
+          cache-dependency-path: code/client/package-lock.json
 
       - name: Restore frontend
-        working-directory: Code/Client
+        working-directory: code/client
         run: npm ci
 
       - name: Restore backend
-        run: dotnet restore Code/IMT_Reservas.sln
+        run: dotnet restore code/IMT_Reservas.sln
 
       - name: Install coverage report tool
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -57,49 +57,49 @@ jobs:
             $ORGANIZATION_ARG \
             /d:sonar.host.url="$SONAR_HOST_URL" \
             /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.cs.opencover.reportsPaths="Code/Tests/TestResults/**/coverage.opencover.xml" \
-            /d:sonar.javascript.lcov.reportPaths="Code/Client/coverage/lcov.info" \
-            /d:sonar.coverage.exclusions="Code/Tests/**"
+            /d:sonar.cs.opencover.reportsPaths="code/tests/TestResults/**/coverage.opencover.xml" \
+            /d:sonar.javascript.lcov.reportPaths="code/client/coverage/lcov.info" \
+            /d:sonar.coverage.exclusions="code/tests/**"
 
       - name: Build backend
-        run: dotnet build Code/IMT_Reservas.sln --no-restore --configuration $BUILD_CONFIGURATION
+        run: dotnet build code/IMT_Reservas.sln --no-restore --configuration $BUILD_CONFIGURATION
 
       - name: Test backend with coverage
         run: |
-          dotnet test Code/Tests/IMT_Reservas.Tests.csproj \
+          dotnet test code/tests/IMT_Reservas.Tests.csproj \
             --no-build \
             --configuration $BUILD_CONFIGURATION \
-            --settings Code/Tests/coverage.runsettings \
+            --settings code/tests/coverage.runsettings \
             --collect:"XPlat Code Coverage" \
-            --results-directory Code/Tests/TestResults \
+            --results-directory code/tests/TestResults \
             --logger "console;verbosity=normal"
 
       - name: Generate backend HTML coverage
         if: always()
         run: |
           reportgenerator \
-            -reports:"Code/Tests/TestResults/**/coverage.cobertura.xml" \
-            -targetdir:"Code/Tests/coveragereport" \
+            -reports:"code/tests/TestResults/**/coverage.cobertura.xml" \
+            -targetdir:"code/tests/coveragereport" \
             -reporttypes:"Html;TextSummary"
 
       - name: Check frontend format
-        working-directory: Code/Client
+        working-directory: code/client
         run: npm run format:check
 
       - name: Typecheck frontend app
-        working-directory: Code/Client
+        working-directory: code/client
         run: npx tsc -p tsconfig.app.json --noEmit
 
       - name: Typecheck frontend tests
-        working-directory: Code/Client
+        working-directory: code/client
         run: npx tsc -p tsconfig.spec.json --noEmit
 
       - name: Test frontend with coverage
-        working-directory: Code/Client
+        working-directory: code/client
         run: npm run test:coverage
 
       - name: Build frontend
-        working-directory: Code/Client
+        working-directory: code/client
         run: npm run build
 
       - name: Finish SonarQube analysis
@@ -109,37 +109,37 @@ jobs:
       - name: Fetch SonarQube measures
         if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != ''
         run: |
-          mkdir -p Code/QualityReports
+          mkdir -p code/tools/quality-reports
           curl --fail --silent --show-error --user "$SONAR_TOKEN:" \
             "$SONAR_HOST_URL/api/measures/component?component=$SONAR_PROJECT_KEY&metricKeys=alert_status,bugs,vulnerabilities,security_hotspots,code_smells,coverage,duplicated_lines_density" \
-            --output Code/QualityReports/sonar-measures.json
+            --output code/tools/quality-reports/sonar-measures.json
 
       - name: Generate visual quality report
         if: always()
         run: |
-          node Code/QualityReports/generate-quality-report.js
-          mkdir -p Code/QualityReports/html/frontend-coverage
-          mkdir -p Code/QualityReports/html/backend-coverage
-          cp -r Code/Client/coverage/. Code/QualityReports/html/frontend-coverage/ || true
-          cp -r Code/Tests/coveragereport/. Code/QualityReports/html/backend-coverage/ || true
+          node code/tools/quality-reports/generate-quality-report.js
+          mkdir -p code/tools/quality-reports/html/frontend-coverage
+          mkdir -p code/tools/quality-reports/html/backend-coverage
+          cp -r code/client/coverage/. code/tools/quality-reports/html/frontend-coverage/ || true
+          cp -r code/tests/coveragereport/. code/tools/quality-reports/html/backend-coverage/ || true
 
       - name: Upload visual quality report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: visual-quality-report
-          path: Code/QualityReports/html/
+          path: code/tools/quality-reports/html/
 
       - name: Upload backend coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-html
-          path: Code/Tests/coveragereport/
+          path: code/tests/coveragereport/
 
       - name: Upload frontend coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage
-          path: Code/Client/coverage/
+          path: code/client/coverage/

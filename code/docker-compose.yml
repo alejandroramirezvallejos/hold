@@ -12,7 +12,7 @@ services:
       retries: 5
     volumes:
       - ucb_db_data:/var/lib/postgresql/data
-      - ./DataBase/server.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
 
   ucb_redis:
     container_name: ucb_redis
@@ -45,7 +45,7 @@ services:
 
   ucb_server:
     container_name: ucb_server
-    build: ./Server
+    build: ./server
     restart: on-failure
     init: true
     security_opt:
@@ -70,7 +70,7 @@ services:
 
   ucb_client:
     container_name: ucb_client
-    build: ./Client
+    build: ./client
     restart: on-failure
     init: true
     security_opt:
