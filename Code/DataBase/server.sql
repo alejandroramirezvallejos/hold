@@ -4441,7 +4441,10 @@ CREATE TABLE public.comentarios_equipos (
     carnet_usuario character varying(20) NOT NULL,
     contenido character varying(1024) NOT NULL,
     fecha_creacion timestamp with time zone DEFAULT now() NOT NULL,
-    estado_eliminado boolean DEFAULT false NOT NULL
+    estado_eliminado boolean DEFAULT false NOT NULL,
+    id_comentario_padre integer,
+    likes integer DEFAULT 0 NOT NULL,
+    liked_by text DEFAULT ''::text NOT NULL
 );
 
 
@@ -4756,9 +4759,9 @@ COPY hangfire.aggregatedcounter (id, key, value, expireat) FROM stdin;
 636	stats:succeeded:2026-08-04-17	2	2026-08-05 13:10:13.559936-04
 640	stats:succeeded:2026-08-04-18	1	2026-08-05 14:25:04.438258-04
 642	stats:succeeded:2026-08-04-21	2	2026-08-05 17:50:04.55889-04
-627	stats:succeeded:2026-08-04	9	2026-09-04 18:00:18.481712-04
-3	stats:succeeded	243	\N
-649	stats:succeeded:2026-08-04-22	1	2026-08-05 18:00:19.481712-04
+627	stats:succeeded:2026-08-04	12	2026-09-04 18:30:11.068049-04
+649	stats:succeeded:2026-08-04-22	4	2026-08-05 18:30:12.068049-04
+3	stats:succeeded	246	\N
 \.
 
 
@@ -4781,9 +4784,9 @@ COPY hangfire.hash (id, key, field, value, expireat, updatecount) FROM stdin;
 4	recurring-job:estado-prestamo	Job	{"Type":"IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","Method":"Execute","ParameterTypes":"[]","Arguments":"[]"}	\N	0
 5	recurring-job:estado-prestamo	CreatedAt	2026-06-01T02:32:59.4235310Z	\N	0
 7	recurring-job:estado-prestamo	V	2	\N	0
-8	recurring-job:estado-prestamo	LastExecution	2026-08-04T22:00:13.0775076Z	\N	0
-6	recurring-job:estado-prestamo	NextExecution	2026-08-04T22:10:00.0000000Z	\N	0
-9	recurring-job:estado-prestamo	LastJobId	242	\N	0
+8	recurring-job:estado-prestamo	LastExecution	2026-08-04T22:30:11.9523513Z	\N	0
+6	recurring-job:estado-prestamo	NextExecution	2026-08-04T22:40:00.0000000Z	\N	0
+9	recurring-job:estado-prestamo	LastJobId	245	\N	0
 \.
 
 
@@ -4793,14 +4796,17 @@ COPY hangfire.hash (id, key, field, value, expireat, updatecount) FROM stdin;
 
 COPY hangfire.job (id, stateid, statename, invocationdata, arguments, createdat, expireat, updatecount) FROM stdin;
 235	705	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 12:00:02.582595-04	2026-08-05 08:00:02.75234-04	0
+245	735	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 22:30:11.968447-04	2026-08-05 18:30:12.068049-04	0
 237	711	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 17:04:27.819045-04	2026-08-05 13:04:30.14577-04	0
 241	723	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 21:50:04.434542-04	2026-08-05 17:50:04.55889-04	0
 239	717	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 18:25:04.357098-04	2026-08-05 14:25:04.438258-04	0
+243	729	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 22:10:00.048956-04	2026-08-05 18:10:00.395488-04	0
 236	708	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 12:10:04.412681-04	2026-08-05 08:10:04.506288-04	0
 238	714	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 17:10:13.480003-04	2026-08-05 13:10:13.559936-04	0
 240	720	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 21:43:33.069779-04	2026-08-05 17:43:34.004639-04	0
 242	726	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 22:00:13.268772-04	2026-08-05 18:00:19.481712-04	0
 234	702	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 11:51:00.750074-04	2026-08-05 07:51:27.22131-04	0
+244	732	Succeeded	{"Type": "IMT_Reservas.Server.Infrastructure.Jobs.EstadoPrestamoJob, IMT_Reservas.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", "Method": "Execute", "Arguments": "[]", "ParameterTypes": "[]"}	[]	2026-08-04 22:20:10.064661-04	2026-08-05 18:20:10.511034-04	0
 \.
 
 
@@ -4845,6 +4851,18 @@ COPY hangfire.jobparameter (id, jobid, name, value, updatecount) FROM stdin;
 966	242	Time	1785880813	0
 967	242	CurrentCulture	"es-MX"	0
 968	242	CurrentUICulture	"es-MX"	0
+969	243	RecurringJobId	"estado-prestamo"	0
+970	243	Time	1785881400	0
+971	243	CurrentCulture	"es-MX"	0
+972	243	CurrentUICulture	"es-MX"	0
+973	244	RecurringJobId	"estado-prestamo"	0
+974	244	Time	1785882009	0
+975	244	CurrentCulture	"es-MX"	0
+976	244	CurrentUICulture	"es-MX"	0
+977	245	RecurringJobId	"estado-prestamo"	0
+978	245	Time	1785882611	0
+979	245	CurrentCulture	"es-MX"	0
+980	245	CurrentUICulture	"es-MX"	0
 \.
 
 
@@ -4886,7 +4904,6 @@ COPY hangfire.schema (version) FROM stdin;
 --
 
 COPY hangfire.server (id, data, lastheartbeat, updatecount) FROM stdin;
-x:31848:4b7b2440-fdd5-4a28-9853-8c5105c3942d	{"Queues": ["default"], "StartedAt": "2026-08-04T21:59:57.5069284Z", "WorkerCount": 20}	2026-08-04 18:06:58.136398-04	0
 \.
 
 
@@ -4895,7 +4912,7 @@ x:31848:4b7b2440-fdd5-4a28-9853-8c5105c3942d	{"Queues": ["default"], "StartedAt"
 --
 
 COPY hangfire.set (id, key, score, value, expireat, updatecount) FROM stdin;
-1	recurring-jobs	1785881400	estado-prestamo	\N	0
+1	recurring-jobs	1785883200	estado-prestamo	\N	0
 \.
 
 
@@ -4914,6 +4931,8 @@ COPY hangfire.state (id, jobid, name, reason, createdat, data, updatecount) FROM
 718	240	Enqueued	Triggered by recurring job scheduler	2026-08-04 21:43:33.543241-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T21:43:33.5428626Z"}	0
 723	241	Succeeded	\N	2026-08-04 21:50:04.561359-04	{"Latency": "59", "SucceededAt": "2026-08-04T21:50:04.5383102Z", "PerformanceDuration": "43"}	0
 726	242	Succeeded	\N	2026-08-04 22:00:19.486619-04	{"Latency": "271", "SucceededAt": "2026-08-04T22:00:19.4333127Z", "PerformanceDuration": "5892"}	0
+730	244	Enqueued	Triggered by recurring job scheduler	2026-08-04 22:20:10.163447-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T22:20:10.1393779Z"}	0
+733	245	Enqueued	Triggered by recurring job scheduler	2026-08-04 22:30:12.007942-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T22:30:12.0072357Z"}	0
 701	234	Processing	\N	2026-08-04 11:51:01.650211-04	{"ServerId": "x:20404:c2bcf028-d0b9-4063-9882-6776a45d5b16", "WorkerId": "11511e1d-ed6a-4a2e-83ee-e70e07c2a821", "StartedAt": "2026-08-04T11:51:01.5611580Z"}	0
 704	235	Processing	\N	2026-08-04 12:00:02.658193-04	{"ServerId": "x:20404:c2bcf028-d0b9-4063-9882-6776a45d5b16", "WorkerId": "11511e1d-ed6a-4a2e-83ee-e70e07c2a821", "StartedAt": "2026-08-04T12:00:02.6537205Z"}	0
 708	236	Succeeded	\N	2026-08-04 12:10:04.507586-04	{"Latency": "64", "SucceededAt": "2026-08-04T12:10:04.4991874Z", "PerformanceDuration": "21"}	0
@@ -4923,6 +4942,10 @@ COPY hangfire.state (id, jobid, name, reason, createdat, data, updatecount) FROM
 720	240	Succeeded	\N	2026-08-04 21:43:34.006816-04	{"Latency": "652", "SucceededAt": "2026-08-04T21:43:33.9620806Z", "PerformanceDuration": "240"}	0
 722	241	Processing	\N	2026-08-04 21:50:04.48651-04	{"ServerId": "x:34840:4a6d56ae-5f61-4d55-926b-ee0f89ff99bb", "WorkerId": "0d2a4e7b-bb8e-404f-8b00-246e94309ec1", "StartedAt": "2026-08-04T21:50:04.4774151Z"}	0
 724	242	Enqueued	Triggered by recurring job scheduler	2026-08-04 22:00:13.388682-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T22:00:13.3615353Z"}	0
+727	243	Enqueued	Triggered by recurring job scheduler	2026-08-04 22:10:00.090237-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T22:10:00.0897558Z"}	0
+729	243	Succeeded	\N	2026-08-04 22:10:00.422689-04	{"Latency": "99", "SucceededAt": "2026-08-04T22:10:00.3876687Z", "PerformanceDuration": "239"}	0
+731	244	Processing	\N	2026-08-04 22:20:10.243465-04	{"ServerId": "x:41544:ae8f472b-ecd6-44a8-b44e-3a769b993ce9", "WorkerId": "65a83830-9892-4f62-a1d5-c987793dfb70", "StartedAt": "2026-08-04T22:20:10.2095065Z"}	0
+734	245	Processing	\N	2026-08-04 22:30:12.028468-04	{"ServerId": "x:41544:ae8f472b-ecd6-44a8-b44e-3a769b993ce9", "WorkerId": "d92dc056-fa96-44e0-9627-c0f29d9baf3a", "StartedAt": "2026-08-04T22:30:12.0204584Z"}	0
 702	234	Succeeded	\N	2026-08-04 11:51:27.258776-04	{"Latency": "920", "SucceededAt": "2026-08-04T11:51:27.1382247Z", "PerformanceDuration": "25464"}	0
 705	235	Succeeded	\N	2026-08-04 12:00:02.754262-04	{"Latency": "79", "SucceededAt": "2026-08-04T12:00:02.7416043Z", "PerformanceDuration": "79"}	0
 709	237	Enqueued	Triggered by recurring job scheduler	2026-08-04 17:04:27.945024-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T17:04:27.9281472Z"}	0
@@ -4931,6 +4954,9 @@ COPY hangfire.state (id, jobid, name, reason, createdat, data, updatecount) FROM
 719	240	Processing	\N	2026-08-04 21:43:33.715755-04	{"ServerId": "x:34840:4a6d56ae-5f61-4d55-926b-ee0f89ff99bb", "WorkerId": "59fa228a-f81e-4115-8c10-7a3465aa2880", "StartedAt": "2026-08-04T21:43:33.7068580Z"}	0
 721	241	Enqueued	Triggered by recurring job scheduler	2026-08-04 21:50:04.457227-04	{"Queue": "default", "EnqueuedAt": "2026-08-04T21:50:04.4566434Z"}	0
 725	242	Processing	\N	2026-08-04 22:00:13.522975-04	{"ServerId": "x:31848:4b7b2440-fdd5-4a28-9853-8c5105c3942d", "WorkerId": "e94845a4-1c3a-4a1e-9ee7-58237bb365eb", "StartedAt": "2026-08-04T22:00:13.4678003Z"}	0
+728	243	Processing	\N	2026-08-04 22:10:00.138743-04	{"ServerId": "x:31848:4b7b2440-fdd5-4a28-9853-8c5105c3942d", "WorkerId": "e94845a4-1c3a-4a1e-9ee7-58237bb365eb", "StartedAt": "2026-08-04T22:10:00.1211132Z"}	0
+732	244	Succeeded	\N	2026-08-04 22:20:10.516582-04	{"Latency": "187", "SucceededAt": "2026-08-04T22:20:10.4111801Z", "PerformanceDuration": "158"}	0
+735	245	Succeeded	\N	2026-08-04 22:30:12.069622-04	{"Latency": "66", "SucceededAt": "2026-08-04T22:30:12.0563216Z", "PerformanceDuration": "21"}	0
 \.
 
 
@@ -5047,6 +5073,8 @@ COPY public.audit_logs (id, admin_carnet, admin_nombre, accion, entidad, entidad
 83	12890061	Fernando	Devolver	Prestamo	260	{"observacion":null,"equipos":[{"codigo":270000001,"nombre":"Cable conector","estado":"operativo"}]}	2026-07-14 18:44:22.634785-04	f
 84	12890061	Fernando	Crear	Prestamo	261	\N	2026-07-14 20:57:54.88284-04	f
 85	sistema		Rechazar	PrestamoEntity	261	Auto-rechazado por exceder fecha de inicio	2026-08-04 11:51:23.706052-04	f
+86	sistema		Crear	Usuario	8983511	\N	2026-08-04 22:19:05.222515-04	f
+87	sistema		Crear	Usuario	5555555	\N	2026-08-04 22:35:15.407648-04	f
 \.
 
 
@@ -5138,7 +5166,8 @@ COPY public.categorias (id_categoria, nombre, estado_eliminado) FROM stdin;
 -- Data for Name: comentarios_equipos; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.comentarios_equipos (id_comentario_equipo, id_grupo_equipo, carnet_usuario, contenido, fecha_creacion, estado_eliminado) FROM stdin;
+COPY public.comentarios_equipos (id_comentario_equipo, id_grupo_equipo, carnet_usuario, contenido, fecha_creacion, estado_eliminado, id_comentario_padre, likes, liked_by) FROM stdin;
+1	85	12890061	Muy bien equipo	2026-08-04 22:17:04.31093-04	f	\N	0	
 \.
 
 
@@ -6185,7 +6214,9 @@ COPY public.prestamos (id_prestamo, fecha_solicitud, fecha_prestamo, fecha_devol
 --
 
 COPY public.usuarios (carnet, nombre, apellido_paterno, apellido_materno, rol, contrasena, email, telefono, telefono_referencia, nombre_referencia, email_referencia, estado_eliminado, id_carrera, imagen_frente_carnet, imagen_atras_carnet, refresh_token, refresh_token_expiry, bloqueado, motivo_bloqueo) FROM stdin;
-12890061	Fernando	Terrazas	Llanos	administrador	$2a$10$/8JV2T7ZgDGesA4Bd8J1Ne7YprDGYSOIS3vdcXZ9TBf2B4aifVe0G	fernando.terrazas@ucb.edu.bo	799430792	\N	\N	\N	f	2	\N	\N	hcOw3qUOZlS/9SQQDB6HZOWVEnnLNM3Zb/YU3g7qijzfoLzI9yNVYgYWWVsb4qpNIT1B2PiezanAcEEJn8uAYA==	2026-08-11 17:05:49.135075-04	f	\N
+8983511	Alejandro	Ramirez 	Vallejos	estudiante	$2a$12$ai36d.Oc6CvZFGOy8BEiFO9ijDpbNKyTk1Jf2iqVCmcMWWOVc1qDm	alejandro.ramirez.v@ucb.edu.bo	70000000	\N	\N	\N	f	2	\N	\N	iojV4So/igq/1+fGPhlZfl9bF4TSUq15fh84911dPrRor17CLcGF/NrewrtpzhK3PoAsqutOKtzCAUDJiBxEeQ==	2026-08-11 22:19:41.450632-04	f	\N
+5555555	Josue	Balbontin	Ugarteche	estudiante	$2a$12$jixVVETcEHVYF1uXYJLJKeqFolVm/s9bKdIO2UvKNZLPAdwiCPqDS	josue.balbontin@ucb.edu.bo	80000000	\N	\N	\N	f	2	\N	\N	oOh9bJ263G2fJrint+vqigWQo3cbGXQRKxIiLBgD0xwzkkTaw8RnJr2W+1n3GGwVjuR+mPAJSaw5mr9KFsYYYg==	2026-08-11 22:35:16.849131-04	f	\N
+12890061	Fernando	Terrazas	Llanos	administrador	$2a$10$/8JV2T7ZgDGesA4Bd8J1Ne7YprDGYSOIS3vdcXZ9TBf2B4aifVe0G	fernando.terrazas@ucb.edu.bo	799430792	\N	\N	\N	f	2	\N	\N	IGS5iXoK+XxINPKy/eSRd5rRzZkeCvz8f0inKKbPZl796wrv6Gqj82JWJlES344VGzYDObIBbIn4sqiR/rIyFA==	2026-08-11 22:16:29.869-04	f	\N
 \.
 
 
@@ -6193,14 +6224,14 @@ COPY public.usuarios (carnet, nombre, apellido_paterno, apellido_materno, rol, c
 -- Name: aggregatedcounter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.aggregatedcounter_id_seq', 649, true);
+SELECT pg_catalog.setval('hangfire.aggregatedcounter_id_seq', 658, true);
 
 
 --
 -- Name: counter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.counter_id_seq', 729, true);
+SELECT pg_catalog.setval('hangfire.counter_id_seq', 738, true);
 
 
 --
@@ -6214,21 +6245,21 @@ SELECT pg_catalog.setval('hangfire.hash_id_seq', 9, true);
 -- Name: job_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.job_id_seq', 242, true);
+SELECT pg_catalog.setval('hangfire.job_id_seq', 245, true);
 
 
 --
 -- Name: jobparameter_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.jobparameter_id_seq', 968, true);
+SELECT pg_catalog.setval('hangfire.jobparameter_id_seq', 980, true);
 
 
 --
 -- Name: jobqueue_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.jobqueue_id_seq', 242, true);
+SELECT pg_catalog.setval('hangfire.jobqueue_id_seq', 245, true);
 
 
 --
@@ -6242,14 +6273,14 @@ SELECT pg_catalog.setval('hangfire.list_id_seq', 1, false);
 -- Name: set_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.set_id_seq', 243, true);
+SELECT pg_catalog.setval('hangfire.set_id_seq', 246, true);
 
 
 --
 -- Name: state_id_seq; Type: SEQUENCE SET; Schema: hangfire; Owner: postgres
 --
 
-SELECT pg_catalog.setval('hangfire.state_id_seq', 726, true);
+SELECT pg_catalog.setval('hangfire.state_id_seq', 735, true);
 
 
 --
@@ -6326,7 +6357,7 @@ SELECT pg_catalog.setval('public."Prestamo_Id_Prestamo_seq"', 261, true);
 -- Name: audit_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.audit_logs_id_seq', 85, true);
+SELECT pg_catalog.setval('public.audit_logs_id_seq', 87, true);
 
 
 --
@@ -6354,7 +6385,7 @@ SELECT pg_catalog.setval('public.carreras_id_carrera_seq', 48, true);
 -- Name: comentarios_equipos_id_comentario_equipo_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.comentarios_equipos_id_comentario_equipo_seq', 1, false);
+SELECT pg_catalog.setval('public.comentarios_equipos_id_comentario_equipo_seq', 1, true);
 
 
 --
@@ -6963,6 +6994,13 @@ CREATE INDEX ix_comentarios_equipos_grupo_fecha ON public.comentarios_equipos US
 
 
 --
+-- Name: ix_comentarios_equipos_padre_estado; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX ix_comentarios_equipos_padre_estado ON public.comentarios_equipos USING btree (id_comentario_padre, estado_eliminado);
+
+
+--
 -- Name: ix_detalles_prestamos_id_equipo; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -7169,6 +7207,14 @@ ALTER TABLE ONLY public.avisos_disponibilidad
 
 ALTER TABLE ONLY public.comentarios_equipos
     ADD CONSTRAINT comentarios_equipos_carnet_usuario_fkey FOREIGN KEY (carnet_usuario) REFERENCES public.usuarios(carnet);
+
+
+--
+-- Name: comentarios_equipos comentarios_equipos_id_comentario_padre_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.comentarios_equipos
+    ADD CONSTRAINT comentarios_equipos_id_comentario_padre_fkey FOREIGN KEY (id_comentario_padre) REFERENCES public.comentarios_equipos(id_comentario_equipo) ON DELETE RESTRICT;
 
 
 --

@@ -539,13 +539,18 @@ create table comentarios_equipos
 (
     id_comentario_equipo integer generated always as identity
         primary key,
-    id_grupo_equipo      integer                                not null
+    id_grupo_equipo      integer                                   not null
         references grupos_equipos,
-    carnet_usuario       varchar(20)                            not null
+    carnet_usuario       varchar(20)                               not null
         references usuarios,
-    contenido            varchar(1024)                          not null,
-    fecha_creacion       timestamp with time zone default now() not null,
-    estado_eliminado     boolean                  default false not null
+    contenido            varchar(1024)                             not null,
+    fecha_creacion       timestamp with time zone default now()    not null,
+    estado_eliminado     boolean                  default false    not null,
+    id_comentario_padre  integer
+        references comentarios_equipos
+            on delete restrict,
+    likes                integer                  default 0        not null,
+    liked_by             text                     default ''::text not null
 );
 
 alter table comentarios_equipos
@@ -553,6 +558,9 @@ alter table comentarios_equipos
 
 create index ix_comentarios_equipos_grupo_fecha
     on comentarios_equipos (id_grupo_equipo, fecha_creacion, estado_eliminado);
+
+create index ix_comentarios_equipos_padre_estado
+    on comentarios_equipos (id_comentario_padre, estado_eliminado);
 
 create view vw_equipos_necesitan_mantenimiento
             (codigo_imt, grupo_equipo, estado_equipo, ubicacion, ultima_fecha_mantenimiento) as
