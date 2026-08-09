@@ -46,9 +46,8 @@ describe('PrestamosTablaComponent', () => {
       crearPrestamo({ id: 2, nombre: 'CarnetMenor', carnet: '100' }),
     ]);
 
-    const sortButtons = fixture.nativeElement.querySelectorAll(
-      '.table-sort-button',
-    );
+    const sortButtons =
+      fixture.nativeElement.querySelectorAll('.table-sort-button');
     const sortableHeaders =
       fixture.nativeElement.querySelectorAll('.sortable-th');
     const headers = Array.from(

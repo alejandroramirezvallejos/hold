@@ -221,14 +221,14 @@ export class ObjetoComponent {
     this.servicio
       .obtenerComentarios(this.producto.id, this.ordenComentarios)
       .subscribe({
-      next: (comentarios) => {
-        this.comentarios = comentarios;
-        this.cargandoComentarios = false;
-      },
-      error: () => {
-        this.comentarioError = 'No se pudieron cargar los comentarios.';
-        this.cargandoComentarios = false;
-      },
+        next: (comentarios) => {
+          this.comentarios = comentarios;
+          this.cargandoComentarios = false;
+        },
+        error: () => {
+          this.comentarioError = 'No se pudieron cargar los comentarios.';
+          this.cargandoComentarios = false;
+        },
       });
   }
 
@@ -346,19 +346,21 @@ export class ObjetoComponent {
     this.eliminandoComentarioId = comentario.id;
     this.comentarioError = '';
 
-    this.servicio.eliminarComentario(this.producto.id, comentario.id).subscribe({
-      next: () => {
-        this.comentarios = this.removerComentario(
-          this.comentarios,
-          comentario.id,
-        );
-        this.eliminandoComentarioId = null;
-      },
-      error: () => {
-        this.comentarioError = 'No se pudo eliminar el comentario.';
-        this.eliminandoComentarioId = null;
-      },
-    });
+    this.servicio
+      .eliminarComentario(this.producto.id, comentario.id)
+      .subscribe({
+        next: () => {
+          this.comentarios = this.removerComentario(
+            this.comentarios,
+            comentario.id,
+          );
+          this.eliminandoComentarioId = null;
+        },
+        error: () => {
+          this.comentarioError = 'No se pudo eliminar el comentario.';
+          this.eliminandoComentarioId = null;
+        },
+      });
   }
 
   totalComentarios(): number {

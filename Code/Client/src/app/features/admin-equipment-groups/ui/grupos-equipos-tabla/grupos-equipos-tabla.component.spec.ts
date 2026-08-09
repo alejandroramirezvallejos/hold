@@ -49,9 +49,8 @@ describe('GruposEquiposTablaComponent', () => {
     fixture.detectChanges();
 
     const sortableHeader = fixture.nativeElement.querySelector('.sortable-th');
-    const sortButton = fixture.nativeElement.querySelector(
-      '.table-sort-button',
-    );
+    const sortButton =
+      fixture.nativeElement.querySelector('.table-sort-button');
     const headers = Array.from(
       fixture.nativeElement.querySelectorAll('thead th'),
     ).map((header) => (header as HTMLElement).textContent!.trim());
