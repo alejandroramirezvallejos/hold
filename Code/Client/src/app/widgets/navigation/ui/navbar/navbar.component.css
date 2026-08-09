@@ -377,6 +377,14 @@
   line-height: 1;
   text-align: center;
   pointer-events: none;
+  transition:
+    background-color var(--t-fast),
+    color var(--t-fast);
+}
+.notif__button:hover .notif__badge,
+.notif__button--active .notif__badge {
+  background-color: #8f9195;
+  color: var(--brand);
 }
 .notif__dropdown {
   position: absolute;
@@ -520,10 +528,25 @@
   display: none;
 }
 .notif__list {
-  max-height: 360px;
+  max-height: min(360px, calc(100dvh - 12rem));
   overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
   scrollbar-color: var(--scrollbar-thumb) transparent;
   scrollbar-width: thin;
+}
+.notif__list::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+}
+.notif__list::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  background-clip: content-box;
+}
+.notif__list::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 10px 0;
 }
 .notif__item {
   display: flex;
@@ -562,6 +585,8 @@
 .notif__details-toggle {
   align-self: flex-start;
   margin-top: 0.15rem;
+  min-width: unset !important;
+  min-height: 1.75rem !important;
   padding: 0.25rem 0.55rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
@@ -647,6 +672,11 @@
 
   .notif__list {
     max-height: calc(100dvh - 220px);
+  }
+
+  .notif__details-toggle {
+    min-height: 1.9rem !important;
+    min-width: unset !important;
   }
 
   .notif__item {
