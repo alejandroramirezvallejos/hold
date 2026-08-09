@@ -1,43 +1,49 @@
-<div align="center">
+# Contributing Guide
 
-# Contributing
+Thank you for contributing to UCB Hold. This project favors small, reviewable changes, clear intent and consistent implementation over large unstructured updates.
 
-Guía para contribuir a UCB Hold con cambios pequeños, revisables y alineados con la arquitectura del proyecto.
+## Development Workflow
 
-[README](README.md) · [Setup](docs/setup.md) · [Security](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
+1. Create a focused branch from `main`.
+2. Keep each change scoped to one user-facing feature, fix, refactor or documentation update.
+3. Follow the existing architecture before introducing new patterns.
+4. Update documentation when behavior, setup, deployment, API contracts or database structure changes.
+5. Run the local quality checks before opening a pull request.
 
-</div>
+## Branch Naming
 
----
+Use short lowercase branch names:
 
-## <img height="22" src="docs/assets/readme-icons/contributing.svg" alt="" /> Flujo de Trabajo
+| Type | Example |
+| --- | --- |
+| Feature | `feature/comment-likes` |
+| Fix | `fix/mobile-notifications` |
+| Refactor | `refactor/repository-layout` |
+| Docs | `docs/release-notes` |
+| CI | `ci/coverage-artifacts` |
 
-1. Revisar issues o abrir una propuesta si el cambio es grande.
-2. Crear una rama corta y descriptiva.
-3. Mantener el cambio enfocado en un solo objetivo.
-4. Actualizar documentación cuando cambien setup, API, arquitectura o comportamiento visible.
-5. Enviar PR con contexto, pasos de prueba y capturas si cambia la UI.
+## Commit Standard
 
----
+Use Conventional Commits:
 
-## Convenciones
+```text
+feat(scope): add user comment replies
+fix(scope): correct mobile notification counter
+refactor(scope): normalize repository layout
+docs(scope): update setup guide
+test(scope): cover comment permissions
+ci(scope): publish coverage artifacts
+chore(scope): ignore generated files
+```
 
-| Área      | Regla                                                                                         |
-| --------- | --------------------------------------------------------------------------------------------- |
-| Commits   | Conventional Commits: `feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `ci:`.                  |
-| Ramas     | `feature/<descripcion>`, `fix/<descripcion>`, `refactor/<descripcion>`, `docs/<descripcion>`. |
-| Frontend  | Feature-Sliced Design, BEM, archivos en `kebab-case`, TypeScript estricto.                    |
-| Backend   | Servicios con reglas de negocio, DTOs explícitos, validación centralizada y tests.            |
-| Seguridad | No versionar secretos; usar `dotnet user-secrets` o variables de entorno.                     |
+Prefer atomic commits. A commit should explain one reason for change and should be revertable without unrelated fallout.
 
----
-
-## Checklist Local
+## Local Quality Gates
 
 Backend:
 
 ```bash
-dotnet build code/server/IMT_Reservas.Server.csproj
+dotnet build code/IMT_Reservas.sln
 dotnet test code/tests/IMT_Reservas.Tests.csproj
 ```
 
@@ -52,17 +58,28 @@ npm run test:coverage
 npm run build
 ```
 
----
+## Pull Request Requirements
 
-## Pull Requests
+A pull request should include:
 
-Un buen PR debe incluir:
+| Section | Expected content |
+| --- | --- |
+| Summary | What changed and which area was affected. |
+| Motivation | Why the change is needed. |
+| Verification | Commands executed and manual scenarios tested. |
+| Risk | Migrations, data changes, UI impact, security considerations or compatibility concerns. |
+| Screenshots | Required for visible UI changes. |
 
-| Campo       | Qué incluir                                                |
-| ----------- | ---------------------------------------------------------- |
-| Qué cambió  | Resumen breve del cambio.                                  |
-| Por qué     | Problema, issue o deuda que resuelve.                      |
-| Cómo probar | Comandos ejecutados y escenarios manuales.                 |
-| Riesgo      | Migraciones, cambios visuales, seguridad o compatibilidad. |
+## Code Expectations
 
-Evitar dependencias nuevas salvo que el beneficio, tamaño e impacto de seguridad estén justificados.
+| Area | Standard |
+| --- | --- |
+| Frontend | Use existing Angular and Feature-Sliced Design boundaries. Keep files in `kebab-case`. |
+| Backend | Keep business rules in services, validations explicit and persistence behind repositories. |
+| Tests | Add or update tests when behavior, permissions or data rules change. |
+| Documentation | Keep examples current and avoid environment-specific secrets. |
+| Generated files | Do not commit local reports, build output, caches or database backups. |
+
+## Dependencies
+
+New dependencies should be justified by a clear maintenance or product benefit. Include why the dependency is needed, whether a built-in alternative exists and any relevant security or licensing consideration.

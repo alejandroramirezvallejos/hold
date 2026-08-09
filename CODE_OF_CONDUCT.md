@@ -1,61 +1,33 @@
-<div align="center">
-
 # Code of Conduct
 
-Estándares de colaboración para mantener una comunidad profesional, segura y respetuosa.
+UCB Hold is maintained as a professional academic software project. All collaboration should be respectful, constructive and focused on improving the product.
 
-[README](README.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+## Our Commitment
 
-</div>
+We are committed to a harassment-free environment for everyone, regardless of age, background, education, nationality, appearance, race, religion, gender identity, sexual orientation, disability or experience level.
 
----
+## Expected Behavior
 
-## <img height="22" src="docs/assets/readme-icons/community.svg" alt="" /> Nuestro Compromiso
+| Expected | Not Accepted |
+| --- | --- |
+| Use respectful and inclusive language. | Insults, harassment or personal attacks. |
+| Give constructive technical feedback. | Dismissive or hostile review comments. |
+| Respect different viewpoints and constraints. | Public or private intimidation. |
+| Keep discussions focused on the project. | Publishing private information without permission. |
+| Accept maintainers' moderation decisions. | Repeated disruption of issues, PRs or discussions. |
 
-Nos comprometemos a hacer de la participación en UCB Hold una experiencia libre de acoso para todas las personas, sin distinción de edad, identidad o expresión de género, experiencia, educación, nacionalidad, apariencia, raza, religión, orientación sexual, discapacidad o condición socioeconómica.
+## Maintainer Responsibilities
 
----
+Maintainers may clarify standards, moderate conversations, close discussions, reject contributions or apply temporary or permanent restrictions when behavior harms the project or its contributors.
 
-## <img height="22" src="docs/assets/readme-icons/standards.svg" alt="" /> Estándares
+## Scope
 
-Comportamientos esperados:
+This code applies in project spaces and whenever someone represents UCB Hold publicly, including issues, pull requests, discussions, documentation, demos and related communication channels.
 
-| Esperado                               | No aceptado                                          |
-| -------------------------------------- | ---------------------------------------------------- |
-| Usar lenguaje inclusivo y profesional. | Lenguaje sexualizado, insultos o ataques personales. |
-| Respetar puntos de vista distintos.    | Acoso público o privado.                             |
-| Aceptar crítica constructiva.          | Publicar información privada sin permiso.            |
-| Priorizar lo mejor para el proyecto.   | Conductas inapropiadas en un entorno profesional.    |
+## Reporting
 
----
+Report incidents privately to the maintainers listed in the README. Include context, links, screenshots or timeline details when available. Maintainers will treat sensitive reports with discretion.
 
-## <img height="22" src="docs/assets/readme-icons/responsibility.svg" alt="" /> Responsabilidades
+## Attribution
 
-Los mantenedores pueden aclarar estándares, moderar conversaciones, cerrar discusiones, rechazar contribuciones o aplicar restricciones temporales o permanentes cuando una conducta afecte negativamente al proyecto.
-
----
-
-## <img height="22" src="docs/assets/readme-icons/scope.svg" alt="" /> Alcance
-
-Este código aplica en espacios del proyecto y cuando una persona representa públicamente a UCB Hold, por ejemplo en issues, pull requests, discusiones, documentación, demos o comunicación comunitaria.
-
----
-
-## <img height="22" src="docs/assets/readme-icons/enforcement.svg" alt="" /> Reportes y Aplicación
-
-Los incidentes pueden reportarse a los mantenedores listados en el README. Para reportes sensibles, usar canales privados.
-
-Consecuencias posibles:
-
-| Nivel                 | Acción                                           |
-| --------------------- | ------------------------------------------------ |
-| Corrección            | Advertencia privada con explicación.             |
-| Advertencia           | Restricciones temporales de interacción.         |
-| Suspensión temporal   | Pausa de participación por un periodo definido.  |
-| Suspensión permanente | Restricción indefinida de participación pública. |
-
----
-
-## <img height="22" src="docs/assets/readme-icons/attribution.svg" alt="" /> Atribución
-
-Este código se basa en Contributor Covenant 1.4: <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>.
+This policy is adapted from Contributor Covenant 1.4: <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>.

@@ -1,33 +1,46 @@
-# Product
+# Product Brief
 
-## Register
+## Product Name
 
-product
+UCB Hold
 
-## Users
+## Audience
 
-Estudiantes, docentes y administradores del Laboratorio de Mecatrónica de la Universidad Católica Boliviana que necesitan reservar, aprobar, prestar, mantener y devolver equipos con trazabilidad clara.
+UCB Hold serves students, faculty members and administrators of the Mechatronics Laboratory at Universidad Católica Boliviana. The product is designed for users who need to reserve equipment reliably and for administrators who must approve loans, maintain inventory and preserve operational traceability.
 
-## Product Purpose
+## Problem
 
-UCB Hold reduce fricción operativa en préstamos de laboratorio: permite encontrar equipos, verificar disponibilidad, gestionar reservas, registrar mantenimiento y auditar acciones administrativas desde una interfaz consistente y confiable.
+Laboratory equipment loans are operationally sensitive: availability can change quickly, physical assets must be tracked, and administrative decisions need an auditable history. Manual processes increase the risk of duplicate reservations, incomplete records and inconsistent handoffs between request, approval, delivery and return.
 
-## Brand Personality
+## Product Goal
 
-Clara, académica y operativa. La interfaz debe sentirse sobria, rápida y familiar para usuarios que están completando tareas, no explorando una pieza promocional.
+Provide a dependable reservation and inventory platform that makes equipment availability visible, keeps administrative work structured and records the lifecycle of each loan and maintenance action.
 
-## Anti-references
+## Core Workflows
 
-Evitar modales con estilos aislados, controles nativos mezclados con controles personalizados, tablas con colores distintos entre módulos, botones que cambian de forma sin intención y flujos donde el usuario debe recorrer listas largas sin búsqueda.
+| Workflow | Outcome |
+| --- | --- |
+| Browse equipment | Users can discover available equipment groups and inspect relevant details. |
+| Reserve equipment | Users create requests with date ranges and selected quantities. |
+| Approve loans | Administrators validate availability and move requests through controlled states. |
+| Track delivery and return | Active loans preserve clear dates, responsible users and associated contract data. |
+| Maintain inventory | Administrators manage equipment, categories, furniture, lockers, components and accessories. |
+| Audit operations | Administrative changes and observations remain visible for follow-up. |
 
 ## Design Principles
 
-- Consistencia antes que sorpresa: el mismo tipo de acción debe verse y comportarse igual en todo el sistema.
-- Eficiencia para tareas repetidas: búsquedas, filtros y selects deben reducir desplazamiento innecesario.
-- Estado visible: disponibilidad, errores, selección y acciones pendientes deben ser fáciles de reconocer.
-- Densidad ordenada: las tablas y modales deben permitir trabajo administrativo rápido sin parecer sobrecargados.
-- Conservación visual: los cambios de código deben mantener la apariencia general ya aceptada por el proyecto.
+| Principle | Direction |
+| --- | --- |
+| Operational clarity | Screens should help users complete work quickly without decorative noise. |
+| Consistency | Repeated actions, counters, panels, tables and forms must behave the same way across modules. |
+| Mobile readiness | Core flows must remain usable on small screens, especially navigation, panels and tables. |
+| Explicit state | Loading, empty, error, selected, disabled and success states should be visible and predictable. |
+| Maintainability | UI changes must respect existing architecture and avoid isolated one-off patterns. |
 
-## Accessibility & Inclusion
+## Accessibility
 
-Apuntar a WCAG AA en contraste y foco visible. Mantener navegación por teclado, blancos táctiles de al menos 44px en móvil, estados `disabled` claros, movimiento reducido cuando el usuario lo solicita y textos de acción explícitos.
+The interface should target WCAG AA contrast, visible focus states, keyboard navigation, clear disabled states, readable labels and touch targets of at least 44px on mobile. Motion should remain purposeful and avoid blocking task completion.
+
+## Non-Goals
+
+UCB Hold is not a marketing website, public marketplace or analytics-heavy BI platform. The interface should prioritize daily operational workflows over promotional layouts.

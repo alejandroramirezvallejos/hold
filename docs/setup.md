@@ -1,49 +1,51 @@
-<div align="center">
+# Setup Guide
 
-# Setup
+This guide describes how to run UCB Hold locally for development, testing and review.
 
-Ambiente local de UCB Hold: `.NET 8`, `Angular 19.2`, `PostgreSQL 14+`, `Redis 7` y `Docker Compose`.
+## Requirements
 
-[Volver al README](../README.md) · [API](api.md) · [Base de datos](database.md)
+| Tool | Minimum version | Check |
+| --- | --- | --- |
+| .NET SDK | 8.0 LTS | `dotnet --version` |
+| Node.js | 20.x recommended | `node -v` |
+| npm | Bundled with Node.js | `npm -v` |
+| Docker Desktop | Current stable | `docker -v` |
+| Git | Current stable | `git --version` |
 
-</div>
+## Repository Layout
 
----
+```text
+code/
+|-- client/      Angular frontend
+|-- server/      ASP.NET Core API
+|-- tests/       Backend tests
+|-- database/    Database schema reference
+`-- docker-compose.yml
+```
 
-## <img height="22" src="assets/readme-icons/prerequisites.svg" alt="" /> Requisitos
+Generated files, local reports, IDE metadata and database backups should not be committed.
 
-| Herramienta    | Versión mínima | Verificar          |
-| -------------- | -------------- | ------------------ |
-| .NET SDK       | 8.0 LTS        | `dotnet --version` |
-| Node.js        | 18.19+         | `node -v`          |
-| Docker Desktop | Actual         | `docker -v`        |
-| Git            | Actual         | `git --version`    |
-
----
-
-## <img height="22" src="assets/readme-icons/setup.svg" alt="" /> Configuración Inicial
+## Environment Configuration
 
 ### Docker
 
-Crear `code/server.env`. Este archivo está ignorado por Git y no debe versionarse:
+Create `code/server.env`:
 
 ```ini
 ASPNETCORE_ENVIRONMENT=Production
 ASPNETCORE_URLS=http://+:80
 ConnectionStrings__PostgreSQL=Host=ucb_db;Port=5432;Database=IMT_Reservas;Username=postgres;Password=postgres;Pooling=true;MinPoolSize=2;MaxPoolSize=20
-Jwt__Key=<clave-local-de-32-caracteres-o-mas>
+Jwt__Key=<local-secret-with-at-least-32-characters>
 Redis__ConnectionString=ucb_redis:6379
 ```
 
-Generar una clave local:
+Generate a development key:
 
 ```bash
 openssl rand -base64 32
 ```
 
-### Rider o Terminal
-
-Configurar secretos del backend:
+### Local Backend
 
 ```bash
 cd code/server
@@ -53,81 +55,64 @@ dotnet user-secrets set "Jwt:Key" "local_dev_secret_at_least_32_chars!!"
 dotnet user-secrets set "Redis:ConnectionString" "localhost:6379"
 ```
 
-Instalar dependencias del frontend:
+### Frontend
 
 ```bash
 cd code/client
 npm install
 ```
 
----
+## Running the Application
 
-## <img height="22" src="assets/readme-icons/running.svg" alt="" /> Ejecución
-
-### Opción 1: Docker
+### Full Stack with Docker
 
 ```bash
 cd code
 docker compose up --build
 ```
 
-| Servicio    | URL                   |
-| ----------- | --------------------- |
-| Frontend    | http://localhost:4200 |
+| Service | URL |
+| --- | --- |
+| Frontend | http://localhost:4200 |
 | Backend API | http://localhost:5000 |
-| PostgreSQL  | localhost:5432        |
-| Redis       | localhost:6379        |
+| PostgreSQL | localhost:5432 |
+| Redis | localhost:6379 |
 
-Comandos útiles:
+### Hybrid Local Development
 
-```bash
-docker compose down
-docker compose down -v
-docker logs -f ucb_server
-```
-
-### Opción 2: Rider
-
-1. Abrir la carpeta `code/`.
-2. Seleccionar la configuración `IMT_Reservas.FullStack`.
-3. Ejecutar con `Shift+F10`.
-
-La base de datos y Redis se levantan como pasos previos desde la configuración del IDE.
-
-### Opción 3: Dos Terminales
+Start infrastructure:
 
 ```bash
 cd code
 docker compose up -d ucb_db ucb_redis
 ```
 
-Backend:
+Run backend:
 
 ```bash
 cd code/server
 dotnet run
 ```
 
-Frontend:
+Run frontend:
 
 ```bash
 cd code/client
 npm start
 ```
 
-| Servicio    | URL                            |
-| ----------- | ------------------------------ |
-| Frontend    | http://localhost:4200          |
-| Backend API | https://localhost:7216         |
-| Swagger     | https://localhost:7216/swagger |
+| Service | URL |
+| --- | --- |
+| Frontend | http://localhost:4200 |
+| Backend API | https://localhost:7216 |
+| Swagger | https://localhost:7216/swagger |
 
----
-
-## <img height="22" src="assets/readme-icons/verification.svg" alt="" /> Verificación
+## Verification
 
 Backend:
 
 ```bash
+dotnet build code/IMT_Reservas.sln
 dotnet test code/tests/IMT_Reservas.Tests.csproj
 ```
 
@@ -142,15 +127,33 @@ npm run test:coverage
 npm run build
 ```
 
----
+## Database Restore
 
-## <img height="22" src="assets/readme-icons/troubleshooting.svg" alt="" /> Solución de Problemas
+Create the database:
 
-| Problema                            | Acción                                                       |
-| ----------------------------------- | ------------------------------------------------------------ |
-| `dotnet: command not found`         | Instalar .NET 8 SDK desde `dotnet.microsoft.com`.            |
-| PostgreSQL o Redis rechaza conexión | Ejecutar `cd code && docker compose up -d ucb_db ucb_redis`. |
-| `User Secrets not initialized`      | Ejecutar `cd code/server && dotnet user-secrets init`.       |
-| Backend en Docker reinicia          | Revisar `docker logs ucb_server`.                            |
-| Puerto `4200` ocupado               | Ejecutar `ng serve --port 4300`.                             |
-| Faltan paquetes Angular             | Ejecutar `cd code/client && npm install`.                    |
+```bash
+psql -U postgres -c "CREATE DATABASE IMT_Reservas;"
+```
+
+Restore from the SQL backup attached to a release:
+
+```bash
+psql -U postgres -d IMT_Reservas -f artifacts/releases/database/backup.sql
+```
+
+Restore from a custom-format backup:
+
+```bash
+pg_restore -U postgres -d IMT_Reservas --clean --if-exists artifacts/releases/database/backup.backup
+```
+
+## Troubleshooting
+
+| Issue | Resolution |
+| --- | --- |
+| `.NET SDK not found` | Install .NET 8 SDK and restart the terminal. |
+| PostgreSQL or Redis refuses connection | Run `cd code && docker compose up -d ucb_db ucb_redis`. |
+| Backend cannot read secrets | Run the `dotnet user-secrets` commands from `code/server`. |
+| Port `4200` is already in use | Run Angular with another port, for example `ng serve --port 4300`. |
+| Frontend dependencies are missing | Run `npm install` from `code/client`. |
+| Docker backend restarts | Inspect logs with `docker logs -f ucb_server`. |

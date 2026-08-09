@@ -1,59 +1,51 @@
-<div align="center">
-
 # Security Policy
 
-Política para reportar vulnerabilidades de forma privada y responsable.
+UCB Hold handles user identity, administrative actions and equipment loan records. Security issues should be reported privately and handled with enough context to reproduce and remediate them safely.
 
-[README](README.md) · [Contributing](CONTRIBUTING.md)
+## Supported Versions
 
-</div>
+| Target | Support |
+| --- | --- |
+| Latest release | Supported |
+| `main` branch | Supported |
+| Older branches | Best effort |
 
----
+## Reporting a Vulnerability
 
-## <img height="22" src="docs/assets/readme-icons/security.svg" alt="" /> Versiones Soportadas
+Use GitHub Security Advisories when available:
 
-| Versión        | Soporte       |
-| -------------- | ------------- |
-| Última release | Sí            |
-| Rama `main`    | Sí            |
-| Ramas antiguas | Caso por caso |
+<https://github.com/alejandroramirezvallejos/UCB_Hold/security/advisories>
 
----
+If advisories are not available, contact a maintainer listed in the README through a private channel.
 
-## <img height="22" src="docs/assets/readme-icons/vulnerability.svg" alt="" /> Reportar una Vulnerabilidad
+Include:
 
-Usar GitHub Security Advisories cuando sea posible:
+| Field | Details |
+| --- | --- |
+| Summary | Short description of the issue and affected area. |
+| Reproduction | Steps, inputs, account type and environment needed to reproduce. |
+| Impact | What data, permissions or workflow could be affected. |
+| Evidence | Logs, screenshots or proof-of-concept details, without exposing secrets. |
+| Suggested fix | Optional remediation notes if known. |
 
-<https://github.com/ucb-hold/ucb-hold/security/advisories>
+## Disclosure Rules
 
-Si no está disponible, contactar a un mantenedor listado en el README.
+| Do | Do not |
+| --- | --- |
+| Report privately first. | Publish exploit details before maintainers can respond. |
+| Share only the access needed to reproduce. | Access or modify unrelated data. |
+| Request permission before automated scans. | Run aggressive scans against shared infrastructure. |
+| Remove secrets from screenshots and logs. | Include tokens, passwords or private keys in reports. |
 
-Incluir:
+## Response Targets
 
-| Dato         | Detalle esperado                          |
-| ------------ | ----------------------------------------- |
-| Descripción  | Qué ocurre y dónde.                       |
-| Reproducción | Pasos, datos requeridos y entorno.        |
-| Impacto      | Qué podría hacer un atacante.             |
-| Alcance      | Componentes, versiones o rutas afectadas. |
+| Step | Target |
+| --- | --- |
+| Acknowledge report | Within 7 business days |
+| Initial triage | After reproducibility and impact are understood |
+| Remediation | Prioritized by severity and operational risk |
+| Public advisory | After a fix or mitigation is available |
 
----
+## Secret Management
 
-## <img height="22" src="docs/assets/readme-icons/disclosure.svg" alt="" /> Reglas de Divulgación
-
-| Hacer                                                | Evitar                                                  |
-| ---------------------------------------------------- | ------------------------------------------------------- |
-| Reportar en privado.                                 | Publicar detalles antes de que exista una corrección.   |
-| Dar información suficiente para reproducir.          | Explotar más de lo necesario para verificar.            |
-| Pedir permiso antes de usar escáneres automatizados. | Ejecutar pruebas agresivas contra infraestructura real. |
-
----
-
-## <img height="22" src="docs/assets/readme-icons/commitment.svg" alt="" /> Compromiso del Proyecto
-
-| Acción                    | Tiempo objetivo                           |
-| ------------------------- | ----------------------------------------- |
-| Acusar recibo del reporte | Hasta 7 días hábiles.                     |
-| Mantener comunicación     | Durante la investigación y corrección.    |
-| Publicar advisory         | Después de tener una mitigación lista.    |
-| Dar crédito               | Cuando la persona reportante lo solicite. |
+Never commit credentials, production connection strings, JWT secrets, private keys, database dumps or backups. Use environment variables, `code/server.env` for local Docker execution, or `dotnet user-secrets` for local backend development.

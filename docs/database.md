@@ -1,125 +1,120 @@
-<div align="center">
+# Database Guide
 
-# Database
+UCB Hold uses PostgreSQL 14+ with Entity Framework Core 8. The database name used by the project is `IMT_Reservas`. Repository source keeps a schema reference in [`code/database/schema.sql`](../code/database/schema.sql); full database snapshots are distributed as release assets.
 
-PostgreSQL 14+ con Entity Framework Core 8. El esquema inicial vive en [`code/database/init.sql`](../code/database/init.sql).
+## Entity Relationship Diagram
 
-[Volver al README](../README.md) · [Setup](setup.md) · [API](api.md)
+![Entity relationship diagram](assets/diagram.png)
 
-</div>
+## Schema Overview
 
----
+| Table | Purpose | Soft delete |
+| --- | --- | --- |
+| `usuarios` | User identity, contact data and role. | Yes |
+| `prestamos` | Loan lifecycle, user ownership and date range. | Yes |
+| `detalles_prestamos` | Equipment groups requested in each loan. | Yes |
+| `grupos_equipos` | Catalog-level grouping for equivalent equipment units. | Yes |
+| `equipos` | Physical equipment units with `codigo_imt` and condition. | Yes |
+| `categorias` | Equipment classification. | Yes |
+| `carreras` | Academic programs associated with users. | Yes |
+| `muebles` | Storage furniture. | Yes |
+| `gaveteros` | Storage lockers inside furniture. | Yes |
+| `accesorios` | Accessories assigned to equipment groups. | Yes |
+| `componentes` | Internal or related components. | Yes |
+| `empresas_mantenimiento` | Maintenance providers. | Yes |
+| `mantenimientos` | Maintenance events. | Yes |
+| `detalles_mantenimientos` | Equipment involved in a maintenance event. | Yes |
+| `contratos` | Generated contract HTML for loans. | No |
 
-## <img height="22" src="assets/readme-icons/database.svg" alt="" /> Diagrama ER
+## PostgreSQL Enums
 
-![Diagrama entidad-relación](assets/diagram.png)
+| Enum | Values | Used by |
+| --- | --- | --- |
+| `estado_prestamo` | `pendiente`, `aprobado`, `activo`, `finalizado`, `rechazado`, `cancelado` | `prestamos` |
+| `estado_equipo` | `operativo`, `parcialmente_operativo`, `inoperativo` | `equipos` |
+| `tipo_usuario` | `docente`, `administrador`, `estudiante` | `usuarios` |
+| `tipo_mantenimiento` | `correctivo`, `preventivo` | `detalles_mantenimientos` |
 
----
+The backend maps PostgreSQL enums with `PgName` and `NpgsqlDataSourceBuilder.MapEnum<T>()`.
 
-## <img height="22" src="assets/readme-icons/tables.svg" alt="" /> Tablas
+## Derived Data
 
-| Tabla                     | Propósito                        | Soft delete | Columnas relevantes                |
-| ------------------------- | -------------------------------- | ----------- | ---------------------------------- |
-| `usuarios`                | Usuarios y autenticación         | Sí          | `carnet`, `email`, `telefono`      |
-| `prestamos`               | Ciclo de vida del préstamo       | Sí          | `estado_prestamo`, FK a `usuarios` |
-| `detalles_prestamos`      | Equipos por préstamo             | Sí          | FK a `prestamos`, FK a `equipos`   |
-| `categorias`              | Categorías de equipos            | Sí          | `nombre`                           |
-| `carreras`                | Programas académicos             | Sí          | `nombre`                           |
-| `empresas_mantenimiento`  | Proveedores de mantenimiento     | Sí          | `nit`                              |
-| `mantenimientos`          | Registros de mantenimiento       | Sí          | FK a `empresas_mantenimiento`      |
-| `detalles_mantenimientos` | Equipos por mantenimiento        | Sí          | `tipo_mantenimiento`               |
-| `grupos_equipos`          | Agrupación lógica de equipos     | Sí          | `cantidad`, `costo_promedio`       |
-| `equipos`                 | Unidades físicas                 | Sí          | `codigo_imt`, `estado_equipo`      |
-| `gaveteros`               | Compartimentos de almacenamiento | Sí          | FK a `muebles`                     |
-| `muebles`                 | Muebles contenedores             | Sí          | `numero_gaveteros`                 |
-| `accesorios`              | Accesorios complementarios       | Sí          | `codigo_imt`                       |
-| `componentes`             | Componentes internos             | Sí          | `codigo_imt`                       |
-| `contratos`               | Contratos HTML generados         | No          | `contrato`, FK a `prestamos`       |
+| Data | Source of truth | Maintenance mechanism |
+| --- | --- | --- |
+| Equipment group quantity | Active `equipos` by group | Database triggers and repository recalculation |
+| Average equipment cost | Active `equipos` by group | Database triggers and repository recalculation |
+| Furniture locker count | Active `gaveteros` by furniture | Database triggers and repository recalculation |
+| Loan detail deletion | Parent loan soft delete | Logical cascade |
+| Maintenance detail deletion | Parent maintenance soft delete | Logical cascade |
 
----
+Derived values exist to speed up administrative screens. Business logic should still validate critical decisions, especially availability, at the service layer.
 
-## <img height="22" src="assets/readme-icons/enums.svg" alt="" /> Enums
+## Availability Rule
 
-| Enum SQL             | Valores                                                                   | Uso                       |
-| -------------------- | ------------------------------------------------------------------------- | ------------------------- |
-| `estado_prestamo`    | `pendiente`, `aprobado`, `activo`, `finalizado`, `rechazado`, `cancelado` | `prestamos`               |
-| `estado_equipo`      | `operativo`, `parcialmente_operativo`, `inoperativo`                      | `equipos`                 |
-| `tipo_usuario`       | `docente`, `administrador`, `estudiante`                                  | `usuarios`                |
-| `tipo_mantenimiento` | `correctivo`, `preventivo`                                                | `detalles_mantenimientos` |
+An equipment unit is unavailable when another loan for the same equipment group overlaps the requested date range and is in `aprobado` or `activo` state.
 
-El backend mapea enums con `PgName` y `NpgsqlDataSourceBuilder.MapEnum<T>()`.
+Pending requests do not block inventory capacity. Approval must re-check availability to avoid conflicts caused by concurrent requests.
 
----
+## Indexes
 
-## <img height="22" src="assets/readme-icons/business-logic.svg" alt="" /> Reglas de Negocio
+| Index | Purpose |
+| --- | --- |
+| `idx_usuarios_email_estado` | Login and email lookup. |
+| `idx_usuarios_nombre_estado` | User listing and search. |
+| `idx_prestamos_temporal_usuario_estado` | Loan history and date filters. |
+| `idx_mantenimientos_temporal_empresa_estado` | Maintenance history by provider and date. |
+| `idx_grupos_equipos_busqueda` | Equipment group catalog search. |
+| `idx_equipos_agrupacion` | Joins between physical units and groups. |
+| `idx_detalles_prestamos_por_prestamo` | Loan detail lookups. |
+| `idx_detalles_mantenimientos_por_mantenimiento` | Maintenance detail lookups. |
 
-### Contadores derivados
+## Views
 
-| Nivel   | Evento                       | Mecanismo                          | Campo mantenido                             |
-| ------- | ---------------------------- | ---------------------------------- | ------------------------------------------- |
-| DB      | `Equipo INSERT/UPDATE`       | Triggers de grupo y costo promedio | `grupos_equipos.cantidad`, `costo_promedio` |
-| DB      | `Gavetero INSERT/UPDATE`     | Triggers de conteo                 | `muebles.numero_gaveteros`                  |
-| DB      | Soft-delete de préstamo      | Cascada lógica a detalles          | `detalles_prestamos.estado_eliminado`       |
-| DB      | Soft-delete de mantenimiento | Cascada lógica a detalles          | `detalles_mantenimientos.estado_eliminado`  |
-| Backend | Crear/editar/eliminar equipo | Recalculo de repositorio           | `cantidad`, `costo_promedio`                |
-| Backend | Crear/eliminar gavetero      | Recalculo de repositorio           | `numero_gaveteros`                          |
+| View | Purpose |
+| --- | --- |
+| `vw_equipos_necesitan_mantenimiento` | Lists equipment that may require preventive maintenance. |
+| `vw_ubicaciones_grupos_equipos` | Exposes physical location by furniture and locker. |
 
-### Disponibilidad
-
-Una unidad no está disponible cuando existe un préstamo del mismo equipo en estado `aprobado` o `activo` con fechas superpuestas.
-
-Los préstamos `pendiente` no bloquean capacidad porque todavía no son reservas confirmadas.
-
-Validaciones relevantes:
-
-| Momento          | Validación                                                               |
-| ---------------- | ------------------------------------------------------------------------ |
-| Antes de crear   | Verifica que exista al menos una unidad disponible del grupo solicitado. |
-| Antes de aprobar | Revalida conflictos para evitar aprobaciones concurrentes incompatibles. |
-
-### Código IMT
-
-`equipos.codigo_imt` se asigna de forma secuencial al crear una unidad. No debe cambiarse en actualizaciones posteriores.
-
----
-
-## <img height="22" src="assets/readme-icons/indexes.svg" alt="" /> Índices
-
-| Índice                                          | Uso                                             |
-| ----------------------------------------------- | ----------------------------------------------- |
-| `idx_usuarios_email_estado`                     | Login y búsqueda por email.                     |
-| `idx_usuarios_nombre_estado`                    | Listado de usuarios.                            |
-| `idx_prestamos_temporal_usuario_estado`         | Historial y filtros por rango de fechas.        |
-| `idx_mantenimientos_temporal_empresa_estado`    | Historial de mantenimiento.                     |
-| `idx_grupos_equipos_busqueda`                   | Búsqueda por categoría, nombre, modelo y marca. |
-| `idx_equipos_agrupacion`                        | Joins entre equipos y grupos.                   |
-| `idx_detalles_prestamos_por_prestamo`           | Detalle por préstamo.                           |
-| `idx_detalles_mantenimientos_por_mantenimiento` | Detalle por mantenimiento.                      |
-
----
-
-## <img height="22" src="assets/readme-icons/views.svg" alt="" /> Vistas SQL
-
-| Vista                                | Propósito                                          |
-| ------------------------------------ | -------------------------------------------------- |
-| `vw_equipos_necesitan_mantenimiento` | Equipos que requieren mantenimiento preventivo.    |
-| `vw_ubicaciones_grupos_equipos`      | Ubicación física de equipos por mueble y gavetero. |
-
----
-
-## <img height="22" src="assets/readme-icons/restoration.svg" alt="" /> Restauración
+## Initialize Database
 
 ```bash
 psql -U postgres -c "CREATE DATABASE IMT_Reservas;"
-psql -U postgres -d IMT_Reservas -f code/database/init.sql
 psql -U postgres -d IMT_Reservas -c "\dt"
 ```
 
-Con Docker:
+With Docker:
 
 ```bash
 cd code
 docker compose up -d ucb_db
 ```
 
-El contenedor `ucb_db` ejecuta `code/database/init.sql` en el primer arranque.
+Docker starts PostgreSQL with an empty persistent volume. Restore a release backup when you need a populated local database.
+
+## Backup and Restore
+
+Create a custom-format backup:
+
+```bash
+pg_dump -U postgres -d IMT_Reservas -F c -f artifacts/releases/database/backup.backup
+```
+
+Create a plain SQL backup:
+
+```bash
+pg_dump -U postgres -d IMT_Reservas -f artifacts/releases/database/backup.sql
+```
+
+Restore a custom-format backup:
+
+```bash
+pg_restore -U postgres -d IMT_Reservas --clean --if-exists artifacts/releases/database/backup.backup
+```
+
+Restore a plain SQL backup:
+
+```bash
+psql -U postgres -d IMT_Reservas -f artifacts/releases/database/backup.sql
+```
+
+Backups are release artifacts. They must not be committed to the repository.

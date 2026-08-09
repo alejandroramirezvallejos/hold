@@ -1,38 +1,21 @@
-<div align="center">
-
 # API Reference
 
-Backend `.NET 8` con endpoints REST bajo `/api/{Controller}` y respuestas normalizadas con `Ardalis.Result`.
+The backend exposes REST endpoints under `/api/{Controller}` and returns normalized response objects built with `Ardalis.Result`.
 
-[Volver al README](../README.md) · [Setup](setup.md) · [Base de datos](database.md)
+## Response Contract
 
-</div>
-
----
-
-## <img height="22" src="assets/readme-icons/response.svg" alt="" /> Formato de Respuesta
-
-### `200 OK`
+Successful responses include a status code and a `Value` payload:
 
 ```json
 {
   "Status": 200,
-  "Value": { "Id": 1, "Nombre": "Ejemplo" },
+  "Value": { "Id": 1, "Nombre": "Osciloscopio" },
   "Errors": [],
   "ValidationErrors": []
 }
 ```
 
-### `201 Created`
-
-```json
-{
-  "Status": 201,
-  "Value": { "Id": 42 }
-}
-```
-
-### `400 Validation`
+Validation and domain failures preserve the same structure:
 
 ```json
 {
@@ -43,128 +26,125 @@ Backend `.NET 8` con endpoints REST bajo `/api/{Controller}` y respuestas normal
 }
 ```
 
-### `401 Unauthorized`
+Common statuses:
 
-```json
-{
-  "Status": 401,
-  "Value": null,
-  "Errors": ["Credenciales inválidas"]
-}
+| Status | Meaning |
+| --- | --- |
+| `200 OK` | Request completed successfully. |
+| `201 Created` | Resource created successfully. |
+| `400 Bad Request` | Validation or business-rule failure. |
+| `401 Unauthorized` | Missing or invalid credentials. |
+| `403 Forbidden` | Authenticated user does not have permission. |
+| `404 Not Found` | Resource does not exist or is not visible. |
+
+## Authentication
+
+JWT is used for authenticated requests. Protected endpoints require:
+
+```http
+Authorization: Bearer <token>
 ```
 
-### `404 Not Found`
+Administrative operations require an administrator account.
 
-```json
-{
-  "Status": 404,
-  "Value": null,
-  "Errors": ["Not Found"]
-}
-```
-
----
-
-## <img height="22" src="assets/readme-icons/endpoints.svg" alt="" /> Endpoints
+## Endpoints
 
 ### Usuario
 
-| Método   | Ruta                    | Uso                                  |
-| -------- | ----------------------- | ------------------------------------ |
-| `GET`    | `/api/Usuario`          | Lista usuarios activos.              |
-| `GET`    | `/api/Usuario/{carnet}` | Obtiene un usuario por carnet.       |
-| `POST`   | `/api/Usuario`          | Crea usuario y hashea contraseña.    |
-| `PUT`    | `/api/Usuario/{carnet}` | Actualiza datos del usuario.         |
-| `DELETE` | `/api/Usuario/{carnet}` | Elimina lógicamente al usuario.      |
-| `POST`   | `/api/Usuario/login`    | Autentica y retorna datos de sesión. |
-
-### Equipo
-
-| Método   | Ruta               | Uso                            |
-| -------- | ------------------ | ------------------------------ |
-| `GET`    | `/api/Equipo`      | Lista equipos activos.         |
-| `GET`    | `/api/Equipo/{id}` | Obtiene equipo por id.         |
-| `POST`   | `/api/Equipo`      | Crea una unidad de equipo.     |
-| `PUT`    | `/api/Equipo/{id}` | Actualiza una unidad.          |
-| `DELETE` | `/api/Equipo/{id}` | Elimina lógicamente la unidad. |
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/Usuario` | List active users. |
+| `GET` | `/api/Usuario/{carnet}` | Get a user by carnet. |
+| `POST` | `/api/Usuario` | Create a user and hash the password. |
+| `PUT` | `/api/Usuario/{carnet}` | Update user data. |
+| `DELETE` | `/api/Usuario/{carnet}` | Soft-delete a user. |
+| `POST` | `/api/Usuario/login` | Authenticate and return session data. |
 
 ### GrupoEquipo
 
-| Método   | Ruta                    | Uso                           |
-| -------- | ----------------------- | ----------------------------- |
-| `GET`    | `/api/GrupoEquipo`      | Lista grupos activos.         |
-| `GET`    | `/api/GrupoEquipo/{id}` | Obtiene grupo por id.         |
-| `POST`   | `/api/GrupoEquipo`      | Crea grupo.                   |
-| `PUT`    | `/api/GrupoEquipo/{id}` | Actualiza grupo.              |
-| `DELETE` | `/api/GrupoEquipo/{id}` | Elimina lógicamente el grupo. |
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/GrupoEquipo` | List active equipment groups. |
+| `GET` | `/api/GrupoEquipo/{id}` | Get an equipment group by id. |
+| `POST` | `/api/GrupoEquipo` | Create an equipment group. |
+| `PUT` | `/api/GrupoEquipo/{id}` | Update an equipment group. |
+| `DELETE` | `/api/GrupoEquipo/{id}` | Soft-delete an equipment group. |
+| `GET` | `/api/GrupoEquipo/{id}/comentarios` | List comments for an equipment group. |
+| `POST` | `/api/GrupoEquipo/{id}/comentarios` | Add an authenticated comment. |
+
+### Equipo
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/Equipo` | List active physical equipment units. |
+| `GET` | `/api/Equipo/{id}` | Get an equipment unit by id. |
+| `POST` | `/api/Equipo` | Create a physical equipment unit. |
+| `PUT` | `/api/Equipo/{id}` | Update a physical equipment unit. |
+| `DELETE` | `/api/Equipo/{id}` | Soft-delete a physical equipment unit. |
 
 ### Prestamo
 
-| Método   | Ruta                               | Uso                                  |
-| -------- | ---------------------------------- | ------------------------------------ |
-| `GET`    | `/api/Prestamo`                    | Lista préstamos para administración. |
-| `GET`    | `/api/Prestamo/{id}`               | Obtiene préstamo por id.             |
-| `GET`    | `/api/Prestamo/historial/{carnet}` | Historial de un usuario.             |
-| `POST`   | `/api/Prestamo`                    | Crea solicitud de préstamo.          |
-| `PUT`    | `/api/Prestamo/{id}/estado`        | Cambia estado del préstamo.          |
-| `DELETE` | `/api/Prestamo/{id}`               | Elimina lógicamente el préstamo.     |
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/Prestamo` | List loans for administration. |
+| `GET` | `/api/Prestamo/{id}` | Get a loan by id. |
+| `GET` | `/api/Prestamo/historial/{carnet}` | Get loan history for a user. |
+| `POST` | `/api/Prestamo` | Create a loan request. |
+| `PUT` | `/api/Prestamo/{id}/estado` | Change loan state. |
+| `DELETE` | `/api/Prestamo/{id}` | Soft-delete a loan. |
 
 ### Disponibilidad
 
-| Método | Ruta                          | Uso                                                       |
-| ------ | ----------------------------- | --------------------------------------------------------- |
-| `POST` | `/api/Carrito/disponibilidad` | Calcula unidades disponibles por grupo y rango de fechas. |
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/Carrito/disponibilidad` | Calculate available units by group and date range. |
 
 ### Mantenimiento
 
-| Método   | Ruta                      | Uso                                |
-| -------- | ------------------------- | ---------------------------------- |
-| `GET`    | `/api/Mantenimiento`      | Lista mantenimientos.              |
-| `GET`    | `/api/Mantenimiento/{id}` | Obtiene mantenimiento.             |
-| `POST`   | `/api/Mantenimiento`      | Crea mantenimiento.                |
-| `PUT`    | `/api/Mantenimiento/{id}` | Actualiza mantenimiento.           |
-| `DELETE` | `/api/Mantenimiento/{id}` | Elimina lógicamente mantenimiento. |
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/Mantenimiento` | List maintenance records. |
+| `GET` | `/api/Mantenimiento/{id}` | Get a maintenance record. |
+| `POST` | `/api/Mantenimiento` | Create a maintenance record. |
+| `PUT` | `/api/Mantenimiento/{id}` | Update a maintenance record. |
+| `DELETE` | `/api/Mantenimiento/{id}` | Soft-delete a maintenance record. |
 
-### Catálogos
+### Catalogs
 
-| Controller             | Ruta                        | Operaciones |
-| ---------------------- | --------------------------- | ----------- |
-| `Categoria`            | `/api/Categoria`            | CRUD        |
-| `Carrera`              | `/api/Carrera`              | CRUD        |
-| `Accesorio`            | `/api/Accesorio`            | CRUD        |
-| `Componente`           | `/api/Componente`           | CRUD        |
-| `EmpresaMantenimiento` | `/api/EmpresaMantenimiento` | CRUD        |
-| `Mueble`               | `/api/Mueble`               | CRUD        |
-| `Gavetero`             | `/api/Gavetero`             | CRUD        |
+| Controller | Base route | Operations |
+| --- | --- | --- |
+| `Categoria` | `/api/Categoria` | CRUD |
+| `Carrera` | `/api/Carrera` | CRUD |
+| `Accesorio` | `/api/Accesorio` | CRUD |
+| `Componente` | `/api/Componente` | CRUD |
+| `EmpresaMantenimiento` | `/api/EmpresaMantenimiento` | CRUD |
+| `Mueble` | `/api/Mueble` | CRUD |
+| `Gavetero` | `/api/Gavetero` | CRUD |
 
----
+## Business Rules
 
-## <img height="22" src="assets/readme-icons/validation.svg" alt="" /> Reglas de Validación
+| Area | Rule |
+| --- | --- |
+| Users | `Carnet` and `Email` are required and unique. `Telefono` is unique when provided. |
+| Passwords | Minimum 8 characters, at least one uppercase letter, one number and one special character. |
+| Equipment | `CodigoImt` is assigned when the unit is created and must not be changed later. |
+| Loans | User, equipment group, loan date and return date are required. |
+| Availability | Only loans in `aprobado` or `activo` state block capacity. |
+| Approval | Availability is revalidated before a pending loan can be approved. |
 
-| Entidad              | Regla                                                                     |
-| -------------------- | ------------------------------------------------------------------------- |
-| Usuario              | `Carnet` y `Email` requeridos y únicos. `Telefono` único cuando se envía. |
-| Contraseña           | Mínimo 8 caracteres, una mayúscula, un número y un carácter especial.     |
-| Equipo               | `IdGrupoEquipo` requerido. `CodigoImt` se asigna al crear y no se edita.  |
-| EmpresaMantenimiento | `NIT` único cuando se envía.                                              |
-| Prestamo             | Usuario, grupo, fecha de préstamo y fecha de devolución son obligatorios. |
-
-Transiciones de préstamo:
+Loan state model:
 
 ```text
 pendiente -> aprobado -> activo -> finalizado
-    |             |          |
-    +-> rechazado +-> cancelado
+    |             |
+    |             +-> cancelado
+    +-> rechazado
 ```
 
-La aprobación revalida conflictos antes de confirmar el préstamo.
-
----
-
-## <img height="22" src="assets/readme-icons/health.svg" alt="" /> Health Check
+## Health Check
 
 ```http
 GET /api/health
 ```
 
-Retorna `200 OK` con `Healthy` cuando la API y la base de datos están operativas.
+Returns `200 OK` with `Healthy` when the API and database are available.
