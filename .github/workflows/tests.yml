@@ -106,30 +106,6 @@ jobs:
         if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != ''
         run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
-      - name: Fetch SonarQube measures
-        if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != ''
-        run: |
-          mkdir -p code/tools/quality-reports
-          curl --fail --silent --show-error --user "$SONAR_TOKEN:" \
-            "$SONAR_HOST_URL/api/measures/component?component=$SONAR_PROJECT_KEY&metricKeys=alert_status,bugs,vulnerabilities,security_hotspots,code_smells,coverage,duplicated_lines_density" \
-            --output code/tools/quality-reports/sonar-measures.json
-
-      - name: Generate visual quality report
-        if: always()
-        run: |
-          node code/tools/quality-reports/generate-quality-report.js
-          mkdir -p code/tools/quality-reports/html/frontend-coverage
-          mkdir -p code/tools/quality-reports/html/backend-coverage
-          cp -r code/client/coverage/. code/tools/quality-reports/html/frontend-coverage/ || true
-          cp -r code/tests/coveragereport/. code/tools/quality-reports/html/backend-coverage/ || true
-
-      - name: Upload visual quality report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: visual-quality-report
-          path: code/tools/quality-reports/html/
-
       - name: Upload backend coverage
         if: always()
         uses: actions/upload-artifact@v4
