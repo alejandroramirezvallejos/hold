@@ -12,9 +12,7 @@ code/coveragereport
 code/server/.sonarqube
 code/tests/coveragereport
 code/tests/TestResults/
-code/tools/quality-reports/*
-!code/tools/quality-reports/
-!code/tools/quality-reports/generate-quality-report.js
+code/tools/quality-reports/
 .vs/
 .vscode/
 .agents
@@ -96,7 +94,6 @@ logs/
 code/database/*.backup
 code/database/*.dump
 code/database/backups/
-!code/database/init.sql
 !code/database/schema.sql
 
 *.log
