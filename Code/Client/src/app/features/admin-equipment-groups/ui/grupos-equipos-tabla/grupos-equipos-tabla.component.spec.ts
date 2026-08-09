@@ -41,31 +41,23 @@ describe('GruposEquiposTablaComponent', () => {
     ).toEqual(['Zeta', 'Alpha']);
   });
 
-  it('should reorder the rendered rows when the Nombre header is clicked', () => {
+  it('should render table headers without sort buttons', () => {
     component.gruposEquiposFiltrados = [
       Object.assign(new GrupoEquipo(), { id: 0, nombre: 'Zeta' }),
       Object.assign(new GrupoEquipo(), { id: 0, nombre: 'Alpha' }),
     ];
     fixture.detectChanges();
 
-    const filasNombre = (): string[] =>
-      Array.from(
-        fixture.nativeElement.querySelectorAll('tbody tr td:first-child'),
-      ).map((celda) => (celda as HTMLElement).textContent!.trim());
-
-    expect(filasNombre()).toEqual(['Zeta', 'Alpha']);
-
-    const botonOrdenar: HTMLElement = fixture.nativeElement.querySelector(
-      '.sortable-th .table-sort-button',
+    const sortableHeader = fixture.nativeElement.querySelector('.sortable-th');
+    const sortButton = fixture.nativeElement.querySelector(
+      '.table-sort-button',
     );
-    botonOrdenar.click();
-    fixture.detectChanges();
+    const headers = Array.from(
+      fixture.nativeElement.querySelectorAll('thead th'),
+    ).map((header) => (header as HTMLElement).textContent!.trim());
 
-    expect(filasNombre()).toEqual(['Alpha', 'Zeta']);
-
-    botonOrdenar.click();
-    fixture.detectChanges();
-
-    expect(filasNombre()).toEqual(['Zeta', 'Alpha']);
+    expect(sortableHeader).toBeNull();
+    expect(sortButton).toBeNull();
+    expect(headers).toContain('Nombre');
   });
 });

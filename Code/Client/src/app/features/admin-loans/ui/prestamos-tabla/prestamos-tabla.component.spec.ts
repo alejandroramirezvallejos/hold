@@ -40,21 +40,25 @@ describe('PrestamosTablaComponent', () => {
     expect(nombresRenderizados()).toEqual(['Reciente', 'Antiguo']);
   });
 
-  it('should use the global sorter when a loan table header is clicked', () => {
+  it('should render loan table headers without sort buttons', () => {
     cargarPrestamos([
       crearPrestamo({ id: 1, nombre: 'CarnetMayor', carnet: '200' }),
       crearPrestamo({ id: 2, nombre: 'CarnetMenor', carnet: '100' }),
     ]);
 
-    botonCabecera('Carnet').click();
-    fixture.detectChanges();
+    const sortButtons = fixture.nativeElement.querySelectorAll(
+      '.table-sort-button',
+    );
+    const sortableHeaders =
+      fixture.nativeElement.querySelectorAll('.sortable-th');
+    const headers = Array.from(
+      fixture.nativeElement.querySelectorAll('thead th'),
+    ).map((header) => (header as HTMLElement).textContent!.trim());
 
-    expect(nombresRenderizados()).toEqual(['CarnetMenor', 'CarnetMayor']);
-
-    botonCabecera('Carnet').click();
-    fixture.detectChanges();
-
-    expect(nombresRenderizados()).toEqual(['CarnetMayor', 'CarnetMenor']);
+    expect(sortButtons.length).toBe(0);
+    expect(sortableHeaders.length).toBe(0);
+    expect(headers).toContain('Carnet');
+    expect(headers).toContain('Estado');
   });
 
   function cargarPrestamos(prestamos: PrestamoDto[]): void {
@@ -92,19 +96,6 @@ describe('PrestamosTablaComponent', () => {
       ),
       EstadoPrestamo: datos.estado ?? 'pendiente',
     });
-  }
-
-  function botonCabecera(nombre: string): HTMLElement {
-    const botones = Array.from(
-      fixture.nativeElement.querySelectorAll('.table-sort-button'),
-    ) as HTMLElement[];
-    const boton = botones.find((elemento) =>
-      elemento.textContent?.includes(nombre),
-    );
-
-    if (!boton) throw new Error(`No se encontró la cabecera ${nombre}`);
-
-    return boton;
   }
 
   function nombresRenderizados(): string[] {
