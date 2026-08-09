@@ -15,6 +15,7 @@ import {
 import { Carrito } from '@entities/cart';
 import {
   ComentarioEquipo,
+  ComentarioEquipoOrden,
   GrupoEquipo,
   GrupoequipoService,
 } from '@entities/equipment-group';
@@ -24,6 +25,8 @@ import { ImageCacheService } from '@shared/lib/image/image-cache.service';
 import {
   EquipmentImagePlaceholderComponent,
   MostrarerrorComponent,
+  CustomSelectComponent,
+  OpcionSelect,
 } from '@shared/ui';
 
 const MINIMUM_CART_QUANTITY = 1;
@@ -40,6 +43,7 @@ const MAX_COMMENT_LENGTH = 1024;
     CalendarioComponent,
     FormsModule,
     NgOptimizedImage,
+    CustomSelectComponent,
   ],
   templateUrl: './objeto.component.html',
   styleUrl: './objeto.component.css',
@@ -47,6 +51,7 @@ const MAX_COMMENT_LENGTH = 1024;
 export class ObjetoComponent {
   readonly minimumCartQuantity = MINIMUM_CART_QUANTITY;
   readonly maxCommentLength = MAX_COMMENT_LENGTH;
+  readonly skeletonComentarios = [0, 1, 2];
   id: string = '';
   producto: GrupoEquipo = new GrupoEquipo();
   cantidadDisponible: number = 0;
@@ -71,8 +76,19 @@ export class ObjetoComponent {
   comentarios: ComentarioEquipo[] = [];
   comentarioTexto = '';
   comentarioError = '';
+  ordenComentarios: ComentarioEquipoOrden = 'recientes';
+  ordenComentariosOpciones: OpcionSelect[] = [
+    { value: 'recientes', label: 'Más recientes' },
+    { value: 'antiguos', label: 'Más antiguos' },
+    { value: 'likes', label: 'Más likes' },
+  ];
+  respuestaActivaId: number | null = null;
+  respuestaTexto: Record<number, string | undefined> = {};
   cargandoComentarios = false;
   publicandoComentario = false;
+  publicandoRespuestaId: number | null = null;
+  eliminandoComentarioId: number | null = null;
+  private readonly likePendienteIds = new Set<number>();
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -202,7 +218,9 @@ export class ObjetoComponent {
     this.cargandoComentarios = true;
     this.comentarioError = '';
 
-    this.servicio.obtenerComentarios(this.producto.id).subscribe({
+    this.servicio
+      .obtenerComentarios(this.producto.id, this.ordenComentarios)
+      .subscribe({
       next: (comentarios) => {
         this.comentarios = comentarios;
         this.cargandoComentarios = false;
@@ -211,7 +229,15 @@ export class ObjetoComponent {
         this.comentarioError = 'No se pudieron cargar los comentarios.';
         this.cargandoComentarios = false;
       },
-    });
+      });
+  }
+
+  cambiarOrdenComentarios(orden: unknown): void {
+    if (!this.esOrdenComentarios(orden)) return;
+    if (this.ordenComentarios === orden) return;
+
+    this.ordenComentarios = orden;
+    this.cargarComentarios();
   }
 
   publicarComentario(): void {
@@ -233,16 +259,155 @@ export class ObjetoComponent {
     this.comentarioError = '';
 
     this.servicio.crearComentario(this.producto.id, contenido).subscribe({
-      next: (comentario) => {
-        this.comentarios = [comentario, ...this.comentarios];
+      next: () => {
         this.comentarioTexto = '';
         this.publicandoComentario = false;
+        this.cargarComentarios();
       },
       error: () => {
         this.comentarioError = 'No se pudo publicar el comentario.';
         this.publicandoComentario = false;
       },
     });
+  }
+
+  alternarRespuesta(comentarioId: number): void {
+    this.respuestaActivaId =
+      this.respuestaActivaId === comentarioId ? null : comentarioId;
+    this.comentarioError = '';
+  }
+
+  cancelarRespuesta(comentarioId: number): void {
+    this.respuestaTexto[comentarioId] = '';
+    this.respuestaActivaId = null;
+  }
+
+  publicarRespuesta(comentarioId: number): void {
+    if (!this.producto.id) return;
+
+    const contenido = (this.respuestaTexto[comentarioId] ?? '').trim();
+
+    if (!contenido) {
+      this.comentarioError = 'Escribe una respuesta antes de publicar.';
+      return;
+    }
+
+    if (contenido.length > MAX_COMMENT_LENGTH) {
+      this.comentarioError = `La respuesta no puede superar ${MAX_COMMENT_LENGTH} caracteres.`;
+      return;
+    }
+
+    this.publicandoRespuestaId = comentarioId;
+    this.comentarioError = '';
+
+    this.servicio
+      .crearComentario(this.producto.id, contenido, comentarioId)
+      .subscribe({
+        next: () => {
+          this.respuestaTexto[comentarioId] = '';
+          this.respuestaActivaId = null;
+          this.publicandoRespuestaId = null;
+          this.cargarComentarios();
+        },
+        error: () => {
+          this.comentarioError = 'No se pudo publicar la respuesta.';
+          this.publicandoRespuestaId = null;
+        },
+      });
+  }
+
+  alternarLikeComentario(comentario: ComentarioEquipo): void {
+    if (!this.producto.id || this.likePendienteIds.has(comentario.id)) return;
+
+    this.likePendienteIds.add(comentario.id);
+    this.comentarioError = '';
+
+    this.servicio
+      .alternarLikeComentario(this.producto.id, comentario.id)
+      .subscribe({
+        next: (actualizado) => {
+          this.comentarios = this.actualizarComentario(
+            this.comentarios,
+            actualizado,
+          );
+          this.likePendienteIds.delete(comentario.id);
+        },
+        error: () => {
+          this.comentarioError = 'No se pudo actualizar el like.';
+          this.likePendienteIds.delete(comentario.id);
+        },
+      });
+  }
+
+  eliminarComentario(comentario: ComentarioEquipo): void {
+    if (!this.producto.id || this.eliminandoComentarioId === comentario.id)
+      return;
+
+    this.eliminandoComentarioId = comentario.id;
+    this.comentarioError = '';
+
+    this.servicio.eliminarComentario(this.producto.id, comentario.id).subscribe({
+      next: () => {
+        this.comentarios = this.removerComentario(
+          this.comentarios,
+          comentario.id,
+        );
+        this.eliminandoComentarioId = null;
+      },
+      error: () => {
+        this.comentarioError = 'No se pudo eliminar el comentario.';
+        this.eliminandoComentarioId = null;
+      },
+    });
+  }
+
+  totalComentarios(): number {
+    return this.comentarios.reduce(
+      (total, comentario) => total + 1 + comentario.respuestas.length,
+      0,
+    );
+  }
+
+  likePendiente(comentarioId: number): boolean {
+    return this.likePendienteIds.has(comentarioId);
+  }
+
+  private actualizarComentario(
+    comentarios: ComentarioEquipo[],
+    actualizado: ComentarioEquipo,
+  ): ComentarioEquipo[] {
+    return comentarios.map((comentario) =>
+      comentario.id === actualizado.id
+        ? {
+            ...comentario,
+            likes: actualizado.likes,
+            likedByCurrentUser: actualizado.likedByCurrentUser,
+            puedeEliminar: actualizado.puedeEliminar,
+          }
+        : {
+            ...comentario,
+            respuestas: this.actualizarComentario(
+              comentario.respuestas,
+              actualizado,
+            ),
+          },
+    );
+  }
+
+  private removerComentario(
+    comentarios: ComentarioEquipo[],
+    comentarioId: number,
+  ): ComentarioEquipo[] {
+    return comentarios
+      .filter((comentario) => comentario.id !== comentarioId)
+      .map((comentario) => ({
+        ...comentario,
+        respuestas: this.removerComentario(comentario.respuestas, comentarioId),
+      }));
+  }
+
+  private esOrdenComentarios(orden: unknown): orden is ComentarioEquipoOrden {
+    return orden === 'recientes' || orden === 'antiguos' || orden === 'likes';
   }
 
   cerrarAvisoModal(): void {

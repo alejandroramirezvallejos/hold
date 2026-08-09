@@ -3,7 +3,10 @@ import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import { ApiResponse, extractApiValue } from '@shared/api';
 import { map, Observable, of, tap } from 'rxjs';
-import { ComentarioEquipo } from '../model/comentario-equipo';
+import {
+  ComentarioEquipo,
+  ComentarioEquipoOrden,
+} from '../model/comentario-equipo';
 import { GrupoEquipo } from '../model/grupo-equipo';
 import { ComentarioEquipoApiItem } from './comentario-equipo-api-item';
 import { GrupoEquipoApiItem } from './grupo-equipo-api-item';
@@ -19,10 +22,15 @@ export class GrupoequipoService {
   private readonly comentarioEquipoApiVacio: ComentarioEquipoApiItem = {
     Id: 0,
     IdGrupoEquipo: 0,
+    IdComentarioPadre: null,
     CarnetUsuario: '',
     NombreUsuario: '',
     Contenido: '',
     FechaCreacion: '',
+    Likes: 0,
+    LikedByCurrentUser: false,
+    PuedeEliminar: false,
+    Respuestas: [],
   };
   private readonly cache = new Map<string, GrupoEquipo[]>();
   paginaGuardada: number = 0;
@@ -52,10 +60,17 @@ export class GrupoequipoService {
     return {
       id: item.Id,
       idGrupoEquipo: item.IdGrupoEquipo,
+      idComentarioPadre: item.IdComentarioPadre ?? null,
       carnetUsuario: item.CarnetUsuario,
       nombreUsuario: item.NombreUsuario,
       contenido: item.Contenido,
       fechaCreacion: item.FechaCreacion,
+      likes: item.Likes ?? 0,
+      likedByCurrentUser: item.LikedByCurrentUser ?? false,
+      puedeEliminar: item.PuedeEliminar ?? false,
+      respuestas: (item.Respuestas ?? []).map((respuesta) =>
+        this.mapearComentario(respuesta),
+      ),
     };
   }
 
@@ -134,10 +149,16 @@ export class GrupoequipoService {
       );
   }
 
-  obtenerComentarios(idGrupoEquipo: number): Observable<ComentarioEquipo[]> {
+  obtenerComentarios(
+    idGrupoEquipo: number,
+    orden: ComentarioEquipoOrden = 'recientes',
+  ): Observable<ComentarioEquipo[]> {
     return this.http
       .get<ApiResponse<ComentarioEquipoApiItem[]>>(
         `${this.apiUrl}/${idGrupoEquipo}/comentarios`,
+        {
+          params: new HttpParams().set('orden', orden),
+        },
       )
       .pipe(
         map((data) =>
@@ -149,11 +170,15 @@ export class GrupoequipoService {
   crearComentario(
     idGrupoEquipo: number,
     contenido: string,
+    idComentarioPadre?: number,
   ): Observable<ComentarioEquipo> {
     return this.http
       .post<ApiResponse<ComentarioEquipoApiItem>>(
         `${this.apiUrl}/${idGrupoEquipo}/comentarios`,
-        { Contenido: contenido },
+        {
+          Contenido: contenido,
+          IdComentarioPadre: idComentarioPadre ?? null,
+        },
       )
       .pipe(
         map((data) =>
@@ -162,6 +187,33 @@ export class GrupoequipoService {
           ),
         ),
       );
+  }
+
+  alternarLikeComentario(
+    idGrupoEquipo: number,
+    idComentario: number,
+  ): Observable<ComentarioEquipo> {
+    return this.http
+      .post<ApiResponse<ComentarioEquipoApiItem>>(
+        `${this.apiUrl}/${idGrupoEquipo}/comentarios/${idComentario}/like`,
+        {},
+      )
+      .pipe(
+        map((data) =>
+          this.mapearComentario(
+            extractApiValue(data, this.comentarioEquipoApiVacio),
+          ),
+        ),
+      );
+  }
+
+  eliminarComentario(
+    idGrupoEquipo: number,
+    idComentario: number,
+  ): Observable<unknown> {
+    return this.http.delete(
+      `${this.apiUrl}/${idGrupoEquipo}/comentarios/${idComentario}`,
+    );
   }
 
   editarGrupoEquipo(grupoEquipo: GrupoEquipo) {
