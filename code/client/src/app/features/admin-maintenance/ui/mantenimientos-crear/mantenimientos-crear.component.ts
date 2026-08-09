@@ -21,13 +21,13 @@ import {
   MostrarerrorComponent,
 } from '@shared/ui';
 import { MantenimientosServiceEquipos } from '../../model/mantenimientos-equipos.service';
-import { ListaequipoComponent } from './listaequipo/listaequipo.component';
+import { ListaEquipoComponent } from './lista-equipo/lista-equipo.component';
 @Component({
   selector: 'app-mantenimientos-crear',
   standalone: true,
   imports: [
     FormsModule,
-    ListaequipoComponent,
+    ListaEquipoComponent,
     CommonModule,
     MostrarerrorComponent,
     Aviso,

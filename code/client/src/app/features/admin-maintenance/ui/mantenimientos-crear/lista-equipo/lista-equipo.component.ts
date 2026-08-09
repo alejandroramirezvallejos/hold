@@ -21,17 +21,17 @@ const EQUIPO_ORDEN_CAMPO: Record<EquipoOrdenColumna, keyof Equipos> = {
 };
 
 @Component({
-  selector: 'app-listaequipo',
+  selector: 'app-lista-equipo',
   imports: [
     CommonModule,
     FormsModule,
     FormularioDatosComponent,
     MostrarerrorComponent,
   ],
-  templateUrl: './listaequipo.component.html',
-  styleUrl: './listaequipo.component.css',
+  templateUrl: './lista-equipo.component.html',
+  styleUrl: './lista-equipo.component.css',
 })
-export class ListaequipoComponent extends BaseTablaComponent {
+export class ListaEquipoComponent extends BaseTablaComponent {
   @Input() agregarequipo: WritableSignal<boolean> = signal(true);
   equipos: Equipos[] = [];
   equiposcopia: Equipos[] = [];

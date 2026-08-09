@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { withDefaultTestingProviders } from '@shared/lib/testing';
-import { ListaequipoComponent } from './listaequipo.component';
-describe('ListaequipoComponent', () => {
-  let component: ListaequipoComponent;
-  let fixture: ComponentFixture<ListaequipoComponent>;
+import { ListaEquipoComponent } from './lista-equipo.component';
+describe('ListaEquipoComponent', () => {
+  let component: ListaEquipoComponent;
+  let fixture: ComponentFixture<ListaEquipoComponent>;
   beforeEach(async () => {
     await TestBed.configureTestingModule(
       withDefaultTestingProviders({
-        imports: [ListaequipoComponent],
+        imports: [ListaEquipoComponent],
       }),
     ).compileComponents();
-    fixture = TestBed.createComponent(ListaequipoComponent);
+    fixture = TestBed.createComponent(ListaEquipoComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
