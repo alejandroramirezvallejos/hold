@@ -31,14 +31,28 @@ public class GrupoEquipoController : Controller
     public async Task<IActionResult> Get(int id) => ToResponse(await _service.Get(id));
 
     [HttpGet("{id:int}/comentarios")]
-    public async Task<IActionResult> GetComentarios(int id) =>
-        ToResponse(await _comentarios.GetByGrupo(id));
+    public async Task<IActionResult> GetComentarios(
+        int id,
+        [FromQuery] string? orden = null
+    ) => ToResponse(await _comentarios.GetByGrupo(id, orden, CurrentCarnet, IsAdmin));
 
     [HttpPost("{id:int}/comentarios")]
     public async Task<IActionResult> CreateComentario(
         int id,
         [FromBody] CrearComentarioEquipoDto? dto
     ) => ToResponse(await _comentarios.Create(id, CurrentCarnet, dto));
+
+    [HttpPost("{id:int}/comentarios/{comentarioId:int}/like")]
+    public async Task<IActionResult> ToggleComentarioLike(int id, int comentarioId) =>
+        ToResponse(await _comentarios.ToggleLike(id, comentarioId, CurrentCarnet, IsAdmin));
+
+    [HttpDelete("{id:int}/comentarios/{comentarioId:int}")]
+    public async Task<IActionResult> DeleteComentario(int id, int comentarioId)
+    {
+        var result = await _comentarios.Delete(id, comentarioId, CurrentCarnet, IsAdmin);
+
+        return result.IsSuccess ? NoContent() : ToResponse(result);
+    }
 
     [Authorize(Roles = "administrador")]
     [HttpPost]
@@ -59,4 +73,5 @@ public class GrupoEquipoController : Controller
     public async Task<IActionResult> Delete(int id) => ToDeleteResponse(await _service.Delete(id));
 
     private string CurrentCarnet => User.Identity?.Name ?? string.Empty;
+    private bool IsAdmin => User.IsInRole("administrador");
 }

@@ -515,15 +515,27 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasColumnName("id_comentario_equipo");
             entity.Property(e => e.IdGrupoEquipo).HasColumnName("id_grupo_equipo");
+            entity.Property(e => e.IdComentarioPadre).HasColumnName("id_comentario_padre");
             entity.Property(e => e.CarnetUsuario).HasColumnName("carnet_usuario").HasMaxLength(20);
             entity.Property(e => e.Contenido).HasColumnName("contenido").HasMaxLength(1024);
             entity.Property(e => e.FechaCreacion).HasColumnName("fecha_creacion");
+            entity.Property(e => e.Likes).HasColumnName("likes").HasDefaultValue(0);
+            entity
+                .Property(e => e.LikedBy)
+                .HasColumnName("liked_by")
+                .HasColumnType("text")
+                .HasDefaultValue(string.Empty);
             entity.Property(e => e.EstadoEliminado).HasColumnName(EstadoEliminadoCol);
             entity
                 .HasOne(e => e.GrupoEquipo)
                 .WithMany()
                 .HasForeignKey(e => e.IdGrupoEquipo)
                 .IsRequired();
+            entity
+                .HasOne(e => e.ComentarioPadre)
+                .WithMany()
+                .HasForeignKey(e => e.IdComentarioPadre)
+                .OnDelete(DeleteBehavior.Restrict);
             entity
                 .HasOne(e => e.Usuario)
                 .WithMany()
@@ -535,6 +547,7 @@ public class ApplicationDbContext : DbContext
                 e.FechaCreacion,
                 e.EstadoEliminado,
             });
+            entity.HasIndex(e => new { e.IdComentarioPadre, e.EstadoEliminado });
             entity.HasQueryFilter(e => !e.EstadoEliminado);
         });
 
