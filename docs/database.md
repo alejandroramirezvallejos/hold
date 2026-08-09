@@ -2,21 +2,21 @@
 
 # Database
 
-PostgreSQL 14+ con Entity Framework Core 8. El esquema inicial vive en [`Code/DataBase/server.sql`](../Code/DataBase/server.sql).
+PostgreSQL 14+ con Entity Framework Core 8. El esquema inicial vive en [`code/database/init.sql`](../code/database/init.sql).
 
-[Volver al README](../README.md) · [Setup](SETUP.md) · [API](API.md)
+[Volver al README](../README.md) · [Setup](setup.md) · [API](api.md)
 
 </div>
 
 ---
 
-## <img height="22" src="../Images/readme-icons/database.svg" alt="" /> Diagrama ER
+## <img height="22" src="assets/readme-icons/database.svg" alt="" /> Diagrama ER
 
-![Diagrama entidad-relación](../Images/diagram.png)
+![Diagrama entidad-relación](assets/diagram.png)
 
 ---
 
-## <img height="22" src="../Images/readme-icons/tables.svg" alt="" /> Tablas
+## <img height="22" src="assets/readme-icons/tables.svg" alt="" /> Tablas
 
 | Tabla                     | Propósito                        | Soft delete | Columnas relevantes                |
 | ------------------------- | -------------------------------- | ----------- | ---------------------------------- |
@@ -38,7 +38,7 @@ PostgreSQL 14+ con Entity Framework Core 8. El esquema inicial vive en [`Code/Da
 
 ---
 
-## <img height="22" src="../Images/readme-icons/enums.svg" alt="" /> Enums
+## <img height="22" src="assets/readme-icons/enums.svg" alt="" /> Enums
 
 | Enum SQL             | Valores                                                                   | Uso                       |
 | -------------------- | ------------------------------------------------------------------------- | ------------------------- |
@@ -51,7 +51,7 @@ El backend mapea enums con `PgName` y `NpgsqlDataSourceBuilder.MapEnum<T>()`.
 
 ---
 
-## <img height="22" src="../Images/readme-icons/business-logic.svg" alt="" /> Reglas de Negocio
+## <img height="22" src="assets/readme-icons/business-logic.svg" alt="" /> Reglas de Negocio
 
 ### Contadores derivados
 
@@ -83,7 +83,7 @@ Validaciones relevantes:
 
 ---
 
-## <img height="22" src="../Images/readme-icons/indexes.svg" alt="" /> Índices
+## <img height="22" src="assets/readme-icons/indexes.svg" alt="" /> Índices
 
 | Índice                                          | Uso                                             |
 | ----------------------------------------------- | ----------------------------------------------- |
@@ -98,7 +98,7 @@ Validaciones relevantes:
 
 ---
 
-## <img height="22" src="../Images/readme-icons/views.svg" alt="" /> Vistas SQL
+## <img height="22" src="assets/readme-icons/views.svg" alt="" /> Vistas SQL
 
 | Vista                                | Propósito                                          |
 | ------------------------------------ | -------------------------------------------------- |
@@ -107,19 +107,19 @@ Validaciones relevantes:
 
 ---
 
-## <img height="22" src="../Images/readme-icons/restoration.svg" alt="" /> Restauración
+## <img height="22" src="assets/readme-icons/restoration.svg" alt="" /> Restauración
 
 ```bash
 psql -U postgres -c "CREATE DATABASE IMT_Reservas;"
-psql -U postgres -d IMT_Reservas -f Code/DataBase/server.sql
+psql -U postgres -d IMT_Reservas -f code/database/init.sql
 psql -U postgres -d IMT_Reservas -c "\dt"
 ```
 
 Con Docker:
 
 ```bash
-cd Code
+cd code
 docker compose up -d ucb_db
 ```
 
-El contenedor `ucb_db` ejecuta `Code/DataBase/server.sql` en el primer arranque.
+El contenedor `ucb_db` ejecuta `code/database/init.sql` en el primer arranque.

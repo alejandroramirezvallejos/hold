@@ -4,13 +4,13 @@
 
 Ambiente local de UCB Hold: `.NET 8`, `Angular 19.2`, `PostgreSQL 14+`, `Redis 7` y `Docker Compose`.
 
-[Volver al README](../README.md) · [API](API.md) · [Base de datos](DATABASE.md)
+[Volver al README](../README.md) · [API](api.md) · [Base de datos](database.md)
 
 </div>
 
 ---
 
-## <img height="22" src="../Images/readme-icons/prerequisites.svg" alt="" /> Requisitos
+## <img height="22" src="assets/readme-icons/prerequisites.svg" alt="" /> Requisitos
 
 | Herramienta    | Versión mínima | Verificar          |
 | -------------- | -------------- | ------------------ |
@@ -21,11 +21,11 @@ Ambiente local de UCB Hold: `.NET 8`, `Angular 19.2`, `PostgreSQL 14+`, `Redis 7
 
 ---
 
-## <img height="22" src="../Images/readme-icons/setup.svg" alt="" /> Configuración Inicial
+## <img height="22" src="assets/readme-icons/setup.svg" alt="" /> Configuración Inicial
 
 ### Docker
 
-Crear `Code/server.env`. Este archivo está ignorado por Git y no debe versionarse:
+Crear `code/server.env`. Este archivo está ignorado por Git y no debe versionarse:
 
 ```ini
 ASPNETCORE_ENVIRONMENT=Production
@@ -46,7 +46,7 @@ openssl rand -base64 32
 Configurar secretos del backend:
 
 ```bash
-cd Code/Server
+cd code/server
 dotnet user-secrets init
 dotnet user-secrets set "ConnectionStrings:PostgreSQL" "Host=localhost;Port=5432;Database=IMT_Reservas;Username=postgres;Password=postgres;Pooling=true;MinPoolSize=2;MaxPoolSize=20"
 dotnet user-secrets set "Jwt:Key" "local_dev_secret_at_least_32_chars!!"
@@ -56,18 +56,18 @@ dotnet user-secrets set "Redis:ConnectionString" "localhost:6379"
 Instalar dependencias del frontend:
 
 ```bash
-cd Code/Client
+cd code/client
 npm install
 ```
 
 ---
 
-## <img height="22" src="../Images/readme-icons/running.svg" alt="" /> Ejecución
+## <img height="22" src="assets/readme-icons/running.svg" alt="" /> Ejecución
 
 ### Opción 1: Docker
 
 ```bash
-cd Code
+cd code
 docker compose up --build
 ```
 
@@ -88,7 +88,7 @@ docker logs -f ucb_server
 
 ### Opción 2: Rider
 
-1. Abrir la carpeta `Code/`.
+1. Abrir la carpeta `code/`.
 2. Seleccionar la configuración `IMT_Reservas.FullStack`.
 3. Ejecutar con `Shift+F10`.
 
@@ -97,21 +97,21 @@ La base de datos y Redis se levantan como pasos previos desde la configuración 
 ### Opción 3: Dos Terminales
 
 ```bash
-cd Code
+cd code
 docker compose up -d ucb_db ucb_redis
 ```
 
 Backend:
 
 ```bash
-cd Code/Server
+cd code/server
 dotnet run
 ```
 
 Frontend:
 
 ```bash
-cd Code/Client
+cd code/client
 npm start
 ```
 
@@ -123,18 +123,18 @@ npm start
 
 ---
 
-## <img height="22" src="../Images/readme-icons/verification.svg" alt="" /> Verificación
+## <img height="22" src="assets/readme-icons/verification.svg" alt="" /> Verificación
 
 Backend:
 
 ```bash
-dotnet test Code/Tests/IMT_Reservas.Tests.csproj
+dotnet test code/tests/IMT_Reservas.Tests.csproj
 ```
 
 Frontend:
 
 ```bash
-cd Code/Client
+cd code/client
 npm run format:check
 npx tsc -p tsconfig.app.json --noEmit
 npx tsc -p tsconfig.spec.json --noEmit
@@ -144,13 +144,13 @@ npm run build
 
 ---
 
-## <img height="22" src="../Images/readme-icons/troubleshooting.svg" alt="" /> Solución de Problemas
+## <img height="22" src="assets/readme-icons/troubleshooting.svg" alt="" /> Solución de Problemas
 
 | Problema                            | Acción                                                       |
 | ----------------------------------- | ------------------------------------------------------------ |
 | `dotnet: command not found`         | Instalar .NET 8 SDK desde `dotnet.microsoft.com`.            |
-| PostgreSQL o Redis rechaza conexión | Ejecutar `cd Code && docker compose up -d ucb_db ucb_redis`. |
-| `User Secrets not initialized`      | Ejecutar `cd Code/Server && dotnet user-secrets init`.       |
+| PostgreSQL o Redis rechaza conexión | Ejecutar `cd code && docker compose up -d ucb_db ucb_redis`. |
+| `User Secrets not initialized`      | Ejecutar `cd code/server && dotnet user-secrets init`.       |
 | Backend en Docker reinicia          | Revisar `docker logs ucb_server`.                            |
 | Puerto `4200` ocupado               | Ejecutar `ng serve --port 4300`.                             |
-| Faltan paquetes Angular             | Ejecutar `cd Code/Client && npm install`.                    |
+| Faltan paquetes Angular             | Ejecutar `cd code/client && npm install`.                    |

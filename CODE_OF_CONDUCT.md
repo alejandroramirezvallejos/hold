@@ -10,13 +10,13 @@ Estándares de colaboración para mantener una comunidad profesional, segura y r
 
 ---
 
-## <img height="22" src="Images/readme-icons/community.svg" alt="" /> Nuestro Compromiso
+## <img height="22" src="docs/assets/readme-icons/community.svg" alt="" /> Nuestro Compromiso
 
 Nos comprometemos a hacer de la participación en UCB Hold una experiencia libre de acoso para todas las personas, sin distinción de edad, identidad o expresión de género, experiencia, educación, nacionalidad, apariencia, raza, religión, orientación sexual, discapacidad o condición socioeconómica.
 
 ---
 
-## <img height="22" src="Images/readme-icons/standards.svg" alt="" /> Estándares
+## <img height="22" src="docs/assets/readme-icons/standards.svg" alt="" /> Estándares
 
 Comportamientos esperados:
 
@@ -29,19 +29,19 @@ Comportamientos esperados:
 
 ---
 
-## <img height="22" src="Images/readme-icons/responsibility.svg" alt="" /> Responsabilidades
+## <img height="22" src="docs/assets/readme-icons/responsibility.svg" alt="" /> Responsabilidades
 
 Los mantenedores pueden aclarar estándares, moderar conversaciones, cerrar discusiones, rechazar contribuciones o aplicar restricciones temporales o permanentes cuando una conducta afecte negativamente al proyecto.
 
 ---
 
-## <img height="22" src="Images/readme-icons/scope.svg" alt="" /> Alcance
+## <img height="22" src="docs/assets/readme-icons/scope.svg" alt="" /> Alcance
 
 Este código aplica en espacios del proyecto y cuando una persona representa públicamente a UCB Hold, por ejemplo en issues, pull requests, discusiones, documentación, demos o comunicación comunitaria.
 
 ---
 
-## <img height="22" src="Images/readme-icons/enforcement.svg" alt="" /> Reportes y Aplicación
+## <img height="22" src="docs/assets/readme-icons/enforcement.svg" alt="" /> Reportes y Aplicación
 
 Los incidentes pueden reportarse a los mantenedores listados en el README. Para reportes sensibles, usar canales privados.
 
@@ -56,6 +56,6 @@ Consecuencias posibles:
 
 ---
 
-## <img height="22" src="Images/readme-icons/attribution.svg" alt="" /> Atribución
+## <img height="22" src="docs/assets/readme-icons/attribution.svg" alt="" /> Atribución
 
 Este código se basa en Contributor Covenant 1.4: <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>.

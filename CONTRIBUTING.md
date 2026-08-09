@@ -4,13 +4,13 @@
 
 Guía para contribuir a UCB Hold con cambios pequeños, revisables y alineados con la arquitectura del proyecto.
 
-[README](README.md) · [Setup](Docs/SETUP.md) · [Security](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
+[README](README.md) · [Setup](docs/setup.md) · [Security](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md)
 
 </div>
 
 ---
 
-## <img height="22" src="Images/readme-icons/contributing.svg" alt="" /> Flujo de Trabajo
+## <img height="22" src="docs/assets/readme-icons/contributing.svg" alt="" /> Flujo de Trabajo
 
 1. Revisar issues o abrir una propuesta si el cambio es grande.
 2. Crear una rama corta y descriptiva.
@@ -37,14 +37,14 @@ Guía para contribuir a UCB Hold con cambios pequeños, revisables y alineados c
 Backend:
 
 ```bash
-dotnet build Code/Server/IMT_Reservas.Server.csproj
-dotnet test Code/Tests/IMT_Reservas.Tests.csproj
+dotnet build code/server/IMT_Reservas.Server.csproj
+dotnet test code/tests/IMT_Reservas.Tests.csproj
 ```
 
 Frontend:
 
 ```bash
-cd Code/Client
+cd code/client
 npm run format:check
 npx tsc -p tsconfig.app.json --noEmit
 npx tsc -p tsconfig.spec.json --noEmit

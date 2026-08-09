@@ -10,7 +10,7 @@ Política para reportar vulnerabilidades de forma privada y responsable.
 
 ---
 
-## <img height="22" src="Images/readme-icons/security.svg" alt="" /> Versiones Soportadas
+## <img height="22" src="docs/assets/readme-icons/security.svg" alt="" /> Versiones Soportadas
 
 | Versión        | Soporte       |
 | -------------- | ------------- |
@@ -20,7 +20,7 @@ Política para reportar vulnerabilidades de forma privada y responsable.
 
 ---
 
-## <img height="22" src="Images/readme-icons/vulnerability.svg" alt="" /> Reportar una Vulnerabilidad
+## <img height="22" src="docs/assets/readme-icons/vulnerability.svg" alt="" /> Reportar una Vulnerabilidad
 
 Usar GitHub Security Advisories cuando sea posible:
 
@@ -39,7 +39,7 @@ Incluir:
 
 ---
 
-## <img height="22" src="Images/readme-icons/disclosure.svg" alt="" /> Reglas de Divulgación
+## <img height="22" src="docs/assets/readme-icons/disclosure.svg" alt="" /> Reglas de Divulgación
 
 | Hacer                                                | Evitar                                                  |
 | ---------------------------------------------------- | ------------------------------------------------------- |
@@ -49,7 +49,7 @@ Incluir:
 
 ---
 
-## <img height="22" src="Images/readme-icons/commitment.svg" alt="" /> Compromiso del Proyecto
+## <img height="22" src="docs/assets/readme-icons/commitment.svg" alt="" /> Compromiso del Proyecto
 
 | Acción                    | Tiempo objetivo                           |
 | ------------------------- | ----------------------------------------- |

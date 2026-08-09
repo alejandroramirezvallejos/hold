@@ -4,13 +4,13 @@
 
 Backend `.NET 8` con endpoints REST bajo `/api/{Controller}` y respuestas normalizadas con `Ardalis.Result`.
 
-[Volver al README](../README.md) · [Setup](SETUP.md) · [Base de datos](DATABASE.md)
+[Volver al README](../README.md) · [Setup](setup.md) · [Base de datos](database.md)
 
 </div>
 
 ---
 
-## <img height="22" src="../Images/readme-icons/response.svg" alt="" /> Formato de Respuesta
+## <img height="22" src="assets/readme-icons/response.svg" alt="" /> Formato de Respuesta
 
 ### `200 OK`
 
@@ -65,7 +65,7 @@ Backend `.NET 8` con endpoints REST bajo `/api/{Controller}` y respuestas normal
 
 ---
 
-## <img height="22" src="../Images/readme-icons/endpoints.svg" alt="" /> Endpoints
+## <img height="22" src="assets/readme-icons/endpoints.svg" alt="" /> Endpoints
 
 ### Usuario
 
@@ -139,7 +139,7 @@ Backend `.NET 8` con endpoints REST bajo `/api/{Controller}` y respuestas normal
 
 ---
 
-## <img height="22" src="../Images/readme-icons/validation.svg" alt="" /> Reglas de Validación
+## <img height="22" src="assets/readme-icons/validation.svg" alt="" /> Reglas de Validación
 
 | Entidad              | Regla                                                                     |
 | -------------------- | ------------------------------------------------------------------------- |
@@ -161,7 +161,7 @@ La aprobación revalida conflictos antes de confirmar el préstamo.
 
 ---
 
-## <img height="22" src="../Images/readme-icons/health.svg" alt="" /> Health Check
+## <img height="22" src="assets/readme-icons/health.svg" alt="" /> Health Check
 
 ```http
 GET /api/health

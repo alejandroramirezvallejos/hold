@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="Images/logo.png" alt="UCB Hold" width="128" />
+<img src="docs/assets/logo.png" alt="UCB Hold" width="128" />
 
 # UCB Hold
 
@@ -11,9 +11,9 @@ Sistema web para reservar, aprobar, prestar y devolver equipos del Laboratorio d
   ·
   <a href="#arquitectura">Arquitectura</a>
   ·
-  <a href="Docs/API.md">API</a>
+  <a href="docs/api.md">API</a>
   ·
-  <a href="Docs/DATABASE.md">Base de datos</a>
+  <a href="docs/database.md">Base de datos</a>
   ·
   <a href="CONTRIBUTING.md">Contribuir</a>
 </p>
@@ -32,7 +32,7 @@ Sistema web para reservar, aprobar, prestar y devolver equipos del Laboratorio d
 
 <a id="producto"></a>
 
-## <img height="22" src="Images/readme-icons/product.svg" alt="" /> Producto
+## <img height="22" src="docs/assets/readme-icons/product.svg" alt="" /> Producto
 
 UCB Hold centraliza el flujo completo de préstamos de laboratorio: búsqueda de equipos, carrito de reserva, validación de disponibilidad, aprobación administrativa, contrato, entrega, devolución, mantenimiento e historial.
 
@@ -50,7 +50,7 @@ UCB Hold centraliza el flujo completo de préstamos de laboratorio: búsqueda de
 
 <a id="stack"></a>
 
-## <img height="22" src="Images/readme-icons/stack.svg" alt="" /> Stack
+## <img height="22" src="docs/assets/readme-icons/stack.svg" alt="" /> Stack
 
 | Capa     | Tecnología                                                 | Uso                                                                             |
 | -------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------- |
@@ -65,7 +65,7 @@ UCB Hold centraliza el flujo completo de préstamos de laboratorio: búsqueda de
 
 <a id="arquitectura"></a>
 
-## <img height="22" src="Images/readme-icons/architecture.svg" alt="" /> Arquitectura
+## <img height="22" src="docs/assets/readme-icons/architecture.svg" alt="" /> Arquitectura
 
 El frontend sigue Feature-Sliced Design y convenciones actuales de Angular:
 
@@ -84,11 +84,11 @@ Los archivos del cliente usan `kebab-case`, una clase/interfaz principal por arc
 
 <a id="inicio-rapido"></a>
 
-## <img height="22" src="Images/readme-icons/quickstart.svg" alt="" /> Inicio Rápido
+## <img height="22" src="docs/assets/readme-icons/quickstart.svg" alt="" /> Inicio Rápido
 
 ### Docker
 
-Crear `Code/server.env`:
+Crear `code/server.env`:
 
 ```ini
 ASPNETCORE_ENVIRONMENT=Production
@@ -101,7 +101,7 @@ Redis__ConnectionString=ucb_redis:6379
 Levantar el stack:
 
 ```bash
-cd Code
+cd code
 docker compose up --build
 ```
 
@@ -114,29 +114,29 @@ docker compose up --build
 ### Desarrollo Local
 
 ```bash
-cd Code
+cd code
 docker compose up -d ucb_db ucb_redis
 
-cd Code/Server
+cd code/server
 dotnet run
 
-cd Code/Client
+cd code/client
 npm install
 npm start
 ```
 
-Guía completa: [Docs/SETUP.md](Docs/SETUP.md).
+Guía completa: [docs/setup.md](docs/setup.md).
 
 ---
 
 <a id="calidad"></a>
 
-## <img height="22" src="Images/readme-icons/quality.svg" alt="" /> Calidad
+## <img height="22" src="docs/assets/readme-icons/quality.svg" alt="" /> Calidad
 
 ```bash
-dotnet test Code/Tests/IMT_Reservas.Tests.csproj
+dotnet test code/tests/IMT_Reservas.Tests.csproj
 
-cd Code/Client
+cd code/client
 npm run format:check
 npx tsc -p tsconfig.app.json --noEmit
 npx tsc -p tsconfig.spec.json --noEmit
@@ -150,13 +150,13 @@ GitHub Actions publica reportes HTML visuales para cobertura, calidad y SonarQub
 
 <a id="documentacion"></a>
 
-## <img height="22" src="Images/readme-icons/documentation.svg" alt="" /> Documentación
+## <img height="22" src="docs/assets/readme-icons/documentation.svg" alt="" /> Documentación
 
 | Documento                                | Contenido                                                        |
 | ---------------------------------------- | ---------------------------------------------------------------- |
-| [Docs/SETUP.md](Docs/SETUP.md)           | Instalación local, Docker, user-secrets y solución de problemas. |
-| [Docs/API.md](Docs/API.md)               | Endpoints REST, DTOs, errores y reglas de validación.            |
-| [Docs/DATABASE.md](Docs/DATABASE.md)     | Tablas, enums, índices, vistas y reglas de disponibilidad.       |
+| [docs/setup.md](docs/setup.md)           | Instalación local, Docker, user-secrets y solución de problemas. |
+| [docs/api.md](docs/api.md)               | Endpoints REST, DTOs, errores y reglas de validación.            |
+| [docs/database.md](docs/database.md)     | Tablas, enums, índices, vistas y reglas de disponibilidad.       |
 | [CONTRIBUTING.md](CONTRIBUTING.md)       | Flujo de trabajo, commits, PRs y checklist de calidad.           |
 | [SECURITY.md](SECURITY.md)               | Política de reporte y tratamiento de vulnerabilidades.           |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Estándares de colaboración del proyecto.                         |
@@ -165,7 +165,7 @@ GitHub Actions publica reportes HTML visuales para cobertura, calidad y SonarQub
 
 <a id="equipo"></a>
 
-## <img height="22" src="Images/readme-icons/team.svg" alt="" /> Equipo
+## <img height="22" src="docs/assets/readme-icons/team.svg" alt="" /> Equipo
 
 <table>
   <tr>
