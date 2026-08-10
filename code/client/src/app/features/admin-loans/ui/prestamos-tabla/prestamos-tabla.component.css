@@ -40,6 +40,9 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   border: 1px solid var(--border);
+  position: relative;
+  padding-bottom: 0.35rem;
+  scroll-padding-inline-end: 2rem;
 }
 .table-responsive::-webkit-scrollbar {
   height: 6px;
@@ -143,6 +146,9 @@ app-buscador {
   box-shadow: var(--shadow-sm);
   margin-bottom: 1.5rem;
   border: 1px solid var(--border);
+  position: relative;
+  padding-bottom: 0.35rem;
+  scroll-padding-inline-end: 2rem;
 }
 .data-table {
   width: 100%;
@@ -219,9 +225,6 @@ td.actions-column {
 .btn-delete:hover {
   background-color: rgba(239, 68, 68, 0.1);
 }
-.empty-table {
-  padding: 3rem !important;
-}
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -229,6 +232,20 @@ td.actions-column {
   justify-content: center;
   gap: 1rem;
   color: var(--ink-secondary);
+}
+
+.empty-state--viewport {
+  position: absolute;
+  top: 3.75rem;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  min-height: 20rem;
+  pointer-events: none;
+}
+
+.table-responsive:has(.empty-state--viewport) {
+  min-height: 28rem;
 }
 
 .devuelto-overlay {
@@ -1212,7 +1229,7 @@ td.actions-column > * {
 
 .data-table--loans {
   table-layout: fixed;
-  min-width: 78rem;
+  min-width: 88rem;
 }
 
 .data-table--loans th,
@@ -1256,17 +1273,18 @@ td.actions-column > * {
 }
 
 .data-table--loans .loans-table__col--acciones {
-  width: 9rem;
+  width: 17.5rem;
 }
 
 .data-table--loans .actions-column {
-  width: 9rem;
-  min-width: 9rem;
-  max-width: 9rem;
+  width: 17.5rem;
+  min-width: 17.5rem;
+  max-width: 17.5rem;
 }
 
 .data-table--loans td.actions-column {
-  padding-inline: 0.75rem !important;
+  padding-inline: 1rem 1.5rem !important;
+  white-space: nowrap;
 }
 
 .data-table--loans .equipos-info {
@@ -1276,14 +1294,18 @@ td.actions-column > * {
 
 @media (max-width: 768px) {
   .data-table--loans {
-    min-width: 72rem;
+    min-width: 76rem;
   }
 
   .data-table--loans .loans-table__col--acciones,
   .data-table--loans .actions-column {
-    width: 8rem;
-    min-width: 8rem;
-    max-width: 8rem;
+    width: 12rem;
+    min-width: 12rem;
+    max-width: 12rem;
+  }
+
+  .empty-state--viewport {
+    top: 3.5rem;
   }
 }
 

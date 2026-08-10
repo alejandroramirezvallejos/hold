@@ -265,18 +265,14 @@
               </td>
             </tr>
           }
-          @if (prestamos.size === 0) {
-            <tr>
-              <td colspan="9" class="empty-table">
-                <div class="empty-state">
-                  <i class="fas fa-search fa-3x"></i>
-                  <p>No se encontraron préstamos</p>
-                </div>
-              </td>
-            </tr>
-          }
         </tbody>
       </table>
+      @if (prestamos.size === 0) {
+        <div class="empty-state empty-state--viewport">
+          <i class="fas fa-search fa-3x"></i>
+          <p>No se encontraron préstamos</p>
+        </div>
+      }
     </div>
   } @else {
     <app-audit-panel [refreshTrigger]="auditRefresh" [entidad]="'Prestamo'">
