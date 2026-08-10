@@ -137,8 +137,10 @@ export class VercontratoComponent extends BaseTablaComponent {
                   max-width: 300px;
                 }
                 .signature img {
-                  max-width: 160px;
-                  height: auto;
+                  width: 240px;
+                  max-width: 100%;
+                  height: 140px;
+                  object-fit: contain;
                   border: 1px solid #ccc;
                   padding: 5px;
                   background-color: #fff;
@@ -171,9 +173,11 @@ export class VercontratoComponent extends BaseTablaComponent {
   private normalizarContratoHtml(html: string): string {
     const placeholder =
       'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    const placeholderSrc = `src="${placeholder}"`;
 
     return html
       .replace(/src=(["'])unsafe:(data:image\/[^"']+)\1/g, 'src=$1$2$1')
+      .replace(/src=(["'])\[\[firmausuario\]\]\1/g, placeholderSrc)
       .replace(
         /(<img\b(?=[^>]*\bid=["']firmaUsuarioPlaceholder["'])[^>]*\bsrc=["'])(["'][^>]*>)/i,
         `$1${placeholder}$2`,

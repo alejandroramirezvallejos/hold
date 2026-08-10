@@ -1,33 +1,47 @@
-<div class="modal-overlay">
-  <div class="modal-container">
-    <div class="modal-header">
-      <h2 class="modal-title">Contrato</h2>
-      <button class="btn-close" (click)="cerrar()" type="button">
+<div class="contract-modal-backdrop">
+  <section
+    class="contract-modal-shell"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="contract-modal-title"
+  >
+    <header class="contract-modal-header">
+      <h2 id="contract-modal-title" class="contract-modal-title">Contrato</h2>
+      <button
+        class="contract-modal-close"
+        (click)="cerrar()"
+        type="button"
+        aria-label="Cerrar contrato"
+      >
         <img src="assets/x.png" alt="Cerrar" />
       </button>
-    </div>
-    <div class="modal-content">
-      <div class="contract-viewer">
-        <div
+    </header>
+    <main class="contract-modal-body">
+      <div class="contract-document-scroll">
+        <article
           #contractContent
-          class="contract-content"
+          class="contract-document"
           *ngIf="contratoContentSeguro; else loading"
           [innerHTML]="contratoContentSeguro"
-        ></div>
+        ></article>
         <ng-template #loading>
-          <div class="loading">
-            <div class="spinner"></div>
+          <div class="contract-loading">
+            <div class="contract-spinner"></div>
             <p>Cargando contrato...</p>
           </div>
         </ng-template>
       </div>
-    </div>
-    <div class="modal-footer" *ngIf="contratoContentSeguro">
-      <button class="btn-secondary" (click)="descargarContrato()" type="button">
+    </main>
+    <footer class="contract-modal-footer" *ngIf="contratoContentSeguro">
+      <button
+        class="contract-download-button"
+        (click)="descargarContrato()"
+        type="button"
+      >
         <i class="fas fa-print"></i> Descargar Contrato
       </button>
-    </div>
-  </div>
+    </footer>
+  </section>
 </div>
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
