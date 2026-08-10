@@ -1203,13 +1203,13 @@ td.actions-column {
 }
 
 .table-responsive {
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .table-responsive::-webkit-scrollbar {
-  display: block;
-  height: var(--scrollbar-size);
+  display: none;
+  height: 0;
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
@@ -1301,6 +1301,16 @@ td.actions-column > * {
 }
 
 @media (max-width: 768px) {
+  .table-responsive {
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+    scrollbar-width: thin;
+  }
+
+  .table-responsive::-webkit-scrollbar {
+    display: block;
+    height: var(--scrollbar-size);
+  }
+
   .data-table--loans {
     min-width: 76rem;
   }

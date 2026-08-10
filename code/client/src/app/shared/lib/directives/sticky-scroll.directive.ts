@@ -15,6 +15,7 @@ export class StickyScrollDirective implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     const host = this.el.nativeElement;
+    host.classList.add('sticky-scroll-host');
 
     this.phantom = document.createElement('div');
     Object.assign(this.phantom.style, {
@@ -31,11 +32,17 @@ export class StickyScrollDirective implements AfterViewInit, OnDestroy {
 
     this.style = document.createElement('style');
     this.style.textContent = `
+      .sticky-scroll-host { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+      .sticky-scroll-host::-webkit-scrollbar { display: none !important; height: 0 !important; width: 0 !important; }
       .sticky-scroll-phantom { scrollbar-color: rgba(148, 163, 184, 0.65) transparent; scrollbar-width: thin; }
       .sticky-scroll-phantom::-webkit-scrollbar { height: 8px; }
       .sticky-scroll-phantom::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.65); border: 2px solid transparent; border-radius: 999px; background-clip: content-box; }
       .sticky-scroll-phantom::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.85); border: 2px solid transparent; background-clip: content-box; }
       .sticky-scroll-phantom::-webkit-scrollbar-track { background: rgba(226, 232, 240, 0.35); }
+      @media (max-width: 768px), (pointer: coarse) {
+        .sticky-scroll-host { scrollbar-color: rgba(148, 163, 184, 0.65) transparent !important; scrollbar-width: thin !important; }
+        .sticky-scroll-host::-webkit-scrollbar { display: block !important; height: 8px !important; }
+      }
     `;
     document.head.appendChild(this.style);
     this.phantom.classList.add('sticky-scroll-phantom');
@@ -94,6 +101,7 @@ export class StickyScrollDirective implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.listeners.forEach((fn) => fn());
+    this.el.nativeElement.classList.remove('sticky-scroll-host');
     this.phantom?.remove();
     this.style?.remove();
   }
