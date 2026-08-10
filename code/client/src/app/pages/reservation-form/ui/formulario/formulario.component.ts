@@ -195,12 +195,13 @@ export class FormularioComponent implements OnInit {
   guardarfirma(signatureData: string): void {
     this.firma = signatureData;
     if (this.contratoContainer) {
-      const signatureImage: HTMLElement | null =
+      const signatureImage: HTMLImageElement | null =
         this.contratoContainer.nativeElement.querySelector(
           '#firmaUsuarioPlaceholder',
         );
       if (signatureImage) {
         this.renderer.setAttribute(signatureImage, 'src', this.firma);
+        this.contenidoHtml = this.contratoContainer.nativeElement.innerHTML;
       }
     }
   }
