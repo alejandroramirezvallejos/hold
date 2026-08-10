@@ -169,9 +169,14 @@ export class VercontratoComponent extends BaseTablaComponent {
   }
 
   private normalizarContratoHtml(html: string): string {
-    return html.replace(
-      /src=(["'])unsafe:(data:image\/[^"']+)\1/g,
-      'src=$1$2$1',
-    );
+    const placeholder =
+      'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+    return html
+      .replace(/src=(["'])unsafe:(data:image\/[^"']+)\1/g, 'src=$1$2$1')
+      .replace(
+        /(<img\b(?=[^>]*\bid=["']firmaUsuarioPlaceholder["'])[^>]*\bsrc=["'])(["'][^>]*>)/i,
+        `$1${placeholder}$2`,
+      );
   }
 }
