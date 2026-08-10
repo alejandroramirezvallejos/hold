@@ -105,7 +105,6 @@ export class FormularioComponent implements OnInit {
           dia_devolucion: (fechaFinal.getDate() + 1).toString(),
           mes_devolucion: (fechaFinal.getMonth() + 1).toString(),
           año_devolucion: fechaFinal.getFullYear().toString(),
-          firmausuario: '',
         });
         this.contenidoHtml = processedTemplate;
       },
