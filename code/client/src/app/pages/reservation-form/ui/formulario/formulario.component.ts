@@ -194,16 +194,11 @@ export class FormularioComponent implements OnInit {
 
   guardarfirma(signatureData: string): void {
     this.firma = signatureData;
-    if (this.contratoContainer) {
-      const signatureImage: HTMLImageElement | null =
-        this.contratoContainer.nativeElement.querySelector(
-          '#firmaUsuarioPlaceholder',
-        );
-      if (signatureImage) {
-        this.renderer.setAttribute(signatureImage, 'src', this.firma);
-        this.contenidoHtml = this.contratoContainer.nativeElement.innerHTML;
-      }
-    }
+    this.contenidoHtml = this.insertarFirmaEnContrato(
+      this.contenidoHtml,
+      signatureData,
+    );
+    window.setTimeout(() => this.aplicarFirmaAlDom());
   }
 
   private primeradelobjeto(carrito: Carrito): string {
@@ -259,7 +254,44 @@ export class FormularioComponent implements OnInit {
   }
 
   generarHTMLTexto(): string {
-    const contratoElement = this.contratoContainer.nativeElement;
-    return contratoElement.outerHTML;
+    const contratoHtml = this.firma
+      ? this.insertarFirmaEnContrato(this.contenidoHtml, this.firma)
+      : this.contenidoHtml;
+    return contratoHtml;
+  }
+
+  private aplicarFirmaAlDom(): void {
+    if (!this.contratoContainer || !this.firma) {
+      return;
+    }
+    const signatureImage: HTMLImageElement | null =
+      this.contratoContainer.nativeElement.querySelector(
+        '#firmaUsuarioPlaceholder',
+      );
+    if (signatureImage) {
+      this.renderer.setAttribute(signatureImage, 'src', this.firma);
+      this.renderer.setAttribute(
+        signatureImage,
+        'alt',
+        'Firma del COMODATARIO',
+      );
+    }
+  }
+
+  private insertarFirmaEnContrato(html: string, firma: string): string {
+    const firmaAtributo = firma.replace(/"/g, '&quot;');
+    const htmlConSrcActualizado = html.replace(
+      /(<img\b(?=[^>]*\bid=["']firmaUsuarioPlaceholder["'])[^>]*\bsrc=["'])[^"']*(["'][^>]*>)/i,
+      `$1${firmaAtributo}$2`,
+    );
+
+    if (htmlConSrcActualizado !== html) {
+      return htmlConSrcActualizado;
+    }
+
+    return html.replace(
+      /(<img\b(?=[^>]*\bid=["']firmaUsuarioPlaceholder["'])[^>]*)(>)/i,
+      `$1 src="${firmaAtributo}"$2`,
+    );
   }
 }

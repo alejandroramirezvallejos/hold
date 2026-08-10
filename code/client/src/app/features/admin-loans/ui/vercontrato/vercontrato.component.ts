@@ -7,6 +7,7 @@ import {
   ViewChild,
   WritableSignal,
 } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PrestamosAPIService } from '@entities/loan';
 import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
@@ -25,7 +26,11 @@ export class VercontratoComponent extends BaseTablaComponent {
   @Input() idprestamo: number = 0;
   @ViewChild('contractContent') contractContentRef?: ElementRef<HTMLElement>;
   contratoContent: string = '';
-  constructor(private readonly prestamo: PrestamosAPIService) {
+  contratoContentSeguro: SafeHtml | null = null;
+  constructor(
+    private readonly prestamo: PrestamosAPIService,
+    private readonly sanitizer: DomSanitizer,
+  ) {
     super();
   }
   ngOnInit() {
@@ -39,7 +44,10 @@ export class VercontratoComponent extends BaseTablaComponent {
           this.error.set(true);
           return;
         }
-        this.contratoContent = data;
+        this.contratoContent = this.normalizarContratoHtml(data);
+        this.contratoContentSeguro = this.sanitizer.bypassSecurityTrustHtml(
+          this.contratoContent,
+        );
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -158,5 +166,12 @@ export class VercontratoComponent extends BaseTablaComponent {
   }
   cerrar() {
     this.vercontraro.set(false);
+  }
+
+  private normalizarContratoHtml(html: string): string {
+    return html.replace(
+      /src=(["'])unsafe:(data:image\/[^"']+)\1/g,
+      'src=$1$2$1',
+    );
   }
 }

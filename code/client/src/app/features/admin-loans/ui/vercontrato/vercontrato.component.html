@@ -11,8 +11,8 @@
         <div
           #contractContent
           class="contract-content"
-          *ngIf="contratoContent; else loading"
-          [innerHTML]="contratoContent"
+          *ngIf="contratoContentSeguro; else loading"
+          [innerHTML]="contratoContentSeguro"
         ></div>
         <ng-template #loading>
           <div class="loading">
@@ -22,7 +22,7 @@
         </ng-template>
       </div>
     </div>
-    <div class="modal-footer" *ngIf="contratoContent">
+    <div class="modal-footer" *ngIf="contratoContentSeguro">
       <button class="btn-secondary" (click)="descargarContrato()" type="button">
         <i class="fas fa-print"></i> Descargar Contrato
       </button>
