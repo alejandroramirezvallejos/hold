@@ -75,6 +75,7 @@ app-buscador {
 ::ng-deep .audit-filters {
   order: 1;
 }
+.loans-table-shell,
 .table-responsive,
 ::ng-deep .audit-count,
 ::ng-deep app-audit-panel .table-responsive,
@@ -240,11 +241,18 @@ td.actions-column {
   right: 0;
   bottom: 0;
   left: 0;
-  min-height: 20rem;
   pointer-events: none;
+  background: var(--surface);
+  border-radius: 0 0 12px 12px;
 }
 
-.table-responsive:has(.empty-state--viewport) {
+.loans-table-shell {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.loans-table-shell--empty,
+.loans-table-shell--empty .table-responsive {
   min-height: 28rem;
 }
 
@@ -1229,7 +1237,7 @@ td.actions-column > * {
 
 .data-table--loans {
   table-layout: fixed;
-  min-width: 88rem;
+  min-width: 92rem;
 }
 
 .data-table--loans th,
@@ -1273,17 +1281,17 @@ td.actions-column > * {
 }
 
 .data-table--loans .loans-table__col--acciones {
-  width: 17.5rem;
+  width: 20rem;
 }
 
 .data-table--loans .actions-column {
-  width: 17.5rem;
-  min-width: 17.5rem;
-  max-width: 17.5rem;
+  width: 20rem;
+  min-width: 20rem;
+  max-width: 20rem;
 }
 
 .data-table--loans td.actions-column {
-  padding-inline: 1rem 1.5rem !important;
+  padding-inline: 1rem 2rem !important;
   white-space: nowrap;
 }
 

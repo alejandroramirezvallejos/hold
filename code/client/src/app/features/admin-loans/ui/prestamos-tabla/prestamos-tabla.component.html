@@ -93,180 +93,189 @@
         Auditoría
       </button>
     </div>
-    <div class="table-responsive" appStickyScroll>
-      <table class="data-table data-table--loans">
-        <colgroup>
-          <col class="loans-table__col loans-table__col--usuario" />
-          <col class="loans-table__col loans-table__col--carnet" />
-          <col class="loans-table__col loans-table__col--telefono" />
-          <col class="loans-table__col loans-table__col--equipos" />
-          <col class="loans-table__col loans-table__col--fecha-solicitud" />
-          <col class="loans-table__col loans-table__col--fecha-prestamo" />
-          <col class="loans-table__col loans-table__col--fecha-devolucion" />
-          <col class="loans-table__col loans-table__col--estado" />
-          <col class="loans-table__col loans-table__col--acciones" />
-        </colgroup>
-        <thead>
-          <tr>
-            @for (columna of columnas; track columna) {
-              <th scope="col">{{ columna }}</th>
-            }
-            <th scope="col">Estado</th>
-            <th class="actions-column">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (
-            prestamo of prestamosTabla;
-            track prestamo.key ||
-              prestamo.value.datosgrupo.Id ||
-              prestamo.value.datosgrupo.CarnetUsuario ||
-              $index
-          ) {
+    <div
+      class="loans-table-shell"
+      [class.loans-table-shell--empty]="prestamos.size === 0"
+    >
+      <div class="table-responsive" appStickyScroll>
+        <table class="data-table data-table--loans">
+          <colgroup>
+            <col class="loans-table__col loans-table__col--usuario" />
+            <col class="loans-table__col loans-table__col--carnet" />
+            <col class="loans-table__col loans-table__col--telefono" />
+            <col class="loans-table__col loans-table__col--equipos" />
+            <col class="loans-table__col loans-table__col--fecha-solicitud" />
+            <col class="loans-table__col loans-table__col--fecha-prestamo" />
+            <col class="loans-table__col loans-table__col--fecha-devolucion" />
+            <col class="loans-table__col loans-table__col--estado" />
+            <col class="loans-table__col loans-table__col--acciones" />
+          </colgroup>
+          <thead>
             <tr>
-              <td class="nombre-usuario">
-                <span
-                  title="{{ prestamo.value.datosgrupo.NombreUsuario }} {{
-                    prestamo.value.datosgrupo.ApellidoPaternoUsuario
-                  }}"
-                >
-                  {{ prestamo.value.datosgrupo.NombreUsuario }}
-                  {{ prestamo.value.datosgrupo.ApellidoPaternoUsuario }}
-                </span>
-              </td>
-              <td>{{ prestamo.value.datosgrupo.CarnetUsuario }}</td>
-              <td>{{ prestamo.value.datosgrupo.TelefonoUsuario }}</td>
-              <td class="equipos-cell">
-                <div class="equipos-info">
+              @for (columna of columnas; track columna) {
+                <th scope="col">{{ columna }}</th>
+              }
+              <th scope="col">Estado</th>
+              <th class="actions-column">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (
+              prestamo of prestamosTabla;
+              track prestamo.key ||
+                prestamo.value.datosgrupo.Id ||
+                prestamo.value.datosgrupo.CarnetUsuario ||
+                $index
+            ) {
+              <tr>
+                <td class="nombre-usuario">
                   <span
-                    class="nombre-equipo"
-                    title="{{ prestamo.value.datosgrupo.NombreGrupoEquipo }}"
+                    title="{{ prestamo.value.datosgrupo.NombreUsuario }} {{
+                      prestamo.value.datosgrupo.ApellidoPaternoUsuario
+                    }}"
                   >
-                    {{ prestamo.value.datosgrupo.NombreGrupoEquipo }}
+                    {{ prestamo.value.datosgrupo.NombreUsuario }}
+                    {{ prestamo.value.datosgrupo.ApellidoPaternoUsuario }}
                   </span>
-                  <small class="cantidad-equipos"
-                    >{{ prestamo?.value?.equipos?.length ?? 0 }} equipos</small
-                  >
-                </div>
-              </td>
-              <td>
-                {{
-                  prestamo.value.datosgrupo.FechaSolicitud
-                    | date: "dd/MM/yyyy HH:mm" : "America/La_Paz"
-                }}
-              </td>
-              <td>
-                {{
-                  prestamo.value.datosgrupo.FechaPrestamoEsperada
-                    | date: "dd/MM/yyyy" : "America/La_Paz"
-                }}
-              </td>
-              <td>
-                {{
-                  prestamo.value.datosgrupo.FechaDevolucionEsperada
-                    | date: "dd/MM/yyyy" : "America/La_Paz"
-                }}
-              </td>
-              <td>
-                <span
-                  [class]="
-                    'badge badge-' + (getEstadoCalculado(prestamo.value) || '')
-                  "
-                >
-                  {{ getEstadoCalculado(prestamo.value) | titlecase }}
-                </span>
-              </td>
-              <td class="actions-column">
-                <button
-                  class="btn-icon btn-view"
-                  title="Ver detalles"
-                  aria-label="Ver detalles"
-                  (click)="abrirVistaPrestamos(prestamo.value.equipos)"
-                >
-                  <i class="fas fa-eye"></i>
-                </button>
-                @if (prestamo.value.datosgrupo.IdContrato) {
-                  <button
-                    class="btn-icon btn-view"
-                    (click)="
-                      cambiarestadovercontrato(prestamo.value.datosgrupo)
+                </td>
+                <td>{{ prestamo.value.datosgrupo.CarnetUsuario }}</td>
+                <td>{{ prestamo.value.datosgrupo.TelefonoUsuario }}</td>
+                <td class="equipos-cell">
+                  <div class="equipos-info">
+                    <span
+                      class="nombre-equipo"
+                      title="{{ prestamo.value.datosgrupo.NombreGrupoEquipo }}"
+                    >
+                      {{ prestamo.value.datosgrupo.NombreGrupoEquipo }}
+                    </span>
+                    <small class="cantidad-equipos"
+                      >{{
+                        prestamo?.value?.equipos?.length ?? 0
+                      }}
+                      equipos</small
+                    >
+                  </div>
+                </td>
+                <td>
+                  {{
+                    prestamo.value.datosgrupo.FechaSolicitud
+                      | date: "dd/MM/yyyy HH:mm" : "America/La_Paz"
+                  }}
+                </td>
+                <td>
+                  {{
+                    prestamo.value.datosgrupo.FechaPrestamoEsperada
+                      | date: "dd/MM/yyyy" : "America/La_Paz"
+                  }}
+                </td>
+                <td>
+                  {{
+                    prestamo.value.datosgrupo.FechaDevolucionEsperada
+                      | date: "dd/MM/yyyy" : "America/La_Paz"
+                  }}
+                </td>
+                <td>
+                  <span
+                    [class]="
+                      'badge badge-' +
+                      (getEstadoCalculado(prestamo.value) || '')
                     "
                   >
-                    <i class="fas fa-file-contract"></i>
-                  </button>
-                }
-                @if (
-                  prestamo.value.datosgrupo.EstadoPrestamo == "rechazado" ||
-                  prestamo.value.datosgrupo.EstadoPrestamo == "finalizado" ||
-                  prestamo.value.datosgrupo.EstadoPrestamo == "cancelado"
-                ) {
+                    {{ getEstadoCalculado(prestamo.value) | titlecase }}
+                  </span>
+                </td>
+                <td class="actions-column">
                   <button
-                    class="btn-icon btn-delete"
-                    (click)="eliminarPrestamo(prestamo.value.datosgrupo)"
+                    class="btn-icon btn-view"
+                    title="Ver detalles"
+                    aria-label="Ver detalles"
+                    (click)="abrirVistaPrestamos(prestamo.value.equipos)"
                   >
-                    <i class="fas fa-trash-alt"></i>
+                    <i class="fas fa-eye"></i>
                   </button>
-                } @else if (
-                  prestamo.value.datosgrupo.EstadoPrestamo == "pendiente"
-                ) {
-                  <button
-                    class="btn-action btn-accept"
-                    title="Aceptar"
-                    aria-label="Aceptar"
-                    (click)="validaraprobacion(prestamo.key)"
-                  >
-                    <i class="fas fa-check"></i>
-                    <span class="btn-label">Aceptar</span>
-                  </button>
-                  <button
-                    class="btn-action btn-reject"
-                    title="Rechazar"
-                    aria-label="Rechazar"
-                    (click)="validarrechazo(prestamo.key)"
-                  >
-                    <i class="fas fa-times"></i>
-                    <span class="btn-label">Rechazar</span>
-                  </button>
-                } @else if (
-                  prestamo.value.datosgrupo.EstadoPrestamo == "aprobado"
-                ) {
-                  <button
-                    class="btn-action btn-accept"
-                    title="Recogido"
-                    aria-label="Recogido"
-                    (click)="validarRecogido(prestamo.key)"
-                  >
-                    <i class="fas fa-briefcase"></i>
-                    <span class="btn-label">Recogido</span>
-                  </button>
-                  <button
-                    class="btn-action btn-reject"
-                    title="Cancelar"
-                    aria-label="Cancelar"
-                    (click)="validarcancelacion(prestamo.key)"
-                  >
-                    <i class="fas fa-times"></i>
-                    <span class="btn-label">Cancelar</span>
-                  </button>
-                } @else if (
-                  getEstadoCalculado(prestamo.value) === "activo" ||
-                  getEstadoCalculado(prestamo.value) === "atrasado"
-                ) {
-                  <button
-                    class="btn-action btn-accept"
-                    title="Devuelto"
-                    aria-label="Devuelto"
-                    (click)="validarDevuelto(prestamo.key)"
-                  >
-                    <i class="fas fa-undo"></i>
-                    <span class="btn-label">Devuelto</span>
-                  </button>
-                }
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+                  @if (prestamo.value.datosgrupo.IdContrato) {
+                    <button
+                      class="btn-icon btn-view"
+                      (click)="
+                        cambiarestadovercontrato(prestamo.value.datosgrupo)
+                      "
+                    >
+                      <i class="fas fa-file-contract"></i>
+                    </button>
+                  }
+                  @if (
+                    prestamo.value.datosgrupo.EstadoPrestamo == "rechazado" ||
+                    prestamo.value.datosgrupo.EstadoPrestamo == "finalizado" ||
+                    prestamo.value.datosgrupo.EstadoPrestamo == "cancelado"
+                  ) {
+                    <button
+                      class="btn-icon btn-delete"
+                      (click)="eliminarPrestamo(prestamo.value.datosgrupo)"
+                    >
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  } @else if (
+                    prestamo.value.datosgrupo.EstadoPrestamo == "pendiente"
+                  ) {
+                    <button
+                      class="btn-action btn-accept"
+                      title="Aceptar"
+                      aria-label="Aceptar"
+                      (click)="validaraprobacion(prestamo.key)"
+                    >
+                      <i class="fas fa-check"></i>
+                      <span class="btn-label">Aceptar</span>
+                    </button>
+                    <button
+                      class="btn-action btn-reject"
+                      title="Rechazar"
+                      aria-label="Rechazar"
+                      (click)="validarrechazo(prestamo.key)"
+                    >
+                      <i class="fas fa-times"></i>
+                      <span class="btn-label">Rechazar</span>
+                    </button>
+                  } @else if (
+                    prestamo.value.datosgrupo.EstadoPrestamo == "aprobado"
+                  ) {
+                    <button
+                      class="btn-action btn-accept"
+                      title="Recogido"
+                      aria-label="Recogido"
+                      (click)="validarRecogido(prestamo.key)"
+                    >
+                      <i class="fas fa-briefcase"></i>
+                      <span class="btn-label">Recogido</span>
+                    </button>
+                    <button
+                      class="btn-action btn-reject"
+                      title="Cancelar"
+                      aria-label="Cancelar"
+                      (click)="validarcancelacion(prestamo.key)"
+                    >
+                      <i class="fas fa-times"></i>
+                      <span class="btn-label">Cancelar</span>
+                    </button>
+                  } @else if (
+                    getEstadoCalculado(prestamo.value) === "activo" ||
+                    getEstadoCalculado(prestamo.value) === "atrasado"
+                  ) {
+                    <button
+                      class="btn-action btn-accept"
+                      title="Devuelto"
+                      aria-label="Devuelto"
+                      (click)="validarDevuelto(prestamo.key)"
+                    >
+                      <i class="fas fa-undo"></i>
+                      <span class="btn-label">Devuelto</span>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       @if (prestamos.size === 0) {
         <div class="empty-state empty-state--viewport">
           <i class="fas fa-search fa-3x"></i>
