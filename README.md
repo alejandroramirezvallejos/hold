@@ -109,7 +109,7 @@ Redis__Enabled=true
 Hangfire__Enabled=true
 ```
 
-Production Docker also requires the ignored files `code/secrets/data-protection.pfx` and `code/secrets/data-protection-password.txt`. Generate them with the exact commands in [docs/setup.md](docs/setup.md).
+Production Docker requires Data Protection material provisioned at runtime through the team's private operations process. These files are ignored by Git and must never be included in source code, CI artifacts or releases.
 
 Start the stack:
 

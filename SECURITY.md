@@ -52,8 +52,8 @@ Never commit credentials, production connection strings, JWT secrets, private ke
 
 JWT access and refresh tokens are transported only in path-scoped `HttpOnly`, `SameSite=Strict` cookies and are `Secure` in production. They are not returned in response bodies or stored in browser storage. Refresh tokens are hashed in PostgreSQL, rotated on use and revoked at logout.
 
-New ASP.NET Data Protection keys are encrypted with a production PFX mounted with its password as separate Docker secrets. Existing plaintext key rings are not rewritten automatically and must remain on encrypted, access-restricted storage until a controlled data re-protection rotation is completed. The key volume, certificate and password must be backed up in restricted secret storage; none belong in Git, CI artifacts or releases.
+ASP.NET Data Protection keys are encrypted with external production key material supplied at runtime. Its generation, rotation, recovery and backup locations belong in a private operational runbook with restricted access; none of that material or those procedures belong in Git, CI artifacts or releases.
 
 GitHub releases contain only `code/database/schema.sql`, generated with `pg_dump --schema-only` and validated to contain no table data. Operational backups, Data Protection keys, user documents and exported contracts remain in restricted private storage.
 
-If sensitive material reaches Git history, removing it in a later commit is insufficient. Revoke or rotate affected credentials, remove the data from every ref with a reviewed history rewrite, invalidate old release assets and require every collaborator to clone the sanitized repository again.
+If sensitive material reaches Git history, treat it as a security incident and follow the private response runbook. Do not document affected values, internal locations or incident-specific remediation details in this public repository.

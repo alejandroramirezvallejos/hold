@@ -62,11 +62,11 @@ jobs:
           fi
 
       - name: Install coverage report tool
-        run: dotnet tool install dotnet-reportgenerator-globaltool --tool-path .tools
+        run: dotnet tool install dotnet-reportgenerator-globaltool --version 5.5.11 --tool-path .tools
 
       - name: Install SonarQube scanner
         if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != ''
-        run: dotnet tool install --global dotnet-sonarscanner
+        run: dotnet tool install --global dotnet-sonarscanner --version 11.3.0
 
       - name: Start SonarQube analysis
         if: env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != ''

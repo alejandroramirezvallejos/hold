@@ -50,19 +50,7 @@ Generate a development key:
 openssl rand -base64 32
 ```
 
-Create the Data Protection certificate from Git Bash before starting the production Compose stack:
-
-```bash
-cd code
-mkdir -p secrets
-openssl rand -base64 48 > secrets/data-protection-password.txt
-openssl req -x509 -newkey rsa:3072 -sha256 -days 825 -keyout secrets/data-protection.key -out secrets/data-protection.crt -passout file:secrets/data-protection-password.txt -subj "/CN=UCB Hold Data Protection"
-openssl pkcs12 -export -out secrets/data-protection.pfx -inkey secrets/data-protection.key -in secrets/data-protection.crt -passin file:secrets/data-protection-password.txt -passout file:secrets/data-protection-password.txt
-rm secrets/data-protection.key secrets/data-protection.crt
-chmod 600 secrets/data-protection.pfx secrets/data-protection-password.txt server.env
-```
-
-`code/secrets` is ignored by Git. Store an encrypted off-server copy of the PFX and password in separate restricted secret storage. Losing either one makes existing protected carnet images, signatures and contracts unrecoverable; exposing them requires immediate replacement and a controlled data re-protection procedure.
+Before starting production, provision the Data Protection material through the team's private operational runbook or institutional key-management service. Its generation, rotation and recovery procedures must not be stored in this public repository. The runtime secret directory is ignored by Git and production refuses to start without the required material.
 
 ### Local Backend
 
@@ -97,9 +85,7 @@ cd code
 docker compose --env-file server.env up --build
 ```
 
-Docker Compose mounts `ucb_dataprotection_keys` at `/app/data-protection-keys` and mounts the PFX and password as read-only Docker secrets. ASP.NET encrypts newly generated Data Protection keys with that certificate. Production refuses to start when persistent keys are configured without both secret files. Back up the key volume, PFX and password through restricted infrastructure and do not replace them during routine deployments; they are required to decrypt saved carnet images, profile signatures, and contracts.
-
-Certificate protection does not rewrite keys that already existed as plaintext XML. If the production volume predates this configuration, keep it on an encrypted Oracle volume with restricted host access and preserve a private snapshot before rollout. Re-protecting existing application data and replacing the old key ring requires a separate controlled rotation; deleting the old ring first would make stored encrypted documents unreadable.
+Docker Compose mounts the persistent Data Protection key ring and its external protection material with read-only access where applicable. Production validates this configuration at startup. Key lifecycle, backup and recovery are restricted operational responsibilities because the protected carnet images, signatures and contracts depend on them.
 
 | Service     | URL                   |
 | ----------- | --------------------- |
@@ -237,4 +223,4 @@ The release never contains production data or full backups. Keep operational bac
 | Port `4200` is already in use          | Run Angular with another port, for example `ng serve --port 4300`.                                 |
 | Frontend dependencies are missing      | Run `npm install` from `code/client`.                                                              |
 | Docker backend restarts                | Inspect logs with `docker logs -f ucb_server`.                                                     |
-| Data Protection secret files missing   | Generate `code/secrets/data-protection.pfx` and its password file before starting production.      |
+| Data Protection material missing       | Provision the required runtime secrets through the private operational process.                    |

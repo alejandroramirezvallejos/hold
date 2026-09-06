@@ -57,7 +57,7 @@ The backend maps PostgreSQL enums with `PgName` and `NpgsqlDataSourceBuilder.Map
 
 Derived values exist to speed up administrative screens. Business logic should still validate critical decisions, especially availability, at the service layer.
 
-`usuarios.imagen_perfil`, `usuarios.imagen_frente_carnet`, `usuarios.imagen_atras_carnet`, `usuarios.imagen_firma`, `configuraciones_sistema.firma_jefe_carrera_base64`, and final contract HTML use ASP.NET Core Data Protection payloads rather than raw sensitive content. Existing plain institutional signatures remain readable and are protected the next time configuration is saved. The key ring must persist across deployments; losing it makes protected documents unreadable. Final contracts retain their own immutable protected copy so later profile or institutional-signature changes do not alter historical records.
+`usuarios.imagen_perfil`, `usuarios.imagen_frente_carnet`, `usuarios.imagen_atras_carnet`, `usuarios.imagen_firma`, `configuraciones_sistema.firma_jefe_carrera_base64`, and final contract HTML use ASP.NET Core Data Protection payloads rather than raw sensitive content. The key ring persists across deployments in restricted infrastructure. Final contracts retain their own immutable protected copy so later profile or institutional-signature changes do not alter historical records.
 
 `usuarios.email_verificado` blocks local authentication until ownership is confirmed. `token_verificacion_hash` stores SHA-256 output rather than the emailed token and is cleared atomically after confirmation. `google_id` uniquely links an institutional Google identity. `codigos_autenticacion` stores only hashes of ten-minute OAuth exchange codes and removes consumed or expired rows as new codes are issued.
 
