@@ -402,6 +402,21 @@ internal class UsuarioServiceTests : ServiceTest<UsuarioService>
     }
 
     [Test]
+    public async Task Logout_ValidToken_RevokesRefreshToken()
+    {
+        await Sut.Create(BuildValidUsuario("U001", "u001@ucb.edu.bo"));
+        await VerifyEmail("U001");
+        var login = await Sut.Login("u001@ucb.edu.bo", "Test@1234");
+
+        await Sut.Logout(login.Value.RefreshToken);
+
+        Db.ChangeTracker.Clear();
+        var user = Db.Usuarios.Single(item => item.Carnet == "U001");
+        user.RefreshToken.Should().BeNull();
+        user.RefreshTokenExpiry.Should().BeNull();
+    }
+
+    [Test]
     public async Task Login_WrongPassword_ReturnsUnauthorized()
     {
         await Sut.Create(BuildValidUsuario("U001", "u001@ucb.edu.bo"));

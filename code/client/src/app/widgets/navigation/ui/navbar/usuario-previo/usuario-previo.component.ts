@@ -32,9 +32,11 @@ export class UsuarioPrevioComponent {
     } else if (item == 'historial') {
       this.router.navigate(['/historial']);
     } else if (item == 'cerrar-sesion') {
-      this.authService.clear();
       this.usuario.limpiarSesion();
-      this.router.navigate(['/login']);
+      this.authService.logout().subscribe({
+        next: () => void this.router.navigate(['/login']),
+        error: () => void this.router.navigate(['/login']),
+      });
     } else if (item == 'admin') {
       this.router.navigate(['/administracion']);
     } else if (item == 'modousuario') {

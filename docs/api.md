@@ -10,7 +10,7 @@ The API is a REST contract under `/api`. Collection resources use short, lowerca
 - Nested resources describe ownership, for example `/api/grupos/{id}/comentarios`.
 - Filters use query parameters instead of action routes such as `buscar`, `por-grupo`, or `historial`.
 - Routes are lowercase. Previous mixed-case client routes and earlier API routes are not supported or redirected.
-- Protected routes require a Bearer token. Root operations require `administrador`. Loan and user management also allow `administrador_laboratorio`; it cannot grant or modify administrator privileges, delete users/loans, access other administrative tables or change configuration.
+- Protected browser routes require the signed access cookie. Root operations require `administrador`. Loan and user management also allow `administrador_laboratorio`; it cannot grant or modify administrator privileges, delete users/loans, access other administrative tables or change configuration.
 
 ## Client Routes
 
@@ -68,25 +68,24 @@ Validation and domain failures preserve the same structure:
 
 ## Authentication
 
-```http
-Authorization: Bearer <token>
-```
+Successful local and Google authentication writes an access cookie and a rotating refresh cookie. Both are `HttpOnly`, `SameSite=Strict`, scoped to API paths and marked `Secure` outside Development. Authentication responses contain the safe user projection and never expose either token to JavaScript. API clients must preserve cookies between requests.
 
-| Method | Route                          | Purpose                                                        |
-| ------ | ------------------------------ | -------------------------------------------------------------- |
-| `POST` | `/api/usuarios`                | Register a local user or complete a Google registration.       |
-| `POST` | `/api/auth/login`              | Authenticate a verified local account and create a session.    |
-| `POST` | `/api/auth/refresh`            | Rotate the access and refresh tokens.                           |
-| `POST` | `/api/auth/verificar`          | Consume a single-use local email-verification token.           |
-| `POST` | `/api/auth/reenviar`           | Issue a replacement token without disclosing account presence. |
+| Method | Route                           | Purpose                                                         |
+| ------ | ------------------------------- | --------------------------------------------------------------- |
+| `POST` | `/api/usuarios`                 | Register a local user or complete a Google registration.        |
+| `POST` | `/api/auth/login`               | Authenticate a verified local account and create a session.     |
+| `POST` | `/api/auth/refresh`             | Rotate the access and refresh tokens.                           |
+| `POST` | `/api/auth/logout`              | Revoke the refresh token and clear both session cookies.        |
+| `POST` | `/api/auth/verificar`           | Consume a single-use local email-verification token.            |
+| `POST` | `/api/auth/reenviar`            | Issue a replacement token without disclosing account presence.  |
 | `POST` | `/api/auth/recuperar`           | Send a password reset link without disclosing account presence. |
 | `POST` | `/api/auth/restablecer`         | Consume a single-use password reset token.                      |
-| `GET`  | `/api/auth/google`             | Start Google OAuth 2.0 authentication.                          |
-| `GET`  | `/api/auth/google/callback`    | OAuth middleware callback registered with Google.              |
-| `GET`  | `/api/auth/google/resultado`   | Complete the server-side provider result.                       |
-| `POST` | `/api/auth/google/intercambiar` | Exchange the short-lived code for a session or registration.  |
+| `GET`  | `/api/auth/google`              | Start Google OAuth 2.0 authentication.                          |
+| `GET`  | `/api/auth/google/callback`     | OAuth middleware callback registered with Google.               |
+| `GET`  | `/api/auth/google/resultado`    | Complete the server-side provider result.                       |
+| `POST` | `/api/auth/google/intercambiar` | Exchange the short-lived code for a session or registration.    |
 
-Local accounts are created with `EmailVerificado = false`. Verification links expire after 24 hours, store only a SHA-256 token hash and become unusable after confirmation. Resend responses are intentionally identical for existing and unknown accounts. Google OAuth accepts only `@ucb.edu.bo` identities, uses middleware correlation/state protection and returns a ten-minute, single-use exchange code instead of placing JWT credentials in a URL. Existing local accounts are linked by their verified institutional email; new identities must complete carnet, career and contact information before the user record is created.
+Local accounts are created with `EmailVerificado = false`. Verification links expire after 24 hours, store only a SHA-256 token hash and become unusable after confirmation. Resend responses are intentionally identical for existing and unknown accounts. Google OAuth accepts only `@ucb.edu.bo` identities, uses middleware correlation/state protection and returns a ten-minute, single-use exchange code instead of placing JWT credentials in a URL. Existing local accounts are linked by their verified institutional email; new identities must complete carnet, career and contact information before the user record is created. The frontend sends credentials only to the same-origin `/api` proxy and retries one request after a successful cookie rotation when an access token expires.
 
 ## Users and Notifications
 

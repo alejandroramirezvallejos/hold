@@ -50,6 +50,20 @@ Generate a development key:
 openssl rand -base64 32
 ```
 
+Create the Data Protection certificate from Git Bash before starting the production Compose stack:
+
+```bash
+cd code
+mkdir -p secrets
+openssl rand -base64 48 > secrets/data-protection-password.txt
+openssl req -x509 -newkey rsa:3072 -sha256 -days 825 -keyout secrets/data-protection.key -out secrets/data-protection.crt -passout file:secrets/data-protection-password.txt -subj "/CN=UCB Hold Data Protection"
+openssl pkcs12 -export -out secrets/data-protection.pfx -inkey secrets/data-protection.key -in secrets/data-protection.crt -passin file:secrets/data-protection-password.txt -passout file:secrets/data-protection-password.txt
+rm secrets/data-protection.key secrets/data-protection.crt
+chmod 600 secrets/data-protection.pfx secrets/data-protection-password.txt server.env
+```
+
+`code/secrets` is ignored by Git. Store an encrypted off-server copy of the PFX and password in separate restricted secret storage. Losing either one makes existing protected carnet images, signatures and contracts unrecoverable; exposing them requires immediate replacement and a controlled data re-protection procedure.
+
 ### Local Backend
 
 ```bash
@@ -83,7 +97,9 @@ cd code
 docker compose --env-file server.env up --build
 ```
 
-Docker Compose mounts `ucb_dataprotection_keys` at `/app/data-protection-keys`. Back up this volume with the database and do not replace it during routine deployments; it is required to decrypt saved carnet images, profile signatures, and contracts.
+Docker Compose mounts `ucb_dataprotection_keys` at `/app/data-protection-keys` and mounts the PFX and password as read-only Docker secrets. ASP.NET encrypts newly generated Data Protection keys with that certificate. Production refuses to start when persistent keys are configured without both secret files. Back up the key volume, PFX and password through restricted infrastructure and do not replace them during routine deployments; they are required to decrypt saved carnet images, profile signatures, and contracts.
+
+Certificate protection does not rewrite keys that already existed as plaintext XML. If the production volume predates this configuration, keep it on an encrypted Oracle volume with restricted host access and preserve a private snapshot before rollout. Re-protecting existing application data and replacing the old key ring requires a separate controlled rotation; deleting the old ring first would make stored encrypted documents unreadable.
 
 | Service     | URL                   |
 | ----------- | --------------------- |
@@ -186,6 +202,8 @@ chmod 600 code/server.env
 
 Never commit `code/server.env`, `.env`, `client_secret.json`, database passwords, `Jwt__Key`, `Authentication__Google__ClientSecret`, `Email__Password`, private keys or production backups. The repository ignores these files; `code/server.env.example` is intentionally tracked and must contain placeholders only. The Google client ID is not a password, but keeping all environment-specific values together avoids accidental production configuration in source control.
 
+Browser sessions use `HttpOnly`, `SameSite=Strict` cookies. Production marks them `Secure`, so the public site must use HTTPS. Local development through the Angular `/api` proxy works over HTTP because the backend runs in the Development environment; tokens are never written to `sessionStorage` or `localStorage`.
+
 If GitHub Actions performs the deployment, store only the values needed by that workflow in GitHub Actions organization or environment secrets, restrict the production environment, and write `server.env` on Oracle during deployment. Do not upload the complete production environment file as a repository artifact.
 
 When email delivery is disabled, accounts can be created but local verification messages are not sent. Enable and test SMTP before allowing local registration in production.
@@ -213,9 +231,10 @@ The release never contains production data or full backups. Keep operational bac
 | Issue                                  | Resolution                                                                                         |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `.NET SDK not found`                   | Install .NET 8 SDK and restart the terminal.                                                       |
-| PostgreSQL or Redis refuses connection | Run `cd code && docker compose --env-file server.env up -d ucb_db ucb_redis`.                          |
+| PostgreSQL or Redis refuses connection | Run `cd code && docker compose --env-file server.env up -d ucb_db ucb_redis`.                      |
 | Backend cannot read secrets            | Run the `dotnet user-secrets` commands from `code/server`.                                         |
-| Database schema is outdated            | Review and apply the required `ALTER` statements, or recreate an empty database from `schema.sql`.   |
+| Database schema is outdated            | Review and apply the required `ALTER` statements, or recreate an empty database from `schema.sql`. |
 | Port `4200` is already in use          | Run Angular with another port, for example `ng serve --port 4300`.                                 |
 | Frontend dependencies are missing      | Run `npm install` from `code/client`.                                                              |
 | Docker backend restarts                | Inspect logs with `docker logs -f ucb_server`.                                                     |
+| Data Protection secret files missing   | Generate `code/secrets/data-protection.pfx` and its password file before starting production.      |

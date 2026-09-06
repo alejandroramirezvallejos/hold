@@ -2,19 +2,21 @@ import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Usuario } from '@entities/user';
 import { environment } from '@environments/environment';
-import { decodeBase64JsonResult, parseJsonResult } from '@shared/lib/result';
+import { parseJsonResult } from '@shared/lib/result';
 import {
   BrowserSessionStorageService,
   SESSION_STORAGE_KEYS,
 } from '@shared/lib/session';
 import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AccessTokenPayload } from './access-token-payload';
-import { RefreshTokenResponse } from './refresh-token-response';
+import { finalize, map } from 'rxjs/operators';
 
-const MILLISECONDS_PER_SECOND = 1000;
-const ROLE_CLAIM =
-  'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+interface SessionResponse {
+  Value: {
+    Usuario: Usuario;
+  };
+}
+
+const LEGACY_TOKEN_KEYS = ['ucbhold_access', 'ucbhold_refresh'];
 
 @Injectable({
   providedIn: 'root',
@@ -27,30 +29,14 @@ export class AuthService {
     private readonly sessionStorage: BrowserSessionStorageService,
   ) {
     this.http = new HttpClient(backend);
+    this.clearLegacyTokens();
   }
 
-  setSession(
-    accessToken: string,
-    refreshToken: string,
-    usuario: Usuario,
-  ): void {
-    this.sessionStorage.setItem(SESSION_STORAGE_KEYS.accessToken, accessToken);
-    this.sessionStorage.setItem(
-      SESSION_STORAGE_KEYS.refreshToken,
-      refreshToken,
-    );
+  setSession(usuario: Usuario): void {
     this.sessionStorage.setItem(
       SESSION_STORAGE_KEYS.user,
       JSON.stringify(usuario),
     );
-  }
-
-  getAccessToken(): string | null {
-    return this.sessionStorage.getItem(SESSION_STORAGE_KEYS.accessToken);
-  }
-
-  getRefreshToken(): string | null {
-    return this.sessionStorage.getItem(SESSION_STORAGE_KEYS.refreshToken);
   }
 
   getStoredUser(): Usuario | null {
@@ -62,36 +48,11 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    const tokenPayload = this.getTokenPayload();
-    const expirationTime = tokenPayload?.exp
-      ? tokenPayload.exp * MILLISECONDS_PER_SECOND
-      : 0;
-
-    return expirationTime > Date.now();
+    return this.getStoredUser() !== null;
   }
 
   getRole(): string | null {
-    const tokenPayload = this.getTokenPayload();
-
-    return tokenPayload?.role ?? tokenPayload?.[ROLE_CLAIM] ?? null;
-  }
-
-  private getTokenPayload(): AccessTokenPayload | null {
-    const accessToken = this.getAccessToken();
-
-    if (!accessToken) return null;
-
-    const encodedPayload = accessToken.split('.')[1];
-
-    if (!encodedPayload) return null;
-
-    const normalizedPayload = encodedPayload
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-
-    return decodeBase64JsonResult<AccessTokenPayload>(
-      normalizedPayload,
-    ).unwrapOr(null);
+    return this.getStoredUser()?.rol ?? null;
   }
 
   isAdmin(): boolean {
@@ -100,34 +61,32 @@ export class AuthService {
     );
   }
 
-  refreshTokens(
-    refreshToken: string,
-  ): Observable<{ accessToken: string; refreshToken: string }> {
+  refreshSession(): Observable<void> {
     return this.http
-      .post<RefreshTokenResponse>(`${environment.apiUrl}/api/auth/refresh`, {
-        RefreshToken: refreshToken,
-      })
-      .pipe(
-        map((rawResponse) => ({
-          accessToken: rawResponse.Value.AccessToken,
-          refreshToken: rawResponse.Value.RefreshToken,
-        })),
-        tap((newTokens) => {
-          this.sessionStorage.setItem(
-            SESSION_STORAGE_KEYS.accessToken,
-            newTokens.accessToken,
-          );
-          this.sessionStorage.setItem(
-            SESSION_STORAGE_KEYS.refreshToken,
-            newTokens.refreshToken,
-          );
-        }),
-      );
+      .post<SessionResponse>(
+        `${environment.apiUrl}/api/auth/refresh`,
+        {},
+        { withCredentials: true },
+      )
+      .pipe(map(() => undefined));
   }
 
   clear(): void {
-    this.sessionStorage.removeItem(SESSION_STORAGE_KEYS.accessToken);
-    this.sessionStorage.removeItem(SESSION_STORAGE_KEYS.refreshToken);
     this.sessionStorage.removeItem(SESSION_STORAGE_KEYS.user);
+    this.clearLegacyTokens();
+  }
+
+  logout(): Observable<void> {
+    return this.http
+      .post<void>(
+        `${environment.apiUrl}/api/auth/logout`,
+        {},
+        { withCredentials: true },
+      )
+      .pipe(finalize(() => this.clear()));
+  }
+
+  private clearLegacyTokens(): void {
+    LEGACY_TOKEN_KEYS.forEach((key) => this.sessionStorage.removeItem(key));
   }
 }

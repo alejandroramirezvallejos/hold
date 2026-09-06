@@ -37,26 +37,26 @@ UCB Hold centraliza el ciclo operativo de los equipos de laboratorio: consulta d
 
 ### Capabilities
 
-| Domain | Scope |
-| --- | --- |
-| Inventory | Equipment groups, physical units, accessories, components, categories, furniture and lockers. |
-| Reservations | Cart-based request flow, date validation, availability checks and loan state transitions. |
-| Administration | CRUD modules, responsive admin tables, audit views and operational notifications. |
-| Maintenance | Preventive and corrective maintenance records by provider and equipment detail. |
-| Contracts | HTML contract generation associated with approved loans. |
-| Security | JWT authentication, refresh tokens, route guards, request validation and private configuration. |
+| Domain         | Scope                                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------- |
+| Inventory      | Equipment groups, physical units, accessories, components, categories, furniture and lockers.                  |
+| Reservations   | Cart-based request flow, date validation, availability checks and loan state transitions.                      |
+| Administration | CRUD modules, responsive admin tables, audit views and operational notifications.                              |
+| Maintenance    | Preventive and corrective maintenance records by provider and equipment detail.                                |
+| Contracts      | HTML contract generation associated with approved loans.                                                       |
+| Security       | HttpOnly cookie sessions, rotating refresh tokens, route guards, request validation and private configuration. |
 
 ---
 
 ## Technology
 
-| Layer | Stack | Responsibility |
-| --- | --- | --- |
-| Frontend | Angular 21.2, TypeScript, RxJS | Application shell, screens, widgets, forms, guards and HTTP integration. |
-| Backend | ASP.NET Core 8, Ardalis.Result, FluentValidation, Mapperly | REST API, business rules, validation and normalized responses. |
-| Data | PostgreSQL 14+, EF Core 8, Npgsql | Persistence, native enums, triggers, indexes and projections. |
-| Infrastructure | Redis 7, Docker Compose, Nginx | Local services, cache support and containerized delivery. |
-| Quality | NUnit, Jasmine/Karma, GitHub Actions, SonarQube | Automated tests, coverage, static analysis and CI verification. |
+| Layer          | Stack                                                      | Responsibility                                                           |
+| -------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Frontend       | Angular 21.2, TypeScript, RxJS                             | Application shell, screens, widgets, forms, guards and HTTP integration. |
+| Backend        | ASP.NET Core 8, Ardalis.Result, FluentValidation, Mapperly | REST API, business rules, validation and normalized responses.           |
+| Data           | PostgreSQL 14+, EF Core 8, Npgsql                          | Persistence, native enums, triggers, indexes and projections.            |
+| Infrastructure | Redis 7, Docker Compose, Nginx                             | Local services, cache support and containerized delivery.                |
+| Quality        | NUnit, Jasmine/Karma, GitHub Actions, SonarQube            | Automated tests, coverage, static analysis and CI verification.          |
 
 ---
 
@@ -79,13 +79,13 @@ The repository is organized around a small monorepo layout:
 
 Frontend modules follow Feature-Sliced Design:
 
-| Slice | Responsibility |
-| --- | --- |
-| `pages` | Routed screens and page-level composition. |
-| `widgets` | Reusable application sections such as navigation, sidebars and panels. |
-| `features` | User actions and business flows. |
-| `entities` | Domain models, API services and entity-specific UI. |
-| `shared` | Cross-cutting utilities, directives, primitives and reusable UI. |
+| Slice      | Responsibility                                                         |
+| ---------- | ---------------------------------------------------------------------- |
+| `pages`    | Routed screens and page-level composition.                             |
+| `widgets`  | Reusable application sections such as navigation, sidebars and panels. |
+| `features` | User actions and business flows.                                       |
+| `entities` | Domain models, API services and entity-specific UI.                    |
+| `shared`   | Cross-cutting utilities, directives, primitives and reusable UI.       |
 
 Backend code separates presentation, application rules, core entities and infrastructure. Controllers expose HTTP contracts; services own business decisions; repositories encapsulate persistence. API DTOs do not expose domain entities, credentials, protected identity documents, or stored signatures. Automated boundary tests keep `Core` independent from outer layers and keep sensitive mapper defaults closed.
 
@@ -109,6 +109,8 @@ Redis__Enabled=true
 Hangfire__Enabled=true
 ```
 
+Production Docker also requires the ignored files `code/secrets/data-protection.pfx` and `code/secrets/data-protection-password.txt`. Generate them with the exact commands in [docs/setup.md](docs/setup.md).
+
 Start the stack:
 
 ```bash
@@ -116,9 +118,9 @@ cd code
 docker compose --env-file server.env up --build
 ```
 
-| Service | URL |
-| --- | --- |
-| Frontend | http://localhost:4200 |
+| Service     | URL                   |
+| ----------- | --------------------- |
+| Frontend    | http://localhost:4200 |
 | Backend API | http://localhost:5000 |
 
 ### Local Development
@@ -162,33 +164,33 @@ Generated coverage and quality outputs must stay out of source control. CI publi
 
 ## Operations
 
-| Concern | Policy |
-| --- | --- |
-| Configuration | Local secrets belong in `code/server.env`, environment variables or `dotnet user-secrets`. |
-| Database schema | `code/database/schema.sql` documents the database structure maintained by the application. |
-| Database releases | Releases contain only the data-free `schema.sql`; production backups stay in private infrastructure. |
-| Generated reports | Coverage, SonarQube exports and HTML reports are ignored and uploaded by CI when needed. |
-| Releases | Each release should include source changes, migration notes and operational artifacts only when required. |
+| Concern           | Policy                                                                                                    |
+| ----------------- | --------------------------------------------------------------------------------------------------------- |
+| Configuration     | Local secrets belong in `code/server.env`, environment variables or `dotnet user-secrets`.                |
+| Database schema   | `code/database/schema.sql` documents the database structure maintained by the application.                |
+| Database releases | Releases contain only the data-free `schema.sql`; production backups stay in private infrastructure.      |
+| Generated reports | Coverage, SonarQube exports and HTML reports are ignored and uploaded by CI when needed.                  |
+| Releases          | Each release should include source changes, migration notes and operational artifacts only when required. |
 
 ---
 
 ## Documentation
 
-| Document | Purpose |
-| --- | --- |
-| [docs/setup.md](docs/setup.md) | Local environment, Docker, secrets, verification and troubleshooting. |
-| [docs/api.md](docs/api.md) | REST contracts, response format, endpoints and validation rules. |
-| [docs/database.md](docs/database.md) | Schema overview, enums, indexes, business rules and restore commands. |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Branching, commits, pull requests and quality expectations. |
-| [SECURITY.md](SECURITY.md) | Supported versions, private disclosure and vulnerability handling. |
-| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Professional collaboration standards. |
+| Document                                 | Purpose                                                               |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| [docs/setup.md](docs/setup.md)           | Local environment, Docker, secrets, verification and troubleshooting. |
+| [docs/api.md](docs/api.md)               | REST contracts, response format, endpoints and validation rules.      |
+| [docs/database.md](docs/database.md)     | Schema overview, enums, indexes, business rules and restore commands. |
+| [CONTRIBUTING.md](CONTRIBUTING.md)       | Branching, commits, pull requests and quality expectations.           |
+| [SECURITY.md](SECURITY.md)               | Supported versions, private disclosure and vulnerability handling.    |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Professional collaboration standards.                                 |
 
 ---
 
 ## Maintainers
 
-| Maintainer | GitHub |
-| --- | --- |
-| Josue Balbontin | [josue-balbontin](https://github.com/josue-balbontin) |
+| Maintainer        | GitHub                                                                  |
+| ----------------- | ----------------------------------------------------------------------- |
+| Josue Balbontin   | [josue-balbontin](https://github.com/josue-balbontin)                   |
 | Alejandro Ramirez | [alejandroramirezvallejos](https://github.com/alejandroramirezvallejos) |
-| Fernando Terrazas | [FernandoTerrazasLl](https://github.com/FernandoTerrazasLl) |
+| Fernando Terrazas | [FernandoTerrazasLl](https://github.com/FernandoTerrazasLl)             |

@@ -8,15 +8,12 @@ import {
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@features/auth-session';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, finalize, shareReplay, switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  private activeRefresh = false;
-  private readonly pendingAccessToken$ = new BehaviorSubject<string | null>(
-    null,
-  );
+  private refreshRequest$: Observable<void> | null = null;
 
   constructor(
     private readonly authService: AuthService,
@@ -27,27 +24,23 @@ export class JwtInterceptor implements HttpInterceptor {
     outgoingRequest: HttpRequest<unknown>,
     nextHandler: HttpHandler,
   ): Observable<HttpEvent<unknown>> {
-    const isAuthEndpoint =
+    const requestWithCookies = outgoingRequest.clone({ withCredentials: true });
+    const isSessionEndpoint =
       outgoingRequest.url.includes('/api/auth/login') ||
-      outgoingRequest.url.includes('/api/auth/refresh');
+      outgoingRequest.url.includes('/api/auth/refresh') ||
+      outgoingRequest.url.includes('/api/auth/logout') ||
+      outgoingRequest.url.includes('/api/auth/google/intercambiar');
 
-    if (isAuthEndpoint) return nextHandler.handle(outgoingRequest);
+    if (isSessionEndpoint) return nextHandler.handle(requestWithCookies);
 
-    const accessToken = this.authService.getAccessToken();
-    const authorizedRequest = accessToken
-      ? outgoingRequest.clone({
-          setHeaders: { Authorization: `Bearer ${accessToken}` },
-        })
-      : outgoingRequest;
-
-    return nextHandler.handle(authorizedRequest).pipe(
+    return nextHandler.handle(requestWithCookies).pipe(
       catchError((responseError) => {
         if (
           responseError instanceof HttpErrorResponse &&
           responseError.status === 401
         ) {
           return this.handleExpiredToken(
-            outgoingRequest,
+            requestWithCookies,
             nextHandler,
             responseError,
           );
@@ -62,48 +55,23 @@ export class JwtInterceptor implements HttpInterceptor {
     nextHandler: HttpHandler,
     originalError: HttpErrorResponse,
   ): Observable<HttpEvent<unknown>> {
-    const storedRefreshToken = this.authService.getRefreshToken();
-
-    if (!storedRefreshToken) {
-      if (this.authService.getAccessToken()) {
-        this.authService.clear();
-        this.router.navigate(['/login']);
-      }
+    if (!this.authService.isLoggedIn()) {
       return throwError(() => originalError);
     }
 
-    if (!this.activeRefresh) {
-      this.activeRefresh = true;
-      this.pendingAccessToken$.next(null);
-
-      return this.authService.refreshTokens(storedRefreshToken).pipe(
-        switchMap((renewedTokens) => {
-          this.activeRefresh = false;
-          this.pendingAccessToken$.next(renewedTokens.accessToken);
-          const retryRequest = failedRequest.clone({
-            setHeaders: {
-              Authorization: `Bearer ${renewedTokens.accessToken}`,
-            },
-          });
-          return nextHandler.handle(retryRequest);
-        }),
-        catchError((refreshError) => {
-          this.activeRefresh = false;
-          this.authService.clear();
-          this.router.navigate(['/login']);
-          return throwError(() => refreshError);
-        }),
+    if (!this.refreshRequest$) {
+      this.refreshRequest$ = this.authService.refreshSession().pipe(
+        finalize(() => (this.refreshRequest$ = null)),
+        shareReplay({ bufferSize: 1, refCount: true }),
       );
     }
 
-    return this.pendingAccessToken$.pipe(
-      filter((newAccessToken) => newAccessToken !== null),
-      take(1),
-      switchMap((newAccessToken) => {
-        const retryRequest = failedRequest.clone({
-          setHeaders: { Authorization: `Bearer ${newAccessToken!}` },
-        });
-        return nextHandler.handle(retryRequest);
+    return this.refreshRequest$.pipe(
+      switchMap(() => nextHandler.handle(failedRequest)),
+      catchError((refreshError) => {
+        this.authService.clear();
+        this.router.navigate(['/login']);
+        return throwError(() => refreshError);
       }),
     );
   }

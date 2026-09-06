@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace IMT_Reservas.Server.Application.Features.Usuario;
 
 public sealed class LoginRequestDto
@@ -8,7 +10,10 @@ public sealed class LoginRequestDto
 
 public class LoginDto
 {
+    [JsonIgnore]
     public string AccessToken { get; set; } = string.Empty;
+
+    [JsonIgnore]
     public string RefreshToken { get; set; } = string.Empty;
     public UsuarioDto Usuario { get; set; } = new();
 }

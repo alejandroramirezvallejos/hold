@@ -181,6 +181,25 @@ public sealed class UsuarioAuthRepository
         return updated == 1;
     }
 
+    public async Task RevokeRefreshToken(
+        string tokenHash,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var entity = await _dbContext
+            .Usuarios.IgnoreQueryFilters()
+            .FirstOrDefaultAsync(
+                user => !user.EstadoEliminado && user.RefreshToken == tokenHash,
+                cancellationToken
+            );
+        if (entity == null)
+            return;
+
+        entity.RefreshToken = null;
+        entity.RefreshTokenExpiry = null;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     private Task<UsuarioAuthData?> GetActiveUser(
         Expression<Func<UsuarioEntity, bool>> predicate,
         CancellationToken cancellationToken

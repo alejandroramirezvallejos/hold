@@ -549,6 +549,20 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
         );
     }
 
+    public async Task Logout(
+        string refreshToken,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (string.IsNullOrWhiteSpace(refreshToken) || refreshToken.Length > 256)
+            return;
+
+        await _authRepository.RevokeRefreshToken(
+            JwtService.HashRefreshToken(refreshToken),
+            cancellationToken
+        );
+    }
+
     private static void PreserveTraceableFields(UsuarioDto dto, UsuarioEntity existing)
     {
         dto.Carnet = existing.Carnet;

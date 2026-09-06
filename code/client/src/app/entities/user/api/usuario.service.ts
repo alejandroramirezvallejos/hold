@@ -64,8 +64,6 @@ export class UsuarioServiceAPI {
     const body = { Email: correo, Contrasena: contrasena };
     return this.http.post<UsuarioLoginApiResponse>(api, body).pipe(
       map((response) => ({
-        accessToken: response.Value.AccessToken as string,
-        refreshToken: response.Value.RefreshToken as string,
         usuario: this.mapearUsuario(response.Value.Usuario),
       })),
     );
@@ -135,8 +133,6 @@ export class UsuarioServiceAPI {
 
   mapearSesionGoogle(session: UsuarioLoginApiResponse['Value']) {
     return {
-      accessToken: session.AccessToken,
-      refreshToken: session.RefreshToken,
       usuario: this.mapearUsuario(session.Usuario),
     };
   }

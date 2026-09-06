@@ -1,5 +1,7 @@
+using Ardalis.Result;
 using IMT_Reservas.Server.Application.Features.Jwt;
 using IMT_Reservas.Server.Application.Features.Usuario;
+using IMT_Reservas.Server.Presentation.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +20,15 @@ public class AuthController : Controller
     private readonly RecuperacionContrasenaService _passwordRecovery;
     private readonly AutenticacionGoogleService _google;
     private readonly IConfiguration _configuration;
+    private readonly AuthCookieService _cookies;
 
     public AuthController(
         UsuarioService service,
         VerificacionCorreoService verification,
         RecuperacionContrasenaService passwordRecovery,
         AutenticacionGoogleService google,
-        IConfiguration configuration
+        IConfiguration configuration,
+        AuthCookieService cookies
     )
     {
         _service = service;
@@ -32,26 +36,37 @@ public class AuthController : Controller
         _passwordRecovery = passwordRecovery;
         _google = google;
         _configuration = configuration;
+        _cookies = cookies;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(
         [FromBody] LoginRequestDto request,
         CancellationToken cancellationToken
-    ) =>
-        ToResponse(
-            await _service.Login(
-                request.Email,
-                request.Contrasena,
-                cancellationToken
-            )
-        );
+    )
+    {
+        var result = await _service.Login(request.Email, request.Contrasena, cancellationToken);
+        return SessionResponse(result);
+    }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(
-        [FromBody] RefreshDto request,
-        CancellationToken cancellationToken
-    ) => ToResponse(await _service.Refresh(request.RefreshToken, cancellationToken));
+    public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
+    {
+        var refreshToken = Request.Cookies[AuthCookieService.RefreshTokenName] ?? string.Empty;
+        var result = await _service.Refresh(refreshToken, cancellationToken);
+        if (!result.IsSuccess)
+            _cookies.Clear(Response.Cookies);
+        return SessionResponse(result);
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+    {
+        var refreshToken = Request.Cookies[AuthCookieService.RefreshTokenName] ?? string.Empty;
+        await _service.Logout(refreshToken, cancellationToken);
+        _cookies.Clear(Response.Cookies);
+        return NoContent();
+    }
 
     [HttpPost("verificar")]
     public async Task<IActionResult> Verify(
@@ -117,5 +132,48 @@ public class AuthController : Controller
     public async Task<IActionResult> ExchangeGoogle(
         [FromBody] TokenDto request,
         CancellationToken cancellationToken
-    ) => ToResponse(await _google.Exchange(request.Token, cancellationToken));
+    )
+    {
+        Response.Headers.CacheControl = "no-store";
+        var result = await _google.Exchange(request.Token, cancellationToken);
+        if (!result.IsSuccess)
+            return ToResponse(result);
+
+        var value = result.Value;
+        AuthSessionResponseDto? session = null;
+        if (value.Sesion != null)
+        {
+            _cookies.Write(Response.Cookies, value.Sesion);
+            session = new AuthSessionResponseDto { Usuario = value.Sesion.Usuario };
+        }
+
+        return ToResponse(
+            Result<GoogleAuthResponseDto>.Success(
+                new GoogleAuthResponseDto
+                {
+                    RequiereRegistro = value.RequiereRegistro,
+                    CodigoRegistro = value.CodigoRegistro,
+                    Email = value.Email,
+                    Nombre = value.Nombre,
+                    ApellidoPaterno = value.ApellidoPaterno,
+                    ApellidoMaterno = value.ApellidoMaterno,
+                    Sesion = session,
+                }
+            )
+        );
+    }
+
+    private IActionResult SessionResponse(Result<LoginDto> result)
+    {
+        Response.Headers.CacheControl = "no-store";
+        if (!result.IsSuccess)
+            return ToResponse(result);
+
+        _cookies.Write(Response.Cookies, result.Value);
+        return ToResponse(
+            Result<AuthSessionResponseDto>.Success(
+                new AuthSessionResponseDto { Usuario = result.Value.Usuario }
+            )
+        );
+    }
 }

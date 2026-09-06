@@ -55,11 +55,7 @@ export class IniciarSesionComponent implements OnInit {
     this.loading = true;
     this.usuarioapi.iniciarSesion(this.email, this.contrasena).subscribe({
       next: (data) => {
-        this.authService.setSession(
-          data.accessToken,
-          data.refreshToken,
-          data.usuario,
-        );
+        this.authService.setSession(data.usuario);
         this.usuario.guardarSesion(data.usuario);
 
         this.loading = false;
@@ -125,11 +121,7 @@ export class IniciarSesionComponent implements OnInit {
           return;
         }
         const data = this.usuarioapi.mapearSesionGoogle(result.Sesion);
-        this.authService.setSession(
-          data.accessToken,
-          data.refreshToken,
-          data.usuario,
-        );
+        this.authService.setSession(data.usuario);
         this.usuario.guardarSesion(data.usuario);
         void this.router.navigate([
           this.authService.isAdmin() ? '/administracion' : '/inicio',

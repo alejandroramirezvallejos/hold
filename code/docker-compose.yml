@@ -42,7 +42,8 @@ services:
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health || exit 1"]
+      test:
+        ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -67,10 +68,15 @@ services:
       ASPNETCORE_HTTP_PORTS: 8080
       HttpsRedirection__Enabled: "false"
       DataProtection__KeysPath: /app/data-protection-keys
+      DataProtection__CertificatePath: /run/secrets/data_protection_certificate
+      DataProtection__CertificatePasswordFile: /run/secrets/data_protection_certificate_password
       Elasticsearch__Uri: http://ucb_elastic:9200
       Redis__ConnectionString: ucb_redis:6379
     volumes:
       - ucb_dataprotection_keys:/app/data-protection-keys
+    secrets:
+      - data_protection_certificate
+      - data_protection_certificate_password
     depends_on:
       ucb_db:
         condition: service_healthy
@@ -112,3 +118,9 @@ networks:
   web:
   data:
     internal: true
+
+secrets:
+  data_protection_certificate:
+    file: ./secrets/data-protection.pfx
+  data_protection_certificate_password:
+    file: ./secrets/data-protection-password.txt
