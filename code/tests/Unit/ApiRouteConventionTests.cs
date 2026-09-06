@@ -13,6 +13,7 @@ internal class ApiRouteConventionTests
         new Dictionary<Type, string>
         {
             [typeof(AccesorioController)] = "api/accesorios",
+            [typeof(AmbienteController)] = "api/ambientes",
             [typeof(AuthController)] = "api/auth",
             [typeof(AuditLogController)] = "api/auditoria",
             [typeof(AvisoDisponibilidadController)] = "api/avisos",
@@ -29,6 +30,7 @@ internal class ApiRouteConventionTests
             [typeof(MuebleController)] = "api/muebles",
             [typeof(NotificacionController)] = "api/notificaciones",
             [typeof(PrestamoController)] = "api/prestamos",
+            [typeof(ProcedenciaController)] = "api/procedencias",
             [typeof(UsuarioController)] = "api/usuarios",
         };
 
@@ -68,7 +70,7 @@ internal class ApiRouteConventionTests
     private static IEnumerable<TestCaseData> ActionRouteCases() =>
         ExpectedRoutes.Keys.SelectMany(controllerType =>
             controllerType
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .SelectMany(method =>
                     method
                         .GetCustomAttributes<HttpMethodAttribute>()

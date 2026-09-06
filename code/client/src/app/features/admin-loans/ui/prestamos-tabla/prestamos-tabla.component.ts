@@ -31,6 +31,7 @@ import {
   StickyScrollDirective,
 } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
+import { formatBoliviaDateTime } from '@shared/lib/date';
 import {
   Aviso,
   AvisoEliminarComponent,
@@ -130,9 +131,9 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
         nombreRol(value.datosgrupo.TipoUsuario),
         value.datosgrupo.TelefonoUsuario,
         this.detalleEquipos(value),
-        this.formatearFechaImpresion(value.datosgrupo.FechaSolicitud),
-        this.formatearFechaImpresion(value.datosgrupo.FechaPrestamoEsperada),
-        this.formatearFechaImpresion(value.datosgrupo.FechaDevolucionEsperada),
+        formatBoliviaDateTime(value.datosgrupo.FechaSolicitud),
+        formatBoliviaDateTime(value.datosgrupo.FechaPrestamoEsperada),
+        formatBoliviaDateTime(value.datosgrupo.FechaDevolucionEsperada),
         this.getEstadoCalculado(value),
       ]),
     );
@@ -158,30 +159,12 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
         nombreRol(value.datosgrupo.TipoUsuario),
         value.datosgrupo.TelefonoUsuario,
         this.detalleEquipos(value),
-        this.formatearFechaImpresion(value.datosgrupo.FechaSolicitud),
-        this.formatearFechaImpresion(value.datosgrupo.FechaPrestamoEsperada),
-        this.formatearFechaImpresion(value.datosgrupo.FechaDevolucionEsperada),
+        formatBoliviaDateTime(value.datosgrupo.FechaSolicitud),
+        formatBoliviaDateTime(value.datosgrupo.FechaPrestamoEsperada),
+        formatBoliviaDateTime(value.datosgrupo.FechaDevolucionEsperada),
         this.getEstadoCalculado(value),
       ]),
     });
-  }
-
-  private formatearFechaImpresion(
-    fecha: Date | string | null | undefined,
-  ): string {
-    if (!fecha) return '';
-    const valor = fecha instanceof Date ? fecha : new Date(fecha);
-    if (Number.isNaN(valor.getTime())) return '';
-
-    return new Intl.DateTimeFormat('es-BO', {
-      timeZone: 'America/La_Paz',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(valor);
   }
 
   vercontrato: WritableSignal<boolean> = signal(false);

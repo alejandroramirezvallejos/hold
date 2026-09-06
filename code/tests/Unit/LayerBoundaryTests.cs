@@ -44,6 +44,23 @@ internal class LayerBoundaryTests
     }
 
     [Test]
+    public void ApplicationAbstractions_HaveMultipleImplementations()
+    {
+        var types = ServerAssembly.GetTypes();
+        var abstractions = types
+            .Where(type => type.IsInterface)
+            .Where(type => type.Namespace == "IMT_Reservas.Server.Application.Abstraction")
+            .ToList();
+
+        var singleUseAbstractions = abstractions
+            .Where(abstraction => CountImplementations(abstraction, types) < 2)
+            .Select(abstraction => abstraction.FullName)
+            .ToList();
+
+        singleUseAbstractions.Should().BeEmpty();
+    }
+
+    [Test]
     public void UsuarioMapper_DoesNotReleaseCredentialsOrDocuments()
     {
         var dto = new UsuarioMapper().ToDto(new Usuario
@@ -89,4 +106,16 @@ internal class LayerBoundaryTests
             foreach (var nested in Expand(argument))
                 yield return nested;
     }
+
+    private static int CountImplementations(Type abstraction, IEnumerable<Type> types) =>
+        types.Count(type =>
+            !type.IsAbstract
+            && !type.IsInterface
+            && type.GetInterfaces().Any(candidate =>
+                abstraction.IsGenericTypeDefinition
+                    ? candidate.IsGenericType
+                        && candidate.GetGenericTypeDefinition() == abstraction
+                    : candidate == abstraction
+            )
+        );
 }

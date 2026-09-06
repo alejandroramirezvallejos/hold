@@ -137,23 +137,6 @@ export class UsuarioServiceAPI {
     };
   }
 
-  actualizarUsuario(usuario: Usuario) {
-    const envio = {
-      Carnet: usuario.carnet,
-      Nombre: usuario.nombre,
-      ApellidoPaterno: usuario.apellido_paterno,
-      ApellidoMaterno: usuario.apellido_materno,
-      Email: usuario.correo,
-      CarreraNombre: usuario.carrera,
-      IdCarrera: usuario.carrera_Id || 0,
-      Telefono: usuario.telefono,
-      TelefonoReferencia: usuario.telefono_referencia,
-      NombreReferencia: usuario.nombre_referencia,
-      EmailReferencia: usuario.email_referencia,
-    };
-    return this.http.put<Usuario>(`${this.apiUrl}/${envio.Carnet}`, envio);
-  }
-
   obtenerPerfil() {
     return this.http
       .get<ApiResponse<UsuarioApiItem>>(`${this.apiUrl}/perfil`)

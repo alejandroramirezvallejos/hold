@@ -7,6 +7,7 @@ import { FlatpickrDirective } from '@shared/lib/directives';
 import { printTable, TablePaginationComponent } from '@shared/lib/admin-table';
 import { CustomSelectComponent, OpcionSelect } from '@shared/ui';
 import { parseJsonResult } from '@shared/lib/result';
+import { formatBoliviaDateTime } from '@shared/lib/date';
 import { AuditObservationDetail } from '../../model/audit-observation-detail';
 
 const ACCIONES_POR_ENTIDAD: Record<string, string[]> = {
@@ -164,31 +165,13 @@ export class AuditPanelComponent implements OnChanges {
       title: `Auditoría: ${this.entidad}`,
       headers: ['Fecha', 'Actor', 'Acción', 'ID', 'Detalle'],
       rows: this.logs.map((log) => [
-        this.formatearFechaImpresion(log.Timestamp),
+        formatBoliviaDateTime(log.Timestamp),
         log.AdminNombre || log.AdminCarnet,
         log.Accion,
         log.EntidadId,
         this.resumenObs(log),
       ]),
     });
-  }
-
-  private formatearFechaImpresion(
-    fecha: Date | string | null | undefined,
-  ): string {
-    if (!fecha) return '';
-    const valor = fecha instanceof Date ? fecha : new Date(fecha);
-    if (Number.isNaN(valor.getTime())) return '';
-
-    return new Intl.DateTimeFormat('es-BO', {
-      timeZone: 'America/La_Paz',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(valor);
   }
 
   ordenarPorColumna(columna: string): void {
@@ -293,18 +276,7 @@ export class AuditPanelComponent implements OnChanges {
   formatearFechaDetalle(fecha?: string): string {
     if (!fecha) return '—';
 
-    const value = new Date(fecha);
-    if (Number.isNaN(value.getTime())) return fecha;
-
-    return new Intl.DateTimeFormat('es-BO', {
-      timeZone: 'America/La_Paz',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    }).format(value);
+    return formatBoliviaDateTime(fecha) || fecha;
   }
 
   estadoEquipoLabel(estado?: string): string {

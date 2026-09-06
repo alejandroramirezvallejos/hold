@@ -108,8 +108,8 @@ export class GrupoequipoService {
     };
   }
 
-  crearGrupoEquipo(grupoEquipo: GrupoEquipo) {
-    const envio = {
+  private serializarGrupoEquipo(grupoEquipo: GrupoEquipo) {
+    return {
       Nombre: grupoEquipo.nombre,
       Modelo: grupoEquipo.modelo,
       Marca: grupoEquipo.marca,
@@ -119,8 +119,19 @@ export class GrupoequipoService {
       UrlImagen: grupoEquipo.link,
       TiempoMaximoPrestamoDias: grupoEquipo.TiempoMaximoPrestamoDias,
     };
+  }
+
+  private extraerComentario(
+    response: ApiResponse<ComentarioEquipoApiItem>,
+  ): ComentarioEquipo {
+    return this.mapearComentario(
+      extractApiValue(response, this.comentarioEquipoApiVacio),
+    );
+  }
+
+  crearGrupoEquipo(grupoEquipo: GrupoEquipo) {
     return this.http
-      .post<unknown>(this.apiUrl, envio)
+      .post<unknown>(this.apiUrl, this.serializarGrupoEquipo(grupoEquipo))
       .pipe(tap(() => this.invalidarCache()));
   }
 
@@ -242,13 +253,7 @@ export class GrupoequipoService {
           IdComentarioPadre: idComentarioPadre ?? null,
         },
       )
-      .pipe(
-        map((data) =>
-          this.mapearComentario(
-            extractApiValue(data, this.comentarioEquipoApiVacio),
-          ),
-        ),
-      );
+      .pipe(map((response) => this.extraerComentario(response)));
   }
 
   alternarLikeComentario(
@@ -260,13 +265,7 @@ export class GrupoequipoService {
         `${this.apiUrl}/${idGrupoEquipo}/comentarios/${idComentario}/likes`,
         {},
       )
-      .pipe(
-        map((data) =>
-          this.mapearComentario(
-            extractApiValue(data, this.comentarioEquipoApiVacio),
-          ),
-        ),
-      );
+      .pipe(map((response) => this.extraerComentario(response)));
   }
 
   eliminarComentario(
@@ -281,14 +280,7 @@ export class GrupoequipoService {
   editarGrupoEquipo(grupoEquipo: GrupoEquipo) {
     const envio = {
       Id: grupoEquipo.id,
-      Nombre: grupoEquipo.nombre,
-      Modelo: grupoEquipo.modelo,
-      Marca: grupoEquipo.marca,
-      NombreCategoria: grupoEquipo.nombreCategoria,
-      Descripcion: grupoEquipo.descripcion,
-      UrlDataSheet: grupoEquipo.url_data_sheet,
-      UrlImagen: grupoEquipo.link,
-      TiempoMaximoPrestamoDias: grupoEquipo.TiempoMaximoPrestamoDias,
+      ...this.serializarGrupoEquipo(grupoEquipo),
     };
     return this.http
       .put<unknown>(`${this.apiUrl}/${grupoEquipo.id}`, envio)
