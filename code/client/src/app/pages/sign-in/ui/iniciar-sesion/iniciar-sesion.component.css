@@ -243,6 +243,13 @@ label {
   font-size: 0.875rem;
   font-family: var(--font);
 }
+.forgot-password {
+  align-self: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
 .forgot-password:hover,
 .forgot-password-link a:hover {
   text-decoration: underline;

@@ -142,7 +142,7 @@ export class IniciarSesionComponent implements OnInit {
   }
 
   recuperarContrasena(): void {
-    void this.router.navigate(['/recuperar-contrasena']);
+    void this.router.navigate(['/recuperar']);
   }
 
   alternarVisibilidadContrasena(): void {

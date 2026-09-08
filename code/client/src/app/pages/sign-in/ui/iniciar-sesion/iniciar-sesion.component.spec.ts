@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { UsuarioServiceAPI } from '@entities/user';
 import { withDefaultTestingProviders } from '@shared/lib/testing';
 import { NEVER } from 'rxjs';
@@ -31,5 +32,14 @@ describe('IniciarSesionComponent', () => {
 
     expect(login).toHaveBeenCalledTimes(1);
     expect(component.loading).toBeTrue();
+  });
+
+  it('navigates to the registered password recovery route', () => {
+    const router = TestBed.inject(Router);
+    const navigate = spyOn(router, 'navigate').and.resolveTo(true);
+
+    component.recuperarContrasena();
+
+    expect(navigate).toHaveBeenCalledOnceWith(['/recuperar']);
   });
 });
