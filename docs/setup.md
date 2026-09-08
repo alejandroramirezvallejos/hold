@@ -56,11 +56,28 @@ Before starting production, provision the Data Protection material through the t
 
 ```bash
 cd code/server
-dotnet user-secrets init
 dotnet user-secrets set "ConnectionStrings:PostgreSQL" "Host=localhost;Port=5432;Database=IMT_Reservas;Username=postgres;Password=<local-database-password>;Pooling=true;MinPoolSize=2;MaxPoolSize=20"
 dotnet user-secrets set "Jwt:Key" "<generated-local-jwt-key>"
 dotnet user-secrets set "Redis:ConnectionString" "localhost:6379"
 ```
+
+The server project already defines a `UserSecretsId`; do not run `dotnet user-secrets init` again. User Secrets remain outside the repository and are loaded automatically while ASP.NET Core runs in the Development environment. They are intended only for local development, not production storage.
+
+#### Authentication secret reference
+
+Local authentication configuration is stored with ASP.NET Core User Secrets. Production configuration is supplied by the deployment environment or its secret manager. The application consumes these keys:
+
+| Configuration key                    | Secret | Purpose                                                        |
+| ------------------------------------ | ------ | -------------------------------------------------------------- |
+| `Authentication:Google:ClientId`     | No     | Identifies the Google OAuth web client.                        |
+| `Authentication:Google:ClientSecret` | Yes    | Authenticates the backend with the Google OAuth client.        |
+| `Authentication:FrontendUrl`         | No     | Defines the trusted frontend destination after authentication. |
+| `Jwt:Key`                            | Yes    | Signs application access and refresh tokens.                   |
+| `ConnectionStrings:PostgreSQL`       | Yes    | Connects the backend to PostgreSQL.                            |
+| `Email:Username`                     | Yes    | Authenticates the configured email sender when required.       |
+| `Email:Password`                     | Yes    | Authenticates the configured email sender.                     |
+
+Google OAuth requires both `Authentication:Google:ClientId` and `Authentication:Google:ClientSecret`; configuring only one prevents the server from starting. Environment-specific values must not appear in tracked configuration, documentation, logs, issues or build artifacts. Do not commit `client_secret.json`, `server.env`, User Secrets output or production credentials.
 
 Redis and Hangfire are disabled by default in the Development environment. Enable them when testing the complete local infrastructure:
 
@@ -138,30 +155,14 @@ npm run build
 
 Google Cloud only provides the OAuth identity in this deployment. The Angular application, ASP.NET API, PostgreSQL and Redis can continue running on Oracle Cloud or any other host.
 
-#### Ownership
+The OAuth client type is **Web application** and the application requests only `openid`, `email` and `profile`. This server-side flow does not require an authorized JavaScript origin. Its expected callbacks are:
 
-Prefer a Google Cloud project owned by the university's Google Workspace or Cloud Identity organization. Grant access to an institution-managed Google Group and keep at least two maintainers; do not leave production OAuth credentials under one student's personal account. A GitHub Organization does not create or own a Google Cloud Organization. It may store source code and deployment workflows, but Google Cloud access is managed separately through IAM.
+| Environment | Callback                                           |
+| ----------- | -------------------------------------------------- |
+| Development | `http://localhost:4200/api/auth/google/callback`   |
+| Production  | `https://<public-domain>/api/auth/google/callback` |
 
-If the university cannot provide an organization-owned project yet, create the project with a durable institutional Google account, add another institutional maintainer in **IAM & Admin > IAM**, and plan to transfer the project later. The Oracle account does not need to own the Google Cloud project.
-
-#### Google Cloud setup
-
-1. Open [Google Cloud Console](https://console.cloud.google.com/), select the university organization when available, and create separate projects for testing and production.
-2. Open **Google Auth Platform > Branding**. Set the application name to `UCB Hold`, choose an institutional support email, and add the public home page, privacy policy and terms URLs from the production domain.
-3. Add the production domain under **Authorized domains**. Verify ownership in Google Search Console if Google requests it.
-4. Open **Google Auth Platform > Audience**. Choose **Internal** only when the project belongs to the university's Google Workspace or Cloud Identity organization and every user is part of it. Otherwise choose **External**; keep it in testing while developing and add the required institutional accounts as test users.
-5. Open **Google Auth Platform > Data Access** and retain only the basic OpenID Connect scopes: `openid`, `email`, and `profile`. UCB Hold does not need Gmail, Drive, Calendar or offline access.
-6. Open **Google Auth Platform > Clients**, select **Create client**, choose **Web application**, and name it `UCB Hold Producción`.
-7. Under **Authorized redirect URIs**, add the exact public callback `https://YOUR_DOMAIN/api/auth/google/callback`. Do not add a trailing slash. Scheme, host, port, path and letter case must match exactly.
-8. For local development, either create a separate web client or add `http://localhost:4200/api/auth/google/callback` only to the testing client. Do not add localhost to the production client.
-9. Create the client and copy its client ID and client secret directly into `code/server.env` on the Oracle server. Do not download or commit `client_secret.json`.
-10. Publish the app when production is ready. An Internal app normally avoids public brand verification; an External app may require domain and brand verification before general use.
-
-Authorized JavaScript origins are not required by this server-side flow. The callback enters through the public Angular/Nginx address and `/api` forwards it to ASP.NET.
-
-The current `/terminos` route can be used as the terms URL. Before publishing an External client, publish a dedicated, publicly accessible privacy-policy URL on the same domain and have the university review its legal content; do not submit a placeholder URL to Google.
-
-#### Oracle production settings
+#### Production configuration reference
 
 Set these values in `code/server.env` for deployment:
 
@@ -180,17 +181,9 @@ Email__EnableSsl=true
 
 Replace the bracketed values with the production configuration on Oracle. TLS must terminate at the public reverse proxy, which must preserve `Host` and `X-Forwarded-Proto`. The configured frontend URL must use `https`, must not contain a path and should not end in `/`.
 
-Create `code/server.env` directly on Oracle and restrict it to the deployment account:
-
-```bash
-chmod 600 code/server.env
-```
-
 Never commit `code/server.env`, `.env`, `client_secret.json`, database passwords, `Jwt__Key`, `Authentication__Google__ClientSecret`, `Email__Password`, private keys or production backups. The repository ignores these files; `code/server.env.example` is intentionally tracked and must contain placeholders only. The Google client ID is not a password, but keeping all environment-specific values together avoids accidental production configuration in source control.
 
 Browser sessions use `HttpOnly`, `SameSite=Strict` cookies. Production marks them `Secure`, so the public site must use HTTPS. Local development through the Angular `/api` proxy works over HTTP because the backend runs in the Development environment; tokens are never written to `sessionStorage` or `localStorage`.
-
-If GitHub Actions performs the deployment, store only the values needed by that workflow in GitHub Actions organization or environment secrets, restrict the production environment, and write `server.env` on Oracle during deployment. Do not upload the complete production environment file as a repository artifact.
 
 When email delivery is disabled, accounts can be created but local verification messages are not sent. Enable and test SMTP before allowing local registration in production.
 
