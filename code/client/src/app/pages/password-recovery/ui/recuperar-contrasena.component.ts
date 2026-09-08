@@ -46,9 +46,7 @@ export class RecuperarContrasenaComponent {
       error: (error) => {
         this.enviando = false;
         if (error.status === 404) {
-          this.toast.error(
-            'No encontramos una cuenta con ese correo.',
-          );
+          this.toast.error('No encontramos una cuenta con ese correo.');
           void this.router.navigate(['/login']);
           return;
         }
