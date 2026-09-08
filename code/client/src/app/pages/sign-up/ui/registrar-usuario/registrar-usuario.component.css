@@ -672,7 +672,8 @@
 
 .register-container--gate {
   min-height: calc(100dvh - 82px);
-  align-items: center;
+  align-items: flex-start;
+  padding-top: clamp(2rem, 6vh, 4rem);
 }
 
 .register-container--gate .register-card {
@@ -717,8 +718,9 @@
 }
 
 .google-registration {
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  margin-bottom: 1.75rem;
 }
 
 .google-registration .google-help,
@@ -761,7 +763,7 @@
 }
 
 .register-form {
-  gap: 1.5rem;
+  gap: 2rem;
   padding-bottom: 2.5rem;
 }
 
@@ -817,11 +819,11 @@
 
 .register-button {
   min-height: 48px;
-  margin: 0;
+  margin: 0.25rem 0 0;
 }
 
 .additional-options {
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 }
 
 @media (max-width: 768px) {

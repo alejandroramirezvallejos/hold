@@ -33,10 +33,8 @@ public sealed class RecuperacionContrasenaService
 
         var normalizedEmail = email.Trim().ToLowerInvariant();
         var user = await _users.GetTrackedByEmail(normalizedEmail, cancellationToken);
-        if (user == null || !user.EmailVerificado || !string.IsNullOrWhiteSpace(user.GoogleId))
-            return Result<object>.NotFound(
-                "No encontramos una cuenta local verificada con ese correo"
-            );
+        if (user == null)
+            return Result<object>.NotFound("No encontramos una cuenta con ese correo");
 
         var token = AuthTokenGenerator.CreateNumericCode();
         await _codes.Create(
@@ -88,10 +86,13 @@ public sealed class RecuperacionContrasenaService
             return InvalidToken();
 
         var user = await _users.GetTrackedByEmail(normalizedEmail, cancellationToken);
-        if (user == null || !user.EmailVerificado || !string.IsNullOrWhiteSpace(user.GoogleId))
+        if (user == null)
             return InvalidToken();
 
         user.Contrasena = BCryptLib.HashPassword(password, workFactor: 12);
+        user.EmailVerificado = true;
+        user.TokenVerificacionHash = null;
+        user.TokenVerificacionExpira = null;
         user.RefreshToken = null;
         user.RefreshTokenExpiry = null;
         await _users.UpdateCredentials(user, cancellationToken);

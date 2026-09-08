@@ -47,7 +47,7 @@ export class RecuperarContrasenaComponent {
         this.enviando = false;
         if (error.status === 404) {
           this.toast.error(
-            'No encontramos una cuenta local verificada con ese correo.',
+            'No encontramos una cuenta con ese correo.',
           );
           void this.router.navigate(['/login']);
           return;
