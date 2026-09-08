@@ -79,6 +79,29 @@ Local authentication configuration is stored with ASP.NET Core User Secrets. Pro
 
 Google OAuth requires both `Authentication:Google:ClientId` and `Authentication:Google:ClientSecret`; configuring only one prevents the server from starting. Environment-specific values must not appear in tracked configuration, documentation, logs, issues or build artifacts. Do not commit `client_secret.json`, `server.env`, User Secrets output or production credentials.
 
+#### Titan email for local development
+
+Run the following commands from the repository root. The password is entered without being displayed or stored in the shell history. Port `587` uses STARTTLS and is compatible with the backend email client.
+
+```bash
+PROJECT="code/server/IMT_Reservas.Server.csproj"
+
+read -rp "Correo remitente de Titan: " SMTP_EMAIL
+
+dotnet user-secrets set "Email:Enabled" "true" --project "$PROJECT"
+dotnet user-secrets set "Email:Host" "smtp.titan.email" --project "$PROJECT"
+dotnet user-secrets set "Email:Port" "587" --project "$PROJECT"
+dotnet user-secrets set "Email:Username" "$SMTP_EMAIL" --project "$PROJECT"
+dotnet user-secrets set "Email:From" "$SMTP_EMAIL" --project "$PROJECT"
+dotnet user-secrets set "Email:EnableSsl" "true" --project "$PROJECT"
+
+read -rsp "Contraseña de la cuenta Titan: " SMTP_PASSWORD
+echo
+dotnet user-secrets set "Email:Password" "$SMTP_PASSWORD" --project "$PROJECT"
+
+unset SMTP_EMAIL SMTP_PASSWORD
+```
+
 Redis and Hangfire are disabled by default in the Development environment. Enable them when testing the complete local infrastructure:
 
 ```bash
