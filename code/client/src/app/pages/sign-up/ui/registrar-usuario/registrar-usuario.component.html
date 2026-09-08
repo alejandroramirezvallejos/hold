@@ -1,8 +1,19 @@
-<div class="register-container">
+<div
+  class="register-container"
+  [class.register-container--gate]="!registroGoogle"
+>
   <div class="register-card">
     <header class="auth-header">
-      <h1 class="title">Crear cuenta</h1>
-      <p>Usa tu correo institucional para solicitar equipos.</p>
+      <h1 class="title">
+        {{ registroGoogle ? "Completa tu cuenta" : "Crear cuenta" }}
+      </h1>
+      <p>
+        {{
+          registroGoogle
+            ? "Revisa los datos proporcionados por Google y completa los campos pendientes."
+            : "Primero verifica tu correo institucional con Google."
+        }}
+      </p>
     </header>
     @if (!registroGoogle) {
       <div class="google-registration">
@@ -18,468 +29,467 @@
             height="20"
             alt=""
           />
-          Continuar con Google
+          Verificar correo con Google
         </button>
-      </div>
-      <div class="auth-separator"><span>o</span></div>
-    }
-    <form
-      (ngSubmit)="registrar(registerForm)"
-      class="register-form"
-      #registerForm="ngForm"
-    >
-      <div class="form-section">
-        <h3>Datos personales</h3>
-        <div class="form-group">
-          <label for="nombre">Nombre</label>
-          <input
-            type="text"
-            name="nombre"
-            [(ngModel)]="nuevoUsuario.nombre"
-            required
-            maxlength="50"
-            placeholder="Ingresa tu nombre"
-            class="form-input"
-            #nombreInput="ngModel"
-          />
-          @if (
-            nombreInput.invalid &&
-            (nombreInput.dirty || nombreInput.touched || submitted)
-          ) {
-            <div class="error-message">El nombre es requerido</div>
-          }
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="apellidoPaterno">Apellido paterno</label>
-            <input
-              type="text"
-              name="apellidoPaterno"
-              maxlength="50"
-              [(ngModel)]="nuevoUsuario.apellido_paterno"
-              required
-              placeholder="Apellido paterno"
-              class="form-input"
-              #apellidoPaternoInput="ngModel"
-            />
-            @if (
-              apellidoPaternoInput.invalid &&
-              (apellidoPaternoInput.dirty ||
-                apellidoPaternoInput.touched ||
-                submitted)
-            ) {
-              <div class="error-message">El apellido paterno es requerido</div>
-            }
-          </div>
-          <div class="form-group">
-            <label for="apellidoMaterno">Apellido materno</label>
-            <input
-              type="text"
-              name="apellidoMaterno"
-              maxlength="50"
-              [(ngModel)]="nuevoUsuario.apellido_materno"
-              required
-              placeholder="Apellido materno"
-              class="form-input"
-              #apellidoMaternoInput="ngModel"
-            />
-            @if (
-              apellidoMaternoInput.invalid &&
-              (apellidoMaternoInput.dirty ||
-                apellidoMaternoInput.touched ||
-                submitted)
-            ) {
-              <div class="error-message">El apellido materno es requerido</div>
-            }
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="carnet">Carnet de identidad</label>
-          <input
-            type="text"
-            name="carnet"
-            minlength="7"
-            maxlength="10"
-            [(ngModel)]="nuevoUsuario.carnet"
-            required
-            placeholder="Ingresa tu carnet"
-            pattern="[0-9]+"
-            required
-            class="form-input"
-            #carnetInput="ngModel"
-          />
-          @if (
-            carnetInput.invalid &&
-            (carnetInput.dirty || carnetInput.touched || submitted)
-          ) {
-            <div class="error-message">El carnet es invalido</div>
-          }
-        </div>
-        <div class="form-group">
-          <label for="correo">Correo electrónico </label>
-          <input
-            type="email"
-            name="correo"
-            [(ngModel)]="nuevoUsuario.correo"
-            [readonly]="registroGoogle"
-            required
-            email
-            maxlength="255"
-            placeholder="tu@ucb.edu.bo"
-            pattern="^[a-zA-Z0-9._%\+\-]+@ucb\.edu\.bo$"
-            required
-            class="form-input"
-            #correoInput="ngModel"
-          />
-          @if (
-            correoInput.invalid &&
-            (correoInput.dirty || correoInput.touched || submitted)
-          ) {
-            <div class="error-message">
-              @if (correoInput.errors?.["required"]) {
-                <div>El correo electrónico es requerido</div>
-              }
-              @if (correoInput.errors?.["pattern"]) {
-                <div>Debe usar un correo institucional &#64;ucb.edu.bo</div>
-              }
-            </div>
-          }
-        </div>
-        <div class="form-group">
-          <label for="telefono">Teléfono</label>
-          <input
-            type="tel"
-            name="telefono"
-            [(ngModel)]="nuevoUsuario.telefono"
-            maxlength="10"
-            pattern="[0-9]{8,10}"
-            required
-            placeholder="70000000"
-            class="form-input"
-            #telefonoInput="ngModel"
-          />
-          @if (
-            (telefonoInput.invalid || validartelefono(telefonoInput.value)) &&
-            (telefonoInput.dirty || telefonoInput.touched || submitted)
-          ) {
-            <div class="error-message">El telefono es invalido</div>
-          }
-        </div>
-        <div class="form-group">
-          <label for="carrera">Elige tu carrera</label>
-          <app-custom-select
-            id="carrera"
-            name="carrera"
-            #carreraInput="ngModel"
-            [(ngModel)]="nuevoUsuario.carrera"
-            [opciones]="carreras"
-            [invalid]="
-              !!(carreraInput.touched || carreraInput.dirty || submitted) &&
-              !nuevoUsuario.carrera
-            "
-            placeholder="Selecciona una carrera"
-            required
-          ></app-custom-select>
-          @if (
-            (carreraInput.touched || carreraInput.dirty || submitted) &&
-            !nuevoUsuario.carrera
-          ) {
-            <div class="error-message">La carrera no seleccionada</div>
-          }
-        </div>
-      </div>
-      <fieldset class="identity-fieldset">
-        <legend>Documentos para contratos <span>(opcional)</span></legend>
-        <p>
-          Guárdalos ahora para completar futuras solicitudes con menos pasos.
+        <p class="google-help">
+          Debes utilizar una cuenta institucional &#64;ucb.edu.bo.
         </p>
-        <div class="identity-grid">
-          <section class="profile-document">
-            <div class="profile-photo-preview">
-              @if (fotoPerfilPreview) {
-                <img
-                  [src]="fotoPerfilPreview"
-                  alt="Vista previa de la foto de perfil"
-                />
-              } @else {
-                <i class="fas fa-user" aria-hidden="true"></i>
-              }
-            </div>
-            <strong>Foto de perfil</strong>
+        <p class="login-link">
+          ¿Ya tienes cuenta? <a (click)="irALogin()">Inicia sesión aquí</a>
+        </p>
+      </div>
+    }
+    @if (registroGoogle) {
+      <form
+        (ngSubmit)="registrar(registerForm)"
+        class="register-form"
+        #registerForm="ngForm"
+      >
+        <div class="form-section">
+          <h3>Datos personales</h3>
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
             <input
-              #fotoPerfilInput
-              type="file"
-              hidden
-              accept="image/jpeg,image/png,image/webp"
-              (change)="cargarImagen($event, 'perfil')"
+              type="text"
+              name="nombre"
+              [(ngModel)]="nuevoUsuario.nombre"
+              required
+              maxlength="50"
+              placeholder="Ingresa tu nombre"
+              class="form-input"
+              #nombreInput="ngModel"
             />
-            <button
-              type="button"
-              class="identity-button"
-              [disabled]="procesandoImagen"
-              (click)="fotoPerfilInput.click()"
-            >
-              {{ fotoPerfilPreview ? "Cambiar" : "Agregar" }}
-            </button>
-          </section>
-          <section>
-            <div class="identity-preview">
-              @if (carnetFrentePreview) {
-                <img [src]="carnetFrentePreview" alt="Anverso del carnet" />
-              } @else {
-                <i class="fas fa-id-card" aria-hidden="true"></i>
-              }
-            </div>
-            <strong>Carnet: anverso</strong>
-            <input
-              #frenteInput
-              type="file"
-              hidden
-              accept="image/jpeg,image/png,image/webp"
-              (change)="cargarImagen($event, 'frente')"
-            />
-            <button
-              type="button"
-              class="identity-button"
-              [disabled]="procesandoImagen"
-              (click)="frenteInput.click()"
-            >
-              {{ carnetFrentePreview ? "Cambiar" : "Agregar" }}
-            </button>
-          </section>
-          <section>
-            <div class="identity-preview">
-              @if (carnetAtrasPreview) {
-                <img [src]="carnetAtrasPreview" alt="Reverso del carnet" />
-              } @else {
-                <i class="fas fa-id-card" aria-hidden="true"></i>
-              }
-            </div>
-            <strong>Carnet: reverso</strong>
-            <input
-              #atrasInput
-              type="file"
-              hidden
-              accept="image/jpeg,image/png,image/webp"
-              (change)="cargarImagen($event, 'atras')"
-            />
-            <button
-              type="button"
-              class="identity-button"
-              [disabled]="procesandoImagen"
-              (click)="atrasInput.click()"
-            >
-              {{ carnetAtrasPreview ? "Cambiar" : "Agregar" }}
-            </button>
-          </section>
-        </div>
-        <div class="signature-registration">
-          <div class="signature-preview">
-            @if (firmaPreview) {
-              <img [src]="firmaPreview" alt="Firma registrada" />
-            } @else {
-              <i class="fas fa-signature" aria-hidden="true"></i>
-              <span>Aún no registraste una firma</span>
+            @if (
+              nombreInput.invalid &&
+              (nombreInput.dirty || nombreInput.touched || submitted)
+            ) {
+              <div class="error-message">El nombre es requerido</div>
             }
           </div>
-          <div>
-            <strong>Firma</strong>
-            <p>Se usará automáticamente en los contratos que aceptes.</p>
-            <button
-              type="button"
-              class="identity-button"
-              (click)="capturandoFirma.set(true)"
-            >
-              {{ firmaPreview ? "Cambiar firma" : "Agregar firma" }}
-            </button>
-          </div>
-        </div>
-      </fieldset>
-      <div class="form-section">
-        <h3>Contacto de referencia</h3>
-        <div class="form-group">
-          <label for="nombreReferencia">Nombre de referencia</label>
-          <input
-            type="text"
-            name="nombreReferencia"
-            [(ngModel)]="nuevoUsuario.nombre_referencia"
-            placeholder="Nombre del contacto de emergencia"
-            class="form-input"
-          />
-        </div>
-        <div class="form-group">
-          <label for="telefonoReferencia">Teléfono de referencia</label>
-          <input
-            type="tel"
-            name="telefonoReferencia"
-            [(ngModel)]="nuevoUsuario.telefono_referencia"
-            pattern="[0-9]{8,10}"
-            maxlength="10"
-            placeholder="70000000"
-            class="form-input"
-          />
-        </div>
-        <div class="form-group">
-          <label for="emailReferencia">Email de referencia</label>
-          <input
-            type="email"
-            name="emailReferencia"
-            [(ngModel)]="nuevoUsuario.email_referencia"
-            placeholder="contacto@email.com"
-            class="form-input"
-          />
-        </div>
-      </div>
-      @if (!registroGoogle) {
-        <div class="form-section">
-          <h3>Contraseña</h3>
-          <div class="form-group">
-            <label for="password">Contraseña</label>
-            <div class="password-field">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="apellidoPaterno">Apellido paterno</label>
               <input
-                [type]="mostrarPassword ? 'text' : 'password'"
-                name="password"
-                [(ngModel)]="password"
+                type="text"
+                name="apellidoPaterno"
+                maxlength="50"
+                [(ngModel)]="nuevoUsuario.apellido_paterno"
                 required
-                minlength="8"
-                pattern="^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$"
-                placeholder="••••••••"
-                class="form-input password-field__input"
-                #passwordInput="ngModel"
+                placeholder="Apellido paterno"
+                class="form-input"
+                #apellidoPaternoInput="ngModel"
               />
-              <button
-                type="button"
-                class="password-field__toggle"
-                [attr.aria-label]="
-                  mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-                "
-                (click)="alternarVisibilidadPassword()"
-              >
-                <i
-                  class="fas"
-                  [class.fa-eye]="!mostrarPassword"
-                  [class.fa-eye-slash]="mostrarPassword"
-                ></i>
-              </button>
+              @if (
+                apellidoPaternoInput.invalid &&
+                (apellidoPaternoInput.dirty ||
+                  apellidoPaternoInput.touched ||
+                  submitted)
+              ) {
+                <div class="error-message">
+                  El apellido paterno es requerido
+                </div>
+              }
             </div>
+            <div class="form-group">
+              <label for="apellidoMaterno">Apellido materno</label>
+              <input
+                type="text"
+                name="apellidoMaterno"
+                maxlength="50"
+                [(ngModel)]="nuevoUsuario.apellido_materno"
+                required
+                placeholder="Apellido materno"
+                class="form-input"
+                #apellidoMaternoInput="ngModel"
+              />
+              @if (
+                apellidoMaternoInput.invalid &&
+                (apellidoMaternoInput.dirty ||
+                  apellidoMaternoInput.touched ||
+                  submitted)
+              ) {
+                <div class="error-message">
+                  El apellido materno es requerido
+                </div>
+              }
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="carnet">Carnet de identidad</label>
+            <input
+              type="text"
+              name="carnet"
+              minlength="7"
+              maxlength="10"
+              [(ngModel)]="nuevoUsuario.carnet"
+              required
+              placeholder="Ingresa tu carnet"
+              pattern="[0-9]+"
+              required
+              class="form-input"
+              #carnetInput="ngModel"
+            />
             @if (
-              passwordInput.invalid &&
-              (passwordInput.dirty || passwordInput.touched || submitted)
+              carnetInput.invalid &&
+              (carnetInput.dirty || carnetInput.touched || submitted)
+            ) {
+              <div class="error-message">El carnet es invalido</div>
+            }
+          </div>
+          <div class="form-group">
+            <label for="correo">Correo electrónico </label>
+            <input
+              type="email"
+              name="correo"
+              [(ngModel)]="nuevoUsuario.correo"
+              [readonly]="registroGoogle"
+              required
+              email
+              maxlength="255"
+              placeholder="tu@ucb.edu.bo"
+              pattern="^[a-zA-Z0-9._%\+\-]+@ucb\.edu\.bo$"
+              required
+              class="form-input"
+              #correoInput="ngModel"
+            />
+            @if (
+              correoInput.invalid &&
+              (correoInput.dirty || correoInput.touched || submitted)
             ) {
               <div class="error-message">
-                @if (passwordInput.errors?.["required"]) {
-                  <div>La contraseña es requerida</div>
+                @if (correoInput.errors?.["required"]) {
+                  <div>El correo electrónico es requerido</div>
                 }
-                @if (passwordInput.errors?.["minlength"]) {
-                  <div>Mínimo 8 caracteres</div>
-                }
-                @if (passwordInput.errors?.["pattern"]) {
-                  <div>
-                    La contraseña debe tener al menos una mayúscula, un número y
-                    un carácter especial
-                  </div>
+                @if (correoInput.errors?.["pattern"]) {
+                  <div>Debe usar un correo institucional &#64;ucb.edu.bo</div>
                 }
               </div>
             }
           </div>
           <div class="form-group">
-            <label for="confirmPassword">Confirmar contraseña </label>
-            <div class="password-field">
-              <input
-                [type]="mostrarConfirmPassword ? 'text' : 'password'"
-                name="confirmPassword"
-                [(ngModel)]="confirmPassword"
-                required
-                placeholder="••••••••"
-                class="form-input password-field__input"
-                #confirmPasswordInput="ngModel"
-              />
-              <button
-                type="button"
-                class="password-field__toggle"
-                [attr.aria-label]="
-                  mostrarConfirmPassword
-                    ? 'Ocultar contraseña'
-                    : 'Mostrar contraseña'
-                "
-                (click)="alternarVisibilidadConfirmPassword()"
-              >
-                <i
-                  class="fas"
-                  [class.fa-eye]="!mostrarConfirmPassword"
-                  [class.fa-eye-slash]="mostrarConfirmPassword"
-                ></i>
-              </button>
-            </div>
+            <label for="telefono">Teléfono</label>
+            <input
+              type="tel"
+              name="telefono"
+              [(ngModel)]="nuevoUsuario.telefono"
+              maxlength="10"
+              pattern="[0-9]{8,10}"
+              required
+              placeholder="70000000"
+              class="form-input"
+              #telefonoInput="ngModel"
+            />
             @if (
-              (confirmPasswordInput.invalid &&
-                (confirmPasswordInput.dirty ||
-                  confirmPasswordInput.touched ||
-                  submitted)) ||
-              (password &&
-                confirmPassword &&
-                password !== confirmPassword &&
-                (confirmPasswordInput.dirty ||
-                  confirmPasswordInput.touched ||
-                  submitted))
+              (telefonoInput.invalid || validartelefono(telefonoInput.value)) &&
+              (telefonoInput.dirty || telefonoInput.touched || submitted)
             ) {
-              @if (confirmPasswordInput.errors?.["required"]) {
-                <div class="error-message">Confirma tu contraseña</div>
-              }
-              @if (
-                password && confirmPassword && password !== confirmPassword
-              ) {
-                <div class="error-message">Las contraseñas no coinciden</div>
-              }
+              <div class="error-message">El telefono es invalido</div>
+            }
+          </div>
+          <div class="form-group">
+            <label for="carrera">Elige tu carrera</label>
+            <app-custom-select
+              id="carrera"
+              name="carrera"
+              #carreraInput="ngModel"
+              [(ngModel)]="nuevoUsuario.carrera"
+              [opciones]="carreras"
+              [invalid]="
+                !!(carreraInput.touched || carreraInput.dirty || submitted) &&
+                !nuevoUsuario.carrera
+              "
+              placeholder="Selecciona una carrera"
+              required
+            ></app-custom-select>
+            @if (
+              (carreraInput.touched || carreraInput.dirty || submitted) &&
+              !nuevoUsuario.carrera
+            ) {
+              <div class="error-message">La carrera no seleccionada</div>
             }
           </div>
         </div>
-      }
-      @if (error()) {
-        <app-mostrarerror
-          [inline]="true"
-          [mensaje]="mensajeerror"
-          [error]="error"
-        ></app-mostrarerror>
-      }
-      <label class="terms-consent">
-        <input
-          type="checkbox"
-          name="aceptaTerminos"
-          [(ngModel)]="aceptaTerminos"
-          required
-        />
-        <span>
-          He leído y acepto los
-          <a routerLink="/terminos"> términos y condiciones </a>.
-        </span>
-      </label>
-      @if (submitted && !aceptaTerminos) {
-        <div class="error-message">
-          Debes aceptar los términos para continuar.
+        <fieldset class="identity-fieldset">
+          <legend>Documentos para contratos <span>(opcional)</span></legend>
+          <p>
+            Guárdalos ahora para completar futuras solicitudes con menos pasos.
+          </p>
+          <div class="identity-grid">
+            <section class="profile-document">
+              <div class="profile-photo-preview">
+                @if (fotoPerfilPreview) {
+                  <img
+                    [src]="fotoPerfilPreview"
+                    alt="Vista previa de la foto de perfil"
+                  />
+                } @else {
+                  <i class="fas fa-user" aria-hidden="true"></i>
+                }
+              </div>
+              <strong>Foto de perfil</strong>
+              <input
+                #fotoPerfilInput
+                type="file"
+                hidden
+                accept="image/jpeg,image/png,image/webp"
+                (change)="cargarImagen($event, 'perfil')"
+              />
+              <button
+                type="button"
+                class="identity-button"
+                [disabled]="procesandoImagen"
+                (click)="fotoPerfilInput.click()"
+              >
+                {{ fotoPerfilPreview ? "Cambiar" : "Agregar" }}
+              </button>
+            </section>
+            <section>
+              <div class="identity-preview">
+                @if (carnetFrentePreview) {
+                  <img [src]="carnetFrentePreview" alt="Anverso del carnet" />
+                } @else {
+                  <i class="fas fa-id-card" aria-hidden="true"></i>
+                }
+              </div>
+              <strong>Carnet: anverso</strong>
+              <input
+                #frenteInput
+                type="file"
+                hidden
+                accept="image/jpeg,image/png,image/webp"
+                (change)="cargarImagen($event, 'frente')"
+              />
+              <button
+                type="button"
+                class="identity-button"
+                [disabled]="procesandoImagen"
+                (click)="frenteInput.click()"
+              >
+                {{ carnetFrentePreview ? "Cambiar" : "Agregar" }}
+              </button>
+            </section>
+            <section>
+              <div class="identity-preview">
+                @if (carnetAtrasPreview) {
+                  <img [src]="carnetAtrasPreview" alt="Reverso del carnet" />
+                } @else {
+                  <i class="fas fa-id-card" aria-hidden="true"></i>
+                }
+              </div>
+              <strong>Carnet: reverso</strong>
+              <input
+                #atrasInput
+                type="file"
+                hidden
+                accept="image/jpeg,image/png,image/webp"
+                (change)="cargarImagen($event, 'atras')"
+              />
+              <button
+                type="button"
+                class="identity-button"
+                [disabled]="procesandoImagen"
+                (click)="atrasInput.click()"
+              >
+                {{ carnetAtrasPreview ? "Cambiar" : "Agregar" }}
+              </button>
+            </section>
+          </div>
+          <div class="signature-registration">
+            <div class="signature-preview">
+              @if (firmaPreview) {
+                <img [src]="firmaPreview" alt="Firma registrada" />
+              } @else {
+                <i class="fas fa-signature" aria-hidden="true"></i>
+                <span>Aún no registraste una firma</span>
+              }
+            </div>
+            <div>
+              <strong>Firma</strong>
+              <p>Se usará automáticamente en los contratos que aceptes.</p>
+              <button
+                type="button"
+                class="identity-button"
+                (click)="capturandoFirma.set(true)"
+              >
+                {{ firmaPreview ? "Cambiar firma" : "Agregar firma" }}
+              </button>
+            </div>
+          </div>
+        </fieldset>
+        <div class="form-section">
+          <h3>Contacto de referencia</h3>
+          <div class="form-group">
+            <label for="nombreReferencia">Nombre de referencia</label>
+            <input
+              type="text"
+              name="nombreReferencia"
+              [(ngModel)]="nuevoUsuario.nombre_referencia"
+              placeholder="Nombre del contacto de emergencia"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="telefonoReferencia">Teléfono de referencia</label>
+            <input
+              type="tel"
+              name="telefonoReferencia"
+              [(ngModel)]="nuevoUsuario.telefono_referencia"
+              pattern="[0-9]{8,10}"
+              maxlength="10"
+              placeholder="70000000"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="emailReferencia">Email de referencia</label>
+            <input
+              type="email"
+              name="emailReferencia"
+              [(ngModel)]="nuevoUsuario.email_referencia"
+              placeholder="contacto@email.com"
+              class="form-input"
+            />
+          </div>
         </div>
-      }
-      <button type="submit" class="register-button" [disabled]="registrando">
-        @if (registrando) {
-          <span class="spinner" aria-hidden="true"></span>
+        @if (!registroGoogle) {
+          <div class="form-section">
+            <h3>Contraseña</h3>
+            <div class="form-group">
+              <label for="password">Contraseña</label>
+              <div class="password-field">
+                <input
+                  [type]="mostrarPassword ? 'text' : 'password'"
+                  name="password"
+                  [(ngModel)]="password"
+                  required
+                  minlength="8"
+                  pattern="^(?=.*[A-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$"
+                  placeholder="••••••••"
+                  class="form-input password-field__input"
+                  #passwordInput="ngModel"
+                />
+                <button
+                  type="button"
+                  class="password-field__toggle"
+                  [attr.aria-label]="
+                    mostrarPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  "
+                  (click)="alternarVisibilidadPassword()"
+                >
+                  <i
+                    class="fas"
+                    [class.fa-eye]="!mostrarPassword"
+                    [class.fa-eye-slash]="mostrarPassword"
+                  ></i>
+                </button>
+              </div>
+              @if (
+                passwordInput.invalid &&
+                (passwordInput.dirty || passwordInput.touched || submitted)
+              ) {
+                <div class="error-message">
+                  @if (passwordInput.errors?.["required"]) {
+                    <div>La contraseña es requerida</div>
+                  }
+                  @if (passwordInput.errors?.["minlength"]) {
+                    <div>Mínimo 8 caracteres</div>
+                  }
+                  @if (passwordInput.errors?.["pattern"]) {
+                    <div>
+                      La contraseña debe tener al menos una mayúscula, un número
+                      y un carácter especial
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+            <div class="form-group">
+              <label for="confirmPassword">Confirmar contraseña </label>
+              <div class="password-field">
+                <input
+                  [type]="mostrarConfirmPassword ? 'text' : 'password'"
+                  name="confirmPassword"
+                  [(ngModel)]="confirmPassword"
+                  required
+                  placeholder="••••••••"
+                  class="form-input password-field__input"
+                  #confirmPasswordInput="ngModel"
+                />
+                <button
+                  type="button"
+                  class="password-field__toggle"
+                  [attr.aria-label]="
+                    mostrarConfirmPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  "
+                  (click)="alternarVisibilidadConfirmPassword()"
+                >
+                  <i
+                    class="fas"
+                    [class.fa-eye]="!mostrarConfirmPassword"
+                    [class.fa-eye-slash]="mostrarConfirmPassword"
+                  ></i>
+                </button>
+              </div>
+              @if (
+                (confirmPasswordInput.invalid &&
+                  (confirmPasswordInput.dirty ||
+                    confirmPasswordInput.touched ||
+                    submitted)) ||
+                (password &&
+                  confirmPassword &&
+                  password !== confirmPassword &&
+                  (confirmPasswordInput.dirty ||
+                    confirmPasswordInput.touched ||
+                    submitted))
+              ) {
+                @if (confirmPasswordInput.errors?.["required"]) {
+                  <div class="error-message">Confirma tu contraseña</div>
+                }
+                @if (
+                  password && confirmPassword && password !== confirmPassword
+                ) {
+                  <div class="error-message">Las contraseñas no coinciden</div>
+                }
+              }
+            </div>
+          </div>
         }
-        <span>{{ registrando ? "Creando cuenta..." : "Crear cuenta" }}</span>
-      </button>
-      <div class="additional-options">
-        <p class="login-link">
-          ¿Ya tienes cuenta? <a (click)="irALogin()">Inicia sesión aquí</a>
-        </p>
-      </div>
-    </form>
+        <label class="terms-consent">
+          <input
+            type="checkbox"
+            name="aceptaTerminos"
+            [(ngModel)]="aceptaTerminos"
+            required
+          />
+          <span>
+            He leído y acepto los
+            <a routerLink="/terminos"> términos y condiciones </a>.
+          </span>
+        </label>
+        @if (submitted && !aceptaTerminos) {
+          <div class="error-message">
+            Debes aceptar los términos para continuar.
+          </div>
+        }
+        <button type="submit" class="register-button" [disabled]="registrando">
+          @if (registrando) {
+            <span class="spinner" aria-hidden="true"></span>
+          }
+          <span>{{ registrando ? "Creando cuenta..." : "Crear cuenta" }}</span>
+        </button>
+        <div class="additional-options">
+          <p class="login-link">
+            ¿Ya tienes cuenta? <a (click)="irALogin()">Inicia sesión aquí</a>
+          </p>
+        </div>
+      </form>
+    }
   </div>
 </div>
-@if (aviso()) {
-  <app-aviso-exito
-    [mensaje]="mensajeaviso"
-    [exito]="aviso"
-    (accion)="irALogin()"
-  ></app-aviso-exito>
-}
 @if (capturandoFirma()) {
   <app-firma
     (firma)="guardarFirma($event)"

@@ -124,8 +124,9 @@ export class UsuarioServiceAPI {
     });
   }
 
-  restablecerContrasena(token: string, contrasena: string) {
+  restablecerContrasena(email: string, token: string, contrasena: string) {
     return this.http.post(`${environment.apiUrl}/api/auth/restablecer`, {
+      Email: email,
       Token: token,
       Contrasena: contrasena,
     });

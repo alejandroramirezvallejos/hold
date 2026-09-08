@@ -66,6 +66,7 @@ export class NavbarComponent {
     const isLoginOrRegister =
       cleanUrl.includes('/login') ||
       cleanUrl.includes('/registro') ||
+      cleanUrl.includes('/recuperar') ||
       cleanUrl.includes('/terminos') ||
       cleanUrl.includes('/verificar');
 

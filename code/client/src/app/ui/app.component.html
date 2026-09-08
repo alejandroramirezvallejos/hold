@@ -8,8 +8,15 @@
 }
 
 @if (toast.visible()) {
-  <app-aviso-exito
-    [exito]="toast.visible"
-    [mensaje]="toast.message()"
-  ></app-aviso-exito>
+  @if (toast.kind() === "success") {
+    <app-aviso-exito
+      [exito]="toast.visible"
+      [mensaje]="toast.message()"
+    ></app-aviso-exito>
+  } @else {
+    <app-mostrarerror
+      [error]="toast.visible"
+      [mensaje]="toast.message()"
+    ></app-mostrarerror>
+  }
 }

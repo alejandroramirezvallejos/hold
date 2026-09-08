@@ -93,29 +93,11 @@
   cursor: not-allowed;
 }
 
-.auth-separator {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 0 0 1.5rem;
-  color: var(--ink-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
 .verification-note {
   margin: calc(var(--sp-3) * -1) 0 var(--sp-6);
   color: var(--ink-secondary);
   font-size: 0.8125rem;
   line-height: 1.5;
-}
-
-.auth-separator::before,
-.auth-separator::after {
-  height: 1px;
-  flex: 1;
-  background: var(--border);
-  content: "";
 }
 
 .form-section {
@@ -688,6 +670,15 @@
   background: var(--bg);
 }
 
+.register-container--gate {
+  min-height: calc(100dvh - 82px);
+  align-items: center;
+}
+
+.register-container--gate .register-card {
+  max-width: 30rem;
+}
+
 .register-card {
   max-width: 40rem;
   padding: 0;
@@ -721,7 +712,6 @@
 }
 
 .google-registration,
-.auth-separator,
 .register-form {
   margin-inline: 2.5rem;
 }
@@ -729,6 +719,11 @@
 .google-registration {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
+}
+
+.google-registration .google-help,
+.google-registration .login-link {
+  text-align: center;
 }
 
 .google-button {
@@ -763,12 +758,6 @@
   outline: 2px solid #1a73e8;
   outline-offset: 2px;
   background: #fff;
-}
-
-.auth-separator {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  color: var(--ink-muted);
 }
 
 .register-form {
@@ -849,7 +838,6 @@
   }
 
   .google-registration,
-  .auth-separator,
   .register-form {
     margin-inline: 1.25rem;
   }

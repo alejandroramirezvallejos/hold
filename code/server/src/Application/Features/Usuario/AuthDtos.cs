@@ -12,6 +12,7 @@ public sealed class EmailDto
 
 public sealed class ResetPasswordDto
 {
+    public string Email { get; set; } = string.Empty;
     public string Token { get; set; } = string.Empty;
     public string Contrasena { get; set; } = string.Empty;
 }

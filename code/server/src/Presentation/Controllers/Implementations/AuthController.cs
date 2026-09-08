@@ -90,7 +90,14 @@ public class AuthController : Controller
     public async Task<IActionResult> ResetPassword(
         [FromBody] ResetPasswordDto request,
         CancellationToken cancellationToken
-    ) => ToResponse(await _passwordRecovery.Reset(request.Token, request.Contrasena, cancellationToken));
+    ) => ToResponse(
+        await _passwordRecovery.Reset(
+            request.Email,
+            request.Token,
+            request.Contrasena,
+            cancellationToken
+        )
+    );
 
     [HttpGet("google")]
     public IActionResult Google([FromQuery] string? origen)

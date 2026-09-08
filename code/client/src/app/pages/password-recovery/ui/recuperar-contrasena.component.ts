@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { UsuarioServiceAPI } from '@entities/user';
 import { extractErrorMessage } from '@shared/lib/error';
+import { ToastService } from '@shared/ui';
 
 @Component({
   selector: 'app-recuperar-contrasena',
@@ -13,23 +14,21 @@ import { extractErrorMessage } from '@shared/lib/error';
   styleUrl: './recuperar-contrasena.component.css',
 })
 export class RecuperarContrasenaComponent {
-  readonly token: string | null;
   email = '';
+  codigo = '';
   contrasena = '';
   repetirContrasena = '';
   enviando = false;
-  completado = false;
-  mensaje = '';
+  codigoEnviado = false;
   error = '';
   mostrarContrasena = false;
   mostrarRepetirContrasena = false;
 
   constructor(
-    route: ActivatedRoute,
+    private readonly router: Router,
     private readonly users: UsuarioServiceAPI,
-  ) {
-    this.token = route.snapshot.queryParamMap.get('token');
-  }
+    private readonly toast: ToastService,
+  ) {}
 
   solicitar(): void {
     if (this.enviando || !this.email) return;
@@ -38,40 +37,58 @@ export class RecuperarContrasenaComponent {
     this.error = '';
     this.users.solicitarRecuperacionContrasena(this.email).subscribe({
       next: () => {
-        this.completado = true;
+        this.codigoEnviado = true;
         this.enviando = false;
-        this.mensaje =
-          'Si existe una cuenta local verificada con este correo, recibirás un enlace para restablecer tu contraseña.';
+        this.toast.success(
+          'Correo enviado. Ingresa el código de recuperación para continuar.',
+        );
       },
-      error: () => {
+      error: (error) => {
         this.enviando = false;
-        this.error = 'No se pudo procesar la solicitud. Intenta nuevamente.';
+        if (error.status === 404) {
+          this.toast.error(
+            'No encontramos una cuenta local verificada con ese correo.',
+          );
+          void this.router.navigate(['/login']);
+          return;
+        }
+        this.toast.error(
+          extractErrorMessage(
+            error,
+            'No se pudo enviar el correo. Intenta nuevamente.',
+          ),
+        );
       },
     });
   }
 
   restablecer(): void {
-    if (this.enviando || !this.token) return;
+    if (this.enviando || !this.codigo) return;
 
     this.error = this.validarContrasena();
     if (this.error) return;
 
     this.enviando = true;
-    this.users.restablecerContrasena(this.token, this.contrasena).subscribe({
-      next: () => {
-        this.completado = true;
-        this.enviando = false;
-        this.mensaje =
-          'Tu contraseña fue actualizada. Ya puedes iniciar sesión con ella.';
-      },
-      error: (error) => {
-        this.enviando = false;
-        this.error = extractErrorMessage(
-          error,
-          'No se pudo restablecer la contraseña. Solicita un nuevo enlace.',
-        );
-      },
-    });
+    this.users
+      .restablecerContrasena(this.email, this.codigo, this.contrasena)
+      .subscribe({
+        next: () => {
+          this.enviando = false;
+          this.toast.success(
+            'Contraseña actualizada. Ya puedes iniciar sesión.',
+          );
+          void this.router.navigate(['/login']);
+        },
+        error: (error) => {
+          this.enviando = false;
+          this.toast.error(
+            extractErrorMessage(
+              error,
+              'El código no es válido o ya expiró. Solicita uno nuevo.',
+            ),
+          );
+        },
+      });
   }
 
   private validarContrasena(): string {

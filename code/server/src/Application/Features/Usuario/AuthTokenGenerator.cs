@@ -8,6 +8,9 @@ public static class AuthTokenGenerator
 {
     public static string Create() => WebEncoders.Base64UrlEncode(RandomNumberGenerator.GetBytes(32));
 
+    public static string CreateNumericCode() =>
+        RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+
     public static string Hash(string token) =>
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token))).ToLowerInvariant();
 }

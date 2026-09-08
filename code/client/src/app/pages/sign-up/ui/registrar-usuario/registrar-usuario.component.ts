@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Carrera } from '@entities/admin';
@@ -10,19 +10,13 @@ import {
   identityDataUrlToBase64,
   processIdentityImage,
 } from '@shared/lib/image/identity-image';
-import {
-  AvisoExitoComponent,
-  CustomSelectComponent,
-  MostrarerrorComponent,
-} from '@shared/ui';
+import { CustomSelectComponent, ToastService } from '@shared/ui';
 import { FirmaComponent } from '@features/signature';
 @Component({
   selector: 'app-registrar-usuario',
   imports: [
     FormsModule,
     CommonModule,
-    MostrarerrorComponent,
-    AvisoExitoComponent,
     CustomSelectComponent,
     FirmaComponent,
     RouterLink,
@@ -48,16 +42,12 @@ export class RegistrarUsuarioComponent {
   carnetAtrasPreview = '';
   firmaPreview = '';
   capturandoFirma = signal(false);
-  error: WritableSignal<boolean> = signal(false);
-  mensajeerror: string = '';
-  aviso: WritableSignal<boolean> = signal(false);
-  mensajeaviso: string =
-    'Aviso desconocido , si ve esto es un error , avise al soporte si puede o intente mas tarde';
   constructor(
     private router: Router,
     private registrarcuenta: UsuarioServiceAPI,
     private carrerasS: CarreraService,
     private readonly route: ActivatedRoute,
+    private readonly toast: ToastService,
   ) {}
   ngOnInit() {
     this.carrerasS.obtenerCarreras().subscribe({
@@ -65,22 +55,23 @@ export class RegistrarUsuarioComponent {
         this.carreras = response.map((carrera) => carrera.Nombre ?? '');
       },
       error: (error) => {
-        const errorMsg = extractErrorMessage(
-          error,
-          'Error al obtener las carreras intente mas tarde',
+        this.toast.error(
+          extractErrorMessage(
+            error,
+            'No se pudieron cargar las carreras. Intenta nuevamente.',
+          ),
         );
-        this.mensajeerror = errorMsg;
-        this.error.set(true);
       },
     });
     const googleCode = this.route.snapshot.queryParamMap.get('google');
     if (googleCode) this.cargarDatosGoogle(googleCode);
-    if (
-      this.route.snapshot.queryParamMap.get('googleError') === 'configuracion'
-    ) {
-      this.mensajeerror =
-        'El acceso con Google aún no está configurado. Usa el registro institucional por ahora.';
-      this.error.set(true);
+    const googleError = this.route.snapshot.queryParamMap.get('googleError');
+    if (googleError) {
+      this.toast.error(
+        googleError === 'configuracion'
+          ? 'El registro con Google no está disponible. Intenta nuevamente más tarde.'
+          : 'No se pudo verificar tu correo con Google. Usa tu cuenta institucional e intenta nuevamente.',
+      );
     }
   }
   registrar(form: NgForm) {
@@ -88,7 +79,8 @@ export class RegistrarUsuarioComponent {
     if (this.registrando) return;
     if (
       form.invalid ||
-      (!this.registroGoogle && this.password !== this.confirmPassword) ||
+      !this.registroGoogle ||
+      !this.codigoGoogle ||
       this.validartelefono(this.nuevoUsuario.telefono) ||
       !this.nuevoUsuario.carrera ||
       !this.aceptaTerminos ||
@@ -97,8 +89,6 @@ export class RegistrarUsuarioComponent {
       return;
     }
     this.registrando = true;
-    this.error.set(false);
-    this.aviso.set(false);
     this.nuevoUsuario.rol = 'usuario';
     this.registrarcuenta
       .registrarCuenta(
@@ -109,22 +99,20 @@ export class RegistrarUsuarioComponent {
         this.codigoGoogle,
       )
       .subscribe({
-        next: (verificationSent) => {
-          this.mensajeaviso = this.registroGoogle
-            ? 'Cuenta completada. Ya puedes iniciar sesión con Google.'
-            : verificationSent
-              ? 'Cuenta creada. Revisa tu correo para verificarla antes de iniciar sesión.'
-              : 'Cuenta creada, pero no se pudo enviar el correo. Intenta reenviarlo desde el inicio de sesión.';
-          this.aviso.set(true);
+        next: () => {
           this.registrando = false;
+          this.toast.success(
+            'Cuenta creada. Ya puedes iniciar sesión con Google.',
+          );
+          void this.router.navigate(['/login']);
         },
         error: (err) => {
-          const errorMsg = extractErrorMessage(
-            err,
-            'Error al registrar el usuario. Intenta más tarde.',
+          this.toast.error(
+            extractErrorMessage(
+              err,
+              'No se pudo crear la cuenta. Revisa los datos e intenta nuevamente.',
+            ),
           );
-          this.mensajeerror = errorMsg;
-          this.error.set(true);
           this.registrando = false;
         },
       });
@@ -147,10 +135,10 @@ export class RegistrarUsuarioComponent {
         this.registrando = false;
       },
       error: () => {
-        this.mensajeerror =
-          'El registro con Google expiró. Vuelve a iniciar sesión con Google.';
-        this.error.set(true);
         this.registrando = false;
+        this.toast.error(
+          'La verificación con Google expiró. Vuelve a verificar tu correo.',
+        );
       },
     });
   }
@@ -179,7 +167,6 @@ export class RegistrarUsuarioComponent {
     if (!file) return;
 
     this.procesandoImagen = true;
-    this.error.set(false);
     try {
       const dataUrl = await processIdentityImage(file);
       const base64 = identityDataUrlToBase64(dataUrl);
@@ -194,9 +181,9 @@ export class RegistrarUsuarioComponent {
         this.nuevoUsuario.imagen_atras_carnet = base64;
       }
     } catch (error) {
-      this.mensajeerror =
-        error instanceof Error ? error.message : 'No se pudo leer la imagen.';
-      this.error.set(true);
+      this.toast.error(
+        error instanceof Error ? error.message : 'No se pudo leer la imagen.',
+      );
       input.value = '';
     } finally {
       this.procesandoImagen = false;

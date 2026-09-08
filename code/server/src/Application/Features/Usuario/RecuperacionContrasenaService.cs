@@ -12,36 +12,37 @@ public sealed class RecuperacionContrasenaService
     private readonly CodigoAutenticacionRepository _codes;
     private readonly UsuarioAuthRepository _users;
     private readonly EmailDeliveryService _email;
-    private readonly string _frontendUrl;
 
     public RecuperacionContrasenaService(
         CodigoAutenticacionRepository codes,
         UsuarioAuthRepository users,
-        EmailDeliveryService email,
-        IConfiguration configuration
+        EmailDeliveryService email
     )
     {
         _codes = codes;
         _users = users;
         _email = email;
-        _frontendUrl = configuration["Authentication:FrontendUrl"]?.TrimEnd('/')
-            ?? "http://localhost:4200";
     }
 
     public async Task<Result<object>> Request(string email, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(email) || email.Length > 255)
-            return Result<object>.Success(null!);
+            return Result<object>.Invalid(
+                new ValidationError("Email", "Ingresa un correo institucional válido")
+            );
 
-        var user = await _users.GetTrackedByEmail(email.Trim().ToLowerInvariant(), cancellationToken);
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        var user = await _users.GetTrackedByEmail(normalizedEmail, cancellationToken);
         if (user == null || !user.EmailVerificado || !string.IsNullOrWhiteSpace(user.GoogleId))
-            return Result<object>.Success(null!);
+            return Result<object>.NotFound(
+                "No encontramos una cuenta local verificada con ese correo"
+            );
 
-        var token = AuthTokenGenerator.Create();
+        var token = AuthTokenGenerator.CreateNumericCode();
         await _codes.Create(
             new CodigoAutenticacion
             {
-                Hash = AuthTokenGenerator.Hash(token),
+                Hash = AuthTokenGenerator.Hash($"{normalizedEmail}:{token}"),
                 Tipo = ResetCodeType,
                 Email = user.Email,
                 GoogleId = string.Empty,
@@ -52,25 +53,33 @@ public sealed class RecuperacionContrasenaService
             },
             cancellationToken
         );
-        var url = $"{_frontendUrl}/recuperar?token={Uri.EscapeDataString(token)}";
-        await _email.SendPasswordReset(user.Email, url, cancellationToken);
+        if (!await _email.SendPasswordReset(user.Email, token, cancellationToken))
+            return Result<object>.Error("No se pudo enviar el correo de recuperación");
+
         return Result<object>.Success(null!);
     }
 
     public async Task<Result<object>> Reset(
+        string email,
         string token,
         string password,
         CancellationToken cancellationToken
     )
     {
-        if (string.IsNullOrWhiteSpace(token) || token.Length > 256)
+        if (
+            string.IsNullOrWhiteSpace(email)
+            || email.Length > 255
+            || string.IsNullOrWhiteSpace(token)
+            || token.Length != 6
+        )
             return InvalidToken();
 
         var passwordResult = ValidatePassword(password);
         if (passwordResult != null)
             return passwordResult;
 
-        var hash = AuthTokenGenerator.Hash(token);
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        var hash = AuthTokenGenerator.Hash($"{normalizedEmail}:{token}");
         var code = await _codes.GetActive(hash, cancellationToken);
         if (code == null || code.Tipo != ResetCodeType)
             return InvalidToken();
@@ -78,7 +87,7 @@ public sealed class RecuperacionContrasenaService
         if (!await _codes.Consume(hash, cancellationToken))
             return InvalidToken();
 
-        var user = await _users.GetTrackedByEmail(code.Email, cancellationToken);
+        var user = await _users.GetTrackedByEmail(normalizedEmail, cancellationToken);
         if (user == null || !user.EmailVerificado || !string.IsNullOrWhiteSpace(user.GoogleId))
             return InvalidToken();
 

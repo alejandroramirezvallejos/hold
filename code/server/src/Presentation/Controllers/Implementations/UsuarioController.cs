@@ -1,4 +1,5 @@
 using IMT_Reservas.Server.Application.Features.Usuario;
+using Ardalis.Result;
 using IMT_Reservas.Server.Core.Entities;
 using Microsoft.AspNetCore.RateLimiting;
 using IMT_Reservas.Server.Infrastructure.Repositories.Implementations;
@@ -63,6 +64,13 @@ public class UsuarioController : Controller
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] UsuarioDto dto)
     {
+        if (!User.PuedeGestionar() && string.IsNullOrWhiteSpace(dto.CodigoGoogle))
+            return ToResponse(
+                Result<UsuarioDto>.Unauthorized(
+                    "Verifica tu correo institucional con Google para crear tu cuenta"
+                )
+            );
+
         var result = await _service.Create(dto, User.PuedeGestionar(), User.IsInRole("administrador_laboratorio"));
         return ToCreatedResponse(result, nameof(Get), new { carnet = result.Value?.Carnet });
     }

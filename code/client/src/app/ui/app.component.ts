@@ -11,6 +11,7 @@ import {
 import { LoanReturnNavigationService } from '@features/cart';
 import {
   AvisoExitoComponent,
+  MostrarerrorComponent,
   PantallaCargaComponent,
   ToastService,
 } from '@shared/ui';
@@ -25,6 +26,7 @@ import { NavbarComponent } from '@widgets/navigation';
     RouterOutlet,
     PantallaCargaComponent,
     AvisoExitoComponent,
+    MostrarerrorComponent,
     CommonModule,
   ],
 })

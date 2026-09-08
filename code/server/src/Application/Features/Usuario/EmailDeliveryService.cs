@@ -31,12 +31,12 @@ public sealed class EmailDeliveryService
 
     public async Task<bool> SendPasswordReset(
         string recipient,
-        string resetUrl,
+        string resetCode,
         CancellationToken cancellationToken
     ) => await Send(
         recipient,
         "Restablece tu contraseña de UCB Hold",
-        $"Solicitaste restablecer tu contraseña. Usa este enlace una sola vez, válido durante 30 minutos:\n\n{resetUrl}\n\nSi no realizaste esta solicitud, puedes ignorar este correo.",
+        $"Tu código para restablecer la contraseña es:\n\n{resetCode}\n\nEl código es válido durante 30 minutos y solo puede utilizarse una vez. Si no realizaste esta solicitud, puedes ignorar este correo.",
         cancellationToken
     );
 

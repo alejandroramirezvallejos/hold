@@ -6,7 +6,7 @@
 
 .recovery-page {
   display: grid;
-  min-height: 100dvh;
+  min-height: calc(100dvh - 82px);
   padding: 2rem 1rem;
   place-items: center;
   background: var(--bg);
@@ -96,6 +96,13 @@ input:focus-visible {
   line-height: 1.4;
 }
 
+.field-error {
+  margin: 0.125rem 0 0;
+  color: var(--error);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
 .primary-action {
   min-height: 46px;
   margin-top: 1rem;
@@ -114,6 +121,20 @@ input:focus-visible {
 .primary-action:disabled {
   cursor: wait;
   opacity: 0.6;
+}
+
+.secondary-action {
+  min-height: 44px;
+  border: 0;
+  border-radius: var(--radius-full);
+  color: var(--interactive-text);
+  background: transparent;
+  font: 700 0.875rem var(--font);
+  cursor: pointer;
+}
+
+.secondary-action:hover:not(:disabled) {
+  background: var(--interactive-subtle);
 }
 
 .feedback {
