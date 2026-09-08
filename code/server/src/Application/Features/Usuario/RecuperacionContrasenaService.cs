@@ -35,6 +35,10 @@ public sealed class RecuperacionContrasenaService
         var user = await _users.GetTrackedByEmail(normalizedEmail, cancellationToken);
         if (user == null)
             return Result<object>.NotFound("No encontramos una cuenta con ese correo");
+        if (!_email.IsEnabled)
+            return Result<object>.Error(
+                "El envío de correo no está configurado. Contacta con un administrador"
+            );
 
         var token = AuthTokenGenerator.CreateNumericCode();
         await _codes.Create(

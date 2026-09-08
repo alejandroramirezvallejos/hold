@@ -18,6 +18,8 @@ public sealed class EmailDeliveryService
         _logger = logger;
     }
 
+    public bool IsEnabled => _settings.Enabled;
+
     public async Task<bool> SendVerification(
         string recipient,
         string verificationUrl,

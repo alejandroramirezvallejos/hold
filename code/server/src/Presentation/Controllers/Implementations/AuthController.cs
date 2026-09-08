@@ -84,7 +84,16 @@ public class AuthController : Controller
     public async Task<IActionResult> RequestPasswordReset(
         [FromBody] EmailDto request,
         CancellationToken cancellationToken
-    ) => ToResponse(await _passwordRecovery.Request(request.Email, cancellationToken));
+    )
+    {
+        var result = await _passwordRecovery.Request(request.Email, cancellationToken);
+        return result.Status == ResultStatus.Error
+            ? StatusCode(
+                StatusCodes.Status503ServiceUnavailable,
+                new { Status = 503, Errors = result.Errors.ToList() }
+            )
+            : ToResponse(result);
+    }
 
     [HttpPost("restablecer")]
     public async Task<IActionResult> ResetPassword(
