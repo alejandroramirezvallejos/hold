@@ -7,11 +7,17 @@ public class AuditLogService
 {
     private readonly AuditLogRepository _repository;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly UsuarioReadRepository _users;
 
-    public AuditLogService(AuditLogRepository repository, IHttpContextAccessor httpContextAccessor)
+    public AuditLogService(
+        AuditLogRepository repository,
+        IHttpContextAccessor httpContextAccessor,
+        UsuarioReadRepository users
+    )
     {
         _repository = repository;
         _httpContextAccessor = httpContextAccessor;
+        _users = users;
     }
 
     public async Task Log(
@@ -22,7 +28,7 @@ public class AuditLogService
         bool saveChanges = true
     )
     {
-        var actor = GetActor();
+        var actor = await GetActor();
         await _repository.WriteLog(
             accion,
             entidad,
@@ -39,7 +45,7 @@ public class AuditLogService
         if (entries.Count == 0)
             return;
 
-        var actor = GetActor();
+        var actor = await GetActor();
         await _repository.WriteMany(entries, actor.Carnet, actor.Nombre);
     }
 
@@ -71,13 +77,15 @@ public class AuditLogService
         return Result<List<AuditLogDto>>.Success(logs);
     }
 
-    private (string Carnet, string Nombre) GetActor()
+    private async Task<(string Carnet, string Nombre)> GetActor()
     {
         var user = _httpContextAccessor.HttpContext?.User;
         var carnet = user?.FindFirst("sub")?.Value;
 
-        return string.IsNullOrWhiteSpace(carnet)
-            ? ("sistema", "Sistema")
-            : (carnet, user?.FindFirst("nombre")?.Value ?? carnet);
+        if (string.IsNullOrWhiteSpace(carnet))
+            return ("sistema", "Sistema");
+
+        var name = await _users.GetDisplayName(carnet);
+        return (carnet, string.IsNullOrWhiteSpace(name) ? carnet : name);
     }
 }

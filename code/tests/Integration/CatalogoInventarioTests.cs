@@ -43,6 +43,7 @@ internal class CatalogoInventarioTests : ServiceTest<CatalogoInventarioRepositor
         services.AddSingleton(Db);
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<AuditLogRepository>();
+        services.AddScoped<UsuarioReadRepository>();
         services.AddScoped<AuditLogService>();
         services.AddInventoryCatalogs();
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });

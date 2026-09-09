@@ -1,0 +1,141 @@
+using System.Collections;
+using System.Globalization;
+using System.Reflection;
+using System.Text.Json;
+
+namespace IMT_Reservas.Server.Application.Features.AuditLog;
+
+public static class AuditChangeDetail
+{
+    private static readonly HashSet<string> IgnoredProperties = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Id",
+        "EstadoEliminado",
+        "CodigoGoogle",
+        "EmailVerificacionEnviada",
+        "AceptaTerminos",
+    };
+
+    private static readonly HashSet<string> ProtectedProperties = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Carnet",
+        "Contrasena",
+        "Email",
+        "Telefono",
+        "NombreReferencia",
+        "TelefonoReferencia",
+        "EmailReferencia",
+        "ImagenPerfil",
+        "ImagenFrenteCarnet",
+        "ImagenAtrasCarnet",
+        "ImagenFirma",
+        "MotivoBloqueo",
+        "RefreshToken",
+        "TokenVerificacionHash",
+    };
+
+    private static readonly Dictionary<string, string> Labels = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["CodigoImt"] = "Código IMT",
+        ["CodigoUcb"] = "Código UCB",
+        ["NumeroSerial"] = "Número de serie",
+        ["EstadoEquipo"] = "Estado del equipo",
+        ["IdAmbiente"] = "Ambiente",
+        ["IdProcedencia"] = "Procedencia",
+        ["IdGrupoEquipo"] = "Grupo de equipos",
+        ["IdGavetero"] = "Gavetero",
+        ["CostoReferencia"] = "Costo de referencia",
+        ["FechaIngresoEquipo"] = "Fecha de ingreso",
+        ["IdCarrera"] = "Carrera",
+        ["ImagenPerfil"] = "Foto de perfil",
+        ["ImagenFrenteCarnet"] = "Anverso del carnet",
+        ["ImagenAtrasCarnet"] = "Reverso del carnet",
+        ["ImagenFirma"] = "Firma",
+        ["Contrasena"] = "Contraseña",
+    };
+
+    public static string? Build<T>(T? previous, T? current)
+    {
+        if (previous == null || current == null)
+            return null;
+
+        var changes = typeof(T)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(property => property.CanRead && !IgnoredProperties.Contains(property.Name))
+            .Select(property => CreateChange(property, previous, current))
+            .Where(change => change != null)
+            .ToList();
+
+        if (changes.Count == 0)
+            return JsonSerializer.Serialize(new { texto = "No se detectaron cambios visibles." });
+
+        return JsonSerializer.Serialize(new
+        {
+            texto = changes.Count == 1 ? "Se modificó 1 campo." : $"Se modificaron {changes.Count} campos.",
+            cambios = changes,
+        });
+    }
+
+    private static object? CreateChange<T>(PropertyInfo property, T previous, T current)
+    {
+        var previousValue = property.GetValue(previous);
+        var currentValue = property.GetValue(current);
+
+        if (ValuesEqual(previousValue, currentValue))
+            return null;
+
+        var label = Labels.GetValueOrDefault(property.Name, SplitName(property.Name));
+
+        if (ProtectedProperties.Contains(property.Name))
+            return new
+            {
+                campo = label,
+                protegido = true,
+                anterior = (string?)null,
+                nuevo = (string?)null,
+            };
+
+        return new
+        {
+            campo = label,
+            protegido = false,
+            anterior = FormatValue(previousValue),
+            nuevo = FormatValue(currentValue),
+        };
+    }
+
+    private static bool ValuesEqual(object? previous, object? current)
+    {
+        if (ReferenceEquals(previous, current))
+            return true;
+        if (previous == null || current == null)
+            return false;
+        if (previous is byte[] previousBytes && current is byte[] currentBytes)
+            return previousBytes.SequenceEqual(currentBytes);
+        if (previous is IEnumerable previousItems && current is IEnumerable currentItems
+            && previous is not string && current is not string)
+            return previousItems.Cast<object?>().SequenceEqual(currentItems.Cast<object?>());
+
+        return Equals(previous, current);
+    }
+
+    private static string FormatValue(object? value)
+    {
+        var formatted = value switch
+        {
+            null => "Sin valor",
+            bool boolean => boolean ? "Sí" : "No",
+            DateTime dateTime => dateTime.ToString("dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
+            DateOnly date => date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
+            IEnumerable values when value is not string => string.Join(", ", values.Cast<object?>().Select(FormatValue)),
+            IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture) ?? "Sin valor",
+            _ => value.ToString() ?? "Sin valor",
+        };
+
+        return formatted.Length <= 180 ? formatted : $"{formatted[..177]}...";
+    }
+
+    private static string SplitName(string value) =>
+        string.Concat(value.Select((character, index) =>
+            index > 0 && char.IsUpper(character) ? $" {char.ToLowerInvariant(character)}" : character.ToString()));
+}

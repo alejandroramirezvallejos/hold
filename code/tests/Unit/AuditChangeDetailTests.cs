@@ -1,0 +1,52 @@
+using System.Text.Json;
+using FluentAssertions;
+using IMT_Reservas.Server.Application.Features.AuditLog;
+using IMT_Reservas.Server.Application.Features.Usuario;
+
+namespace IMT_Reservas.Tests.Unit;
+
+[TestFixture]
+internal class AuditChangeDetailTests
+{
+    [Test]
+    public void Build_RecordsVisibleValuesAndProtectsPersonalData()
+    {
+        var previous = new UsuarioDto
+        {
+            Nombre = "Ana",
+            Email = "anterior@ucb.edu.bo",
+            ImagenFirma = [1, 2],
+            Rol = "estudiante",
+        };
+        var current = new UsuarioDto
+        {
+            Nombre = "Andrea",
+            Email = "nuevo@ucb.edu.bo",
+            ImagenFirma = [3, 4],
+            Rol = "docente",
+        };
+
+        var detail = AuditChangeDetail.Build(previous, current);
+        using var json = JsonDocument.Parse(detail!);
+        var changes = json.RootElement.GetProperty("cambios").EnumerateArray().ToList();
+
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Nombre"
+            && change.GetProperty("anterior").GetString() == "Ana"
+            && change.GetProperty("nuevo").GetString() == "Andrea"
+            && !change.GetProperty("protegido").GetBoolean()
+        );
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Email"
+            && change.GetProperty("protegido").GetBoolean()
+            && change.GetProperty("anterior").ValueKind == JsonValueKind.Null
+            && change.GetProperty("nuevo").ValueKind == JsonValueKind.Null
+        );
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Firma"
+            && change.GetProperty("protegido").GetBoolean()
+        );
+        detail.Should().NotContain("anterior@ucb.edu.bo");
+        detail.Should().NotContain("nuevo@ucb.edu.bo");
+    }
+}

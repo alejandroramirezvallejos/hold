@@ -45,7 +45,11 @@ internal class PrestamoServiceTests : ServiceTest<PrestamoService>
         );
         var validator = new PrestamoValidator(db, configRepo);
 
-        var audit = new AuditLogService(new AuditLogRepository(db), new HttpContextAccessor());
+        var audit = new AuditLogService(
+            new AuditLogRepository(db),
+            new HttpContextAccessor(),
+            new UsuarioReadRepository(db)
+        );
         var notifications = new NotificacionService(new NotificacionRepository(db));
         var userQueries = new UsuarioReadRepository(db);
         var userRepository = new UsuarioRepository(db, new UsuarioMapper(), userQueries);

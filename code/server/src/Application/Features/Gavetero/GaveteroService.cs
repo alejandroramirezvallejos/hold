@@ -45,6 +45,7 @@ public class GaveteroService : Service<GaveteroEntity, GaveteroRepository, Gavet
 
     public override async Task<Result<GaveteroDto>> Update(int id, GaveteroDto dto)
     {
+        var previous = await Repository.Get(id);
         var validation = await Validator.ValidateAsync(dto);
 
         if (!validation.IsValid)
@@ -71,7 +72,8 @@ public class GaveteroService : Service<GaveteroEntity, GaveteroRepository, Gavet
         await Audit!.Log(
             AuditAccion.Editar,
             typeof(GaveteroEntity).Name,
-            id.ToString(CultureInfo.InvariantCulture)
+            id.ToString(CultureInfo.InvariantCulture),
+            previous.IsSuccess ? AuditChangeDetail.Build(previous.Value, result.Value) : null
         );
         return result;
     }

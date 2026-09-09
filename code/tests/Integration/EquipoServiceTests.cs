@@ -20,7 +20,11 @@ internal class EquipoServiceTests : ServiceTest<EquipoService>
         var mapper = new EquipoMapper();
         var repo = new EquipoRepository(db, mapper);
         var validator = new EquipoValidator(db);
-        var audit = new AuditLogService(new AuditLogRepository(db), new HttpContextAccessor());
+        var audit = new AuditLogService(
+            new AuditLogRepository(db),
+            new HttpContextAccessor(),
+            new UsuarioReadRepository(db)
+        );
 
         return new EquipoService(repo, mapper, validator, audit);
     }

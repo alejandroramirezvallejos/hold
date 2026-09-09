@@ -120,33 +120,34 @@
         <tbody>
           @for (log of logsPaginados; track log.Id) {
             <tr>
-              <td class="date-col">
+              <td class="date-col" data-label="Fecha">
                 {{
                   log.Timestamp | date: "dd/MM/yyyy HH:mm" : "America/La_Paz"
                 }}
               </td>
-              <td>
+              <td data-label="Actor">
                 <span class="admin-name">{{
                   log.AdminNombre || log.AdminCarnet
                 }}</span>
                 <span class="admin-carnet">{{ log.AdminCarnet }}</span>
               </td>
-              <td>
+              <td data-label="Acción">
                 <span [class]="'badge ' + badgeClass(log.Accion)">{{
                   log.Accion
                 }}</span>
               </td>
-              <td class="id-col">{{ log.EntidadId }}</td>
+              <td class="id-col" data-label="ID">{{ log.EntidadId }}</td>
               @if (tieneDetalle(log)) {
                 <td
                   class="detail-col detail-clickable"
+                  data-label="Detalle"
                   (click)="abrirObs(log)"
                   title="Ver detalle completo"
                 >
                   {{ resumenObs(log) }}
                 </td>
               } @else {
-                <td class="detail-col">—</td>
+                <td class="detail-col" data-label="Detalle">—</td>
               }
             </tr>
           }
@@ -169,7 +170,48 @@
         <img src="assets/x.png" alt="Cerrar" />
       </button>
       <h3 class="obs-title">Detalle de auditoría</h3>
-      @if (obsAbierta.usuarioNombre || obsAbierta.equiposPrestamo) {
+      @if (obsLogAbierto) {
+        <dl class="obs-context">
+          <div>
+            <dt>Realizado por</dt>
+            <dd>
+              {{ obsLogAbierto.AdminNombre || obsLogAbierto.AdminCarnet }}
+              <span>{{ obsLogAbierto.AdminCarnet }}</span>
+            </dd>
+          </div>
+          <div>
+            <dt>Fecha</dt>
+            <dd>{{ formatearFechaDetalle(obsLogAbierto.Timestamp) }}</dd>
+          </div>
+        </dl>
+      }
+      @if (obsAbierta.cambios?.length) {
+        <div class="change-list" aria-label="Cambios realizados">
+          @for (cambio of obsAbierta.cambios; track cambio.campo) {
+            <section class="change-item">
+              <h4>{{ cambio.campo }}</h4>
+              @if (cambio.protegido) {
+                <p class="change-protected">
+                  <i class="fas fa-lock" aria-hidden="true"></i>
+                  Dato protegido actualizado
+                </p>
+              } @else {
+                <div class="change-values">
+                  <div>
+                    <span>Antes</span>
+                    <strong>{{ cambio.anterior || "Sin valor" }}</strong>
+                  </div>
+                  <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                  <div>
+                    <span>Después</span>
+                    <strong>{{ cambio.nuevo || "Sin valor" }}</strong>
+                  </div>
+                </div>
+              }
+            </section>
+          }
+        </div>
+      } @else if (obsAbierta.usuarioNombre || obsAbierta.equiposPrestamo) {
         <dl class="obs-summary">
           <div>
             <dt>Usuario</dt>

@@ -298,6 +298,8 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
         if (existing == null)
             return Result<UsuarioDto>.NotFound();
 
+        var previous = _mapper.ToDto(existing);
+
         if (!isAdmin)
             PreserveTraceableFields(dto, existing);
 
@@ -349,10 +351,16 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
             existing.IdCarrera,
             cancellationToken
         );
+        var auditDetail = AuditChangeDetail.Build(previous, resultDto);
         ClearProfileDocuments(resultDto);
 
         _ = await _cacheRepository.Remove(CacheKeys.Usuario(carnet));
-        await Audit!.Log(AuditAccion.Editar, typeof(UsuarioEntity).Name, carnet);
+        await Audit!.Log(
+            AuditAccion.Editar,
+            typeof(UsuarioEntity).Name,
+            carnet,
+            auditDetail
+        );
 
         return Result<UsuarioDto>.Success(resultDto);
     }

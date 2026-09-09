@@ -59,13 +59,15 @@ public class Service<TEntity, TRepository, TDto>
 
     public virtual async Task<Result<TDto>> Update(int id, TDto dto)
     {
+        var previous = await Repository.Get(id);
         var result = await ValidateAndUpdate(id, dto);
 
         if (result.IsSuccess)
             await Audit.Log(
                 AuditAccion.Editar,
                 typeof(TEntity).Name,
-                id.ToString(CultureInfo.InvariantCulture)
+                id.ToString(CultureInfo.InvariantCulture),
+                previous.IsSuccess ? AuditChangeDetail.Build(previous.Value, result.Value) : null
             );
 
         return result;

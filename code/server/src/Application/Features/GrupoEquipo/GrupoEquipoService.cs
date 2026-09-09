@@ -57,6 +57,7 @@ public class GrupoEquipoService : Service<GrupoEquipoEntity, GrupoEquipoReposito
 
     public override async Task<Result<GrupoEquipoDto>> Update(int id, GrupoEquipoDto dto)
     {
+        var previous = await Repository.Get(id);
         dto.Id = id;
         await ResolveCategoria(dto);
         var validation = await Validator.ValidateAsync(dto);
@@ -76,7 +77,10 @@ public class GrupoEquipoService : Service<GrupoEquipoEntity, GrupoEquipoReposito
             await Audit!.Log(
                 AuditAccion.Editar,
                 typeof(GrupoEquipoEntity).Name,
-                id.ToString(CultureInfo.InvariantCulture)
+                id.ToString(CultureInfo.InvariantCulture),
+                previous.IsSuccess
+                    ? AuditChangeDetail.Build(previous.Value, updateResult.Value)
+                    : null
             );
         }
 

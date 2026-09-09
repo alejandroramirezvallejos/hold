@@ -1,5 +1,12 @@
 import { AuditEquipmentDetail } from './audit-equipment-detail';
 
+export interface AuditFieldChange {
+  campo: string;
+  anterior?: string | null;
+  nuevo?: string | null;
+  protegido?: boolean;
+}
+
 export interface AuditObservationDetail {
   observacion?: string;
   equipos?: AuditEquipmentDetail[];
@@ -9,4 +16,5 @@ export interface AuditObservationDetail {
   equiposPrestamo?: string;
   fechaInicio?: string;
   fechaDevolucion?: string;
+  cambios?: AuditFieldChange[];
 }

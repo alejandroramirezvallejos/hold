@@ -63,6 +63,8 @@ public class EquipoService : Service<EquipoEntity, EquipoRepository, EquipoDto>
         if (existing == null)
             return Result<EquipoDto>.NotFound();
 
+        var previous = MapToDto(existing);
+
         var entity = MapToEntity(dto);
         entity.Id = id;
         entity.CodigoImt = existing.CodigoImt;
@@ -86,7 +88,8 @@ public class EquipoService : Service<EquipoEntity, EquipoRepository, EquipoDto>
         await Audit!.Log(
             AuditAccion.Editar,
             typeof(EquipoEntity).Name,
-            id.ToString(CultureInfo.InvariantCulture)
+            id.ToString(CultureInfo.InvariantCulture),
+            AuditChangeDetail.Build(previous, result.Value)
         );
 
         return result;

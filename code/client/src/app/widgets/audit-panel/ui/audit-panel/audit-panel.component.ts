@@ -237,7 +237,8 @@ export class AuditPanelComponent implements OnChanges {
       possibleDetail.texto ||
       possibleDetail.equipos ||
       possibleDetail.usuarioNombre ||
-      possibleDetail.equiposPrestamo,
+      possibleDetail.equiposPrestamo ||
+      possibleDetail.cambios?.length,
     );
   }
 
@@ -248,6 +249,9 @@ export class AuditPanelComponent implements OnChanges {
       p.observacion ||
       p.texto ||
       (p.equiposPrestamo ? `Reserva de ${p.equiposPrestamo}` : undefined) ||
+      (p.cambios?.length
+        ? `${p.cambios.length} campo${p.cambios.length === 1 ? '' : 's'} modificado${p.cambios.length === 1 ? '' : 's'}`
+        : undefined) ||
       (p.equipos?.length ? 'Ver estados de equipos' : '—')
     );
   }
@@ -256,13 +260,24 @@ export class AuditPanelComponent implements OnChanges {
     const p = this.parseDetalle(log.Detalle);
     return (
       !!p &&
-      !!(p.observacion || p.texto || p.equiposPrestamo || p.equipos?.length)
+      !!(
+        p.observacion ||
+        p.texto ||
+        p.equiposPrestamo ||
+        p.equipos?.length ||
+        p.cambios?.length
+      )
     );
   }
 
+  obsLogAbierto: AuditLogDto | null = null;
+
   abrirObs(log: AuditLogDto): void {
     const p = this.parseDetalle(log.Detalle);
-    if (p) this.obsAbierta = p;
+    if (p) {
+      this.obsAbierta = p;
+      this.obsLogAbierto = log;
+    }
   }
 
   detenerPropagacion(event: Event): void {
@@ -271,12 +286,16 @@ export class AuditPanelComponent implements OnChanges {
 
   cerrarObs(): void {
     this.obsAbierta = null;
+    this.obsLogAbierto = null;
   }
 
-  formatearFechaDetalle(fecha?: string): string {
+  formatearFechaDetalle(fecha?: string | Date): string {
     if (!fecha) return '—';
 
-    return formatBoliviaDateTime(fecha) || fecha;
+    return (
+      formatBoliviaDateTime(fecha) ||
+      (fecha instanceof Date ? fecha.toISOString() : fecha)
+    );
   }
 
   estadoEquipoLabel(estado?: string): string {

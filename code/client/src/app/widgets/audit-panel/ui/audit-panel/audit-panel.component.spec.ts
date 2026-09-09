@@ -42,6 +42,32 @@ describe('AuditPanelComponent', () => {
     ).toBe('Reserva de Osciloscopio');
   });
 
+  it('should preserve protected audit changes without values', () => {
+    const detail = component.parseDetalle(
+      JSON.stringify({
+        texto: 'Se modificaron 2 campos.',
+        cambios: [
+          {
+            campo: 'Nombre',
+            anterior: 'Ana',
+            nuevo: 'Andrea',
+            protegido: false,
+          },
+          {
+            campo: 'Email',
+            anterior: null,
+            nuevo: null,
+            protegido: true,
+          },
+        ],
+      }),
+    );
+
+    expect(detail?.cambios?.length).toBe(2);
+    expect(detail?.cambios?.[1].protegido).toBeTrue();
+    expect(detail?.cambios?.[1].anterior).toBeNull();
+  });
+
   for (const column of ['Fecha', 'Actor', 'Acción', 'ID', 'Detalle']) {
     it(
       'sorts audit rows by ' + column + ' and returns to the first page',

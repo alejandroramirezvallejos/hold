@@ -68,6 +68,7 @@ public class MantenimientoService
 
     public override async Task<Result<MantenimientoDto>> Update(int id, MantenimientoDto dto)
     {
+        var previous = await Repository.Get(id);
         await ResolveEmpresa(dto);
         var validation = await Validator.ValidateAsync(dto);
         if (!validation.IsValid)
@@ -95,14 +96,18 @@ public class MantenimientoService
 
         await _estadoJob.Execute(CancellationToken.None);
 
+        var updated = await Repository.Get(id);
+
         await Audit!.Log(
             AuditAccion.Editar,
             typeof(MantenimientoEntity).Name,
             id.ToString(CultureInfo.InvariantCulture),
-            BuildAuditDetail(dto)
+            previous.IsSuccess && updated.IsSuccess
+                ? AuditChangeDetail.Build(previous.Value, updated.Value)
+                : null
         );
 
-        return await Repository.Get(id);
+        return updated;
     }
 
     public override async Task<Result<object>> Delete(int id)

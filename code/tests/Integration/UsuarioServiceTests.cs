@@ -59,7 +59,11 @@ internal class UsuarioServiceTests : ServiceTest<UsuarioService>
             NullLogger<CacheRepository>.Instance
         );
 
-        var audit = new AuditLogService(new AuditLogRepository(db), new HttpContextAccessor());
+        var audit = new AuditLogService(
+            new AuditLogRepository(db),
+            new HttpContextAccessor(),
+            queries
+        );
         var notifications = new NotificacionService(new NotificacionRepository(db));
         var emailDelivery = new EmailDeliveryService(
             Options.Create(new EmailSettings()),
