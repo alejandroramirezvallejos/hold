@@ -17,4 +17,23 @@ describe('SidebarComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('keeps the desktop navigation available and closes after selection', () => {
+    component.contenido = ['Prestamos', 'Usuarios'];
+    component.activeItem = 'Prestamos';
+    component.sidebarService.isOpen.set(true);
+    spyOn(component.item, 'emit');
+    fixture.detectChanges();
+
+    const aside = fixture.nativeElement.querySelector('aside');
+    const buttons = aside.querySelectorAll('.item');
+    expect(aside).not.toBeNull();
+    expect(buttons.length).toBe(2);
+    expect(buttons[0].getAttribute('aria-current')).toBe('page');
+
+    buttons[1].click();
+
+    expect(component.item.emit).toHaveBeenCalledWith('Usuarios');
+    expect(component.sidebarService.isOpen()).toBeFalse();
+  });
 });

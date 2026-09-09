@@ -48,7 +48,8 @@ public class GrupoEquipoService : Service<GrupoEquipoEntity, GrupoEquipoReposito
             await Audit!.Log(
                 AuditAccion.Crear,
                 typeof(GrupoEquipoEntity).Name,
-                createResult.Value?.Id?.ToString(CultureInfo.InvariantCulture)
+                createResult.Value?.Id?.ToString(CultureInfo.InvariantCulture),
+                AuditChangeDetail.BuildCreated(createResult.Value)
             );
         }
 

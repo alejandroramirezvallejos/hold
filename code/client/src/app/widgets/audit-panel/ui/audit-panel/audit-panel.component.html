@@ -136,19 +136,25 @@
                   log.Accion
                 }}</span>
               </td>
-              <td class="id-col" data-label="ID">{{ log.EntidadId }}</td>
-              @if (tieneDetalle(log)) {
-                <td
-                  class="detail-col detail-clickable"
-                  data-label="Detalle"
-                  (click)="abrirObs(log)"
-                  title="Ver detalle completo"
-                >
-                  {{ resumenObs(log) }}
-                </td>
-              } @else {
-                <td class="detail-col" data-label="Detalle">—</td>
-              }
+              <td class="id-col" data-label="Registro">
+                {{ log.EntidadId }}
+              </td>
+              <td class="detail-col" data-label="Detalle">
+                <div class="audit-detail-cell">
+                  <span>{{ resumenObs(log) }}</span>
+                  <button
+                    type="button"
+                    class="audit-detail-button"
+                    (click)="abrirObs(log)"
+                    [attr.aria-label]="
+                      'Ver detalle de ' + accionLabel(log.Accion)
+                    "
+                  >
+                    <i class="fas fa-eye" aria-hidden="true"></i>
+                    Ver detalle
+                  </button>
+                </div>
+              </td>
             </tr>
           }
         </tbody>
@@ -171,12 +177,31 @@
       </button>
       <h3 class="obs-title">Detalle de auditoría</h3>
       @if (obsLogAbierto) {
+        <p class="obs-lead">{{ descripcionAccion(obsLogAbierto) }}</p>
         <dl class="obs-context">
+          <div>
+            <dt>Acción</dt>
+            <dd>
+              <span [class]="'badge ' + badgeClass(obsLogAbierto.Accion)">
+                {{ accionLabel(obsLogAbierto.Accion) }}
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt>Módulo</dt>
+            <dd>{{ entidadLabel(obsLogAbierto.Entidad) }}</dd>
+          </div>
+          <div>
+            <dt>Registro</dt>
+            <dd>{{ obsLogAbierto.EntidadId || "Sin identificador" }}</dd>
+          </div>
           <div>
             <dt>Realizado por</dt>
             <dd>
               {{ obsLogAbierto.AdminNombre || obsLogAbierto.AdminCarnet }}
-              <span>{{ obsLogAbierto.AdminCarnet }}</span>
+              <span class="obs-actor-carnet">{{
+                obsLogAbierto.AdminCarnet
+              }}</span>
             </dd>
           </div>
           <div>
@@ -186,6 +211,7 @@
         </dl>
       }
       @if (obsAbierta.cambios?.length) {
+        <h4 class="obs-section-title">Cambios registrados</h4>
         <div class="change-list" aria-label="Cambios realizados">
           @for (cambio of obsAbierta.cambios; track cambio.campo) {
             <section class="change-item">
@@ -196,22 +222,38 @@
                   Dato protegido actualizado
                 </p>
               } @else {
-                <div class="change-values">
-                  <div>
-                    <span>Antes</span>
-                    <strong>{{ cambio.anterior || "Sin valor" }}</strong>
-                  </div>
-                  <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                  <div>
-                    <span>Después</span>
+                @if (obsLogAbierto?.Accion?.toLowerCase() === "crear") {
+                  <div class="snapshot-value">
+                    <span>Dato registrado</span>
                     <strong>{{ cambio.nuevo || "Sin valor" }}</strong>
                   </div>
-                </div>
+                } @else if (
+                  obsLogAbierto?.Accion?.toLowerCase() === "eliminar"
+                ) {
+                  <div class="snapshot-value">
+                    <span>Valor antes de eliminar</span>
+                    <strong>{{ cambio.anterior || "Sin valor" }}</strong>
+                  </div>
+                } @else {
+                  <div class="change-values">
+                    <div>
+                      <span>Antes</span>
+                      <strong>{{ cambio.anterior || "Sin valor" }}</strong>
+                    </div>
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    <div>
+                      <span>Después</span>
+                      <strong>{{ cambio.nuevo || "Sin valor" }}</strong>
+                    </div>
+                  </div>
+                }
               }
             </section>
           }
         </div>
-      } @else if (obsAbierta.usuarioNombre || obsAbierta.equiposPrestamo) {
+      }
+      @if (obsAbierta.usuarioNombre || obsAbierta.equiposPrestamo) {
+        <h4 class="obs-section-title">Datos del préstamo</h4>
         <dl class="obs-summary">
           <div>
             <dt>Usuario</dt>
@@ -234,13 +276,32 @@
             <dd>{{ formatearFechaDetalle(obsAbierta.fechaDevolucion) }}</dd>
           </div>
         </dl>
-      } @else {
-        <p class="obs-text">
-          {{ obsAbierta.observacion || obsAbierta.texto || "Sin observación" }}
-        </p>
+      }
+      @if (
+        !obsAbierta.cambios?.length &&
+        !obsAbierta.usuarioNombre &&
+        !obsAbierta.equiposPrestamo &&
+        obsAbierta.texto
+      ) {
+        <p class="obs-text">{{ obsAbierta.texto }}</p>
+      }
+      @if (obsAbierta.observacion) {
+        <h4 class="obs-section-title">Observación</h4>
+        <p class="obs-text">{{ obsAbierta.observacion }}</p>
+      }
+      @if (obsAbierta.datos?.length) {
+        <h4 class="obs-section-title">Información registrada</h4>
+        <dl class="obs-data-list">
+          @for (dato of obsAbierta.datos; track dato.etiqueta) {
+            <div>
+              <dt>{{ dato.etiqueta }}</dt>
+              <dd>{{ dato.valor }}</dd>
+            </div>
+          }
+        </dl>
       }
       @if (obsAbierta.equipos?.length) {
-        <h4 class="obs-subtitle">Estado de los equipos devueltos</h4>
+        <h4 class="obs-subtitle">Estado registrado de los equipos</h4>
         <table class="obs-equipos">
           <thead>
             <tr>

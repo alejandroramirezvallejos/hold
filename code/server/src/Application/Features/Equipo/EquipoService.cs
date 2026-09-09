@@ -44,7 +44,8 @@ public class EquipoService : Service<EquipoEntity, EquipoRepository, EquipoDto>
             await Audit!.Log(
                 AuditAccion.Crear,
                 typeof(EquipoEntity).Name,
-                result.Value?.Id?.ToString(CultureInfo.InvariantCulture)
+                result.Value?.Id?.ToString(CultureInfo.InvariantCulture),
+                AuditChangeDetail.BuildCreated(result.Value)
             );
         }
 

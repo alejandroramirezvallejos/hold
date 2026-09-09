@@ -7,6 +7,11 @@ export interface AuditFieldChange {
   protegido?: boolean;
 }
 
+export interface AuditDataItem {
+  etiqueta: string;
+  valor: string;
+}
+
 export interface AuditObservationDetail {
   observacion?: string;
   equipos?: AuditEquipmentDetail[];
@@ -17,4 +22,5 @@ export interface AuditObservationDetail {
   fechaInicio?: string;
   fechaDevolucion?: string;
   cambios?: AuditFieldChange[];
+  datos?: AuditDataItem[];
 }

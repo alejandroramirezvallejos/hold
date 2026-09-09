@@ -19,6 +19,7 @@ public static class AuditChangeDetail
     private static readonly HashSet<string> ProtectedProperties = new(StringComparer.OrdinalIgnoreCase)
     {
         "Carnet",
+        "CarnetAdministrador",
         "Contrasena",
         "Email",
         "Telefono",
@@ -31,6 +32,7 @@ public static class AuditChangeDetail
         "ImagenFirma",
         "MotivoBloqueo",
         "RefreshToken",
+        "GoogleId",
         "TokenVerificacionHash",
     };
 
@@ -76,6 +78,29 @@ public static class AuditChangeDetail
         });
     }
 
+    public static string? BuildCreated<T>(T? current) => BuildSnapshot(current, true);
+
+    public static string? BuildDeleted<T>(T? previous) => BuildSnapshot(previous, false);
+
+    private static string? BuildSnapshot<T>(T? value, bool created)
+    {
+        if (value == null)
+            return null;
+
+        var changes = typeof(T)
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(property => property.CanRead && !IgnoredProperties.Contains(property.Name))
+            .Select(property => CreateSnapshot(property, value, created))
+            .Where(change => change != null)
+            .ToList();
+
+        return JsonSerializer.Serialize(new
+        {
+            texto = created ? "Se registraron los datos iniciales." : "Se conservaron los datos visibles previos a la eliminación.",
+            cambios = changes,
+        });
+    }
+
     private static object? CreateChange<T>(PropertyInfo property, T previous, T current)
     {
         var previousValue = property.GetValue(previous);
@@ -101,6 +126,33 @@ public static class AuditChangeDetail
             protegido = false,
             anterior = FormatValue(previousValue),
             nuevo = FormatValue(currentValue),
+        };
+    }
+
+    private static object? CreateSnapshot<T>(PropertyInfo property, T value, bool created)
+    {
+        var propertyValue = property.GetValue(value);
+
+        if (propertyValue == null || propertyValue is string text && string.IsNullOrWhiteSpace(text))
+            return null;
+
+        var label = Labels.GetValueOrDefault(property.Name, SplitName(property.Name));
+
+        if (ProtectedProperties.Contains(property.Name))
+            return new
+            {
+                campo = label,
+                protegido = true,
+                anterior = (string?)null,
+                nuevo = (string?)null,
+            };
+
+        return new
+        {
+            campo = label,
+            protegido = false,
+            anterior = created ? null : FormatValue(propertyValue),
+            nuevo = created ? FormatValue(propertyValue) : null,
         };
     }
 

@@ -68,7 +68,59 @@ describe('AuditPanelComponent', () => {
     expect(detail?.cambios?.[1].anterior).toBeNull();
   });
 
-  for (const column of ['Fecha', 'Actor', 'Acción', 'ID', 'Detalle']) {
+  it('opens a useful detail view even when a legacy record has no detail', () => {
+    const log = {
+      Id: 3,
+      Accion: 'Eliminar',
+      Entidad: 'Equipo',
+      EntidadId: '25',
+    } as AuditLogDto;
+
+    component.abrirObs(log);
+
+    expect(component.obsLogAbierto).toBe(log);
+    expect(component.obsAbierta?.texto).toContain('equipo 25');
+  });
+
+  it('does not expose generic sensitive fields in structured details', () => {
+    const detail = component.parseDetalle(
+      JSON.stringify({ tokenVerificacionHash: 'secret', cuentaRecreada: true }),
+    );
+
+    expect(detail?.datos).toEqual([
+      { etiqueta: 'Cuenta recreada', valor: 'Sí' },
+    ]);
+  });
+
+  it('offers an explicit detail action for every audit row', () => {
+    component.logs = [
+      {
+        Id: 1,
+        Accion: 'Crear',
+        Entidad: 'Equipo',
+        EntidadId: '10',
+      },
+      {
+        Id: 2,
+        Accion: 'Editar',
+        Entidad: 'Equipo',
+        EntidadId: '11',
+        Detalle: '{"texto":"Se modificó 1 campo."}',
+      },
+    ];
+    component.logsPaginados = component.logs;
+    component.cargando = false;
+    fixture.detectChanges();
+
+    const buttons = fixture.nativeElement.querySelectorAll(
+      '.audit-detail-button',
+    );
+
+    expect(buttons.length).toBe(2);
+    expect(buttons[0].textContent).toContain('Ver detalle');
+  });
+
+  for (const column of ['Fecha', 'Actor', 'Acción', 'Registro', 'Detalle']) {
     it(
       'sorts audit rows by ' + column + ' and returns to the first page',
       async () => {

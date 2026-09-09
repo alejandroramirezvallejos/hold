@@ -51,7 +51,12 @@ public class Service<TEntity, TRepository, TDto>
                 typeof(TDto).GetProperty("Id")?.GetValue(result.Value),
                 CultureInfo.InvariantCulture
             );
-            await Audit.Log(AuditAccion.Crear, typeof(TEntity).Name, id);
+            await Audit.Log(
+                AuditAccion.Crear,
+                typeof(TEntity).Name,
+                id,
+                AuditChangeDetail.BuildCreated(result.Value)
+            );
         }
 
         return result;
@@ -75,13 +80,15 @@ public class Service<TEntity, TRepository, TDto>
 
     public virtual async Task<Result<object>> Delete(int id)
     {
+        var previous = await Repository.Get(id);
         var result = await Repository.Delete(id);
 
         if (result.IsSuccess)
             await Audit.Log(
                 AuditAccion.Eliminar,
                 typeof(TEntity).Name,
-                id.ToString(CultureInfo.InvariantCulture)
+                id.ToString(CultureInfo.InvariantCulture),
+                previous.IsSuccess ? AuditChangeDetail.BuildDeleted(previous.Value) : null
             );
 
         return result;

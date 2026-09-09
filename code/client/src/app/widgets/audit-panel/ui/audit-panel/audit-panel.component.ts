@@ -55,7 +55,7 @@ export class AuditPanelComponent implements OnChanges {
   @Input() refreshTrigger: number = 0;
 
   logs: AuditLogDto[] = [];
-  readonly columnas = ['Fecha', 'Actor', 'Acción', 'ID', 'Detalle'];
+  readonly columnas = ['Fecha', 'Actor', 'Acción', 'Registro', 'Detalle'];
   sortColumn = '';
   sortDirection: 'asc' | 'desc' = 'asc';
   cargando = true;
@@ -208,14 +208,8 @@ export class AuditPanelComponent implements OnChanges {
 
     const parsedDetail = parseJsonResult<unknown>(detalle);
 
-    if (
-      parsedDetail.isOk() &&
-      this.isAuditObservationDetail(parsedDetail.value)
-    ) {
-      const structuredDetail = parsedDetail.value.texto
-        ? (this.parseLegacyLoanDetail(parsedDetail.value.texto) ??
-          parsedDetail.value)
-        : parsedDetail.value;
+    if (parsedDetail.isOk() && this.isRecord(parsedDetail.value)) {
+      const structuredDetail = this.normalizarDetalle(parsedDetail.value);
       this.detalleCache.set(detalle, structuredDetail);
       return structuredDetail;
     }
@@ -225,26 +219,9 @@ export class AuditPanelComponent implements OnChanges {
     return resultado;
   }
 
-  private isAuditObservationDetail(
-    value: unknown,
-  ): value is AuditObservationDetail {
-    if (!value || typeof value !== 'object') return false;
-
-    const possibleDetail = value as AuditObservationDetail;
-
-    return Boolean(
-      possibleDetail.observacion ||
-      possibleDetail.texto ||
-      possibleDetail.equipos ||
-      possibleDetail.usuarioNombre ||
-      possibleDetail.equiposPrestamo ||
-      possibleDetail.cambios?.length,
-    );
-  }
-
   resumenObs(log: AuditLogDto): string {
     const p = this.parseDetalle(log.Detalle);
-    if (!p) return '—';
+    if (!p) return this.descripcionAccion(log);
     return (
       p.observacion ||
       p.texto ||
@@ -252,32 +229,19 @@ export class AuditPanelComponent implements OnChanges {
       (p.cambios?.length
         ? `${p.cambios.length} campo${p.cambios.length === 1 ? '' : 's'} modificado${p.cambios.length === 1 ? '' : 's'}`
         : undefined) ||
-      (p.equipos?.length ? 'Ver estados de equipos' : '—')
-    );
-  }
-
-  tieneDetalle(log: AuditLogDto): boolean {
-    const p = this.parseDetalle(log.Detalle);
-    return (
-      !!p &&
-      !!(
-        p.observacion ||
-        p.texto ||
-        p.equiposPrestamo ||
-        p.equipos?.length ||
-        p.cambios?.length
-      )
+      (p.equipos?.length ? 'Estados de equipos registrados' : undefined) ||
+      (p.datos?.length ? 'Información de la acción registrada' : undefined) ||
+      this.descripcionAccion(log)
     );
   }
 
   obsLogAbierto: AuditLogDto | null = null;
 
   abrirObs(log: AuditLogDto): void {
-    const p = this.parseDetalle(log.Detalle);
-    if (p) {
-      this.obsAbierta = p;
-      this.obsLogAbierto = log;
-    }
+    this.obsAbierta = this.parseDetalle(log.Detalle) ?? {
+      texto: this.descripcionAccion(log),
+    };
+    this.obsLogAbierto = log;
   }
 
   detenerPropagacion(event: Event): void {
@@ -341,12 +305,58 @@ export class AuditPanelComponent implements OnChanges {
     }
   }
 
+  accionLabel(accion?: string): string {
+    if (!accion) return 'Acción registrada';
+
+    return accion
+      .replace(/([a-záéíóúñ])([A-ZÁÉÍÓÚÑ])/g, '$1 $2')
+      .replace(/^./, (value) => value.toUpperCase());
+  }
+
+  entidadLabel(entidad?: string): string {
+    const labels: Record<string, string> = {
+      Prestamo: 'Préstamo',
+      GrupoEquipo: 'Grupo de equipos',
+      EmpresaMantenimiento: 'Empresa de mantenimiento',
+      ConfiguracionSistema: 'Configuración del sistema',
+    };
+
+    return labels[entidad ?? ''] ?? entidad ?? this.entidad;
+  }
+
+  descripcionAccion(log: AuditLogDto): string {
+    const entidad = this.entidadLabel(log.Entidad).toLowerCase();
+    const registro = log.EntidadId ? ` ${log.EntidadId}` : '';
+    const action = log.Accion?.toLowerCase();
+    const descriptions: Record<string, string> = {
+      crear: `Se creó el registro de ${entidad}${registro}.`,
+      editar: `Se actualizaron los datos de ${entidad}${registro}.`,
+      eliminar: `Se eliminó el registro de ${entidad}${registro}.`,
+      aprobar: `Se aprobó el ${entidad}${registro}.`,
+      rechazar: `Se rechazó el ${entidad}${registro}.`,
+      recoger: `Se registró la entrega del ${entidad}${registro}.`,
+      devolver: `Se registró la devolución del ${entidad}${registro}.`,
+      cancelar: `Se canceló el ${entidad}${registro}.`,
+      bloquear: `Se bloqueó el registro de ${entidad}${registro}.`,
+      desbloquear: `Se desbloqueó el registro de ${entidad}${registro}.`,
+      atrasadoautomatico: `El sistema marcó el ${entidad}${registro} como atrasado.`,
+      registrarcontrato: `Se registró el contrato del ${entidad}${registro}.`,
+      eliminarcontrato: `Se eliminó el contrato del ${entidad}${registro}.`,
+      eliminarcomentario: `Se eliminó un comentario de ${entidad}${registro}.`,
+    };
+
+    return (
+      descriptions[action ?? ''] ??
+      `Se registró una acción en ${entidad}${registro}.`
+    );
+  }
+
   private auditSortValue(log: AuditLogDto, columna: string): unknown {
     const values: Record<string, unknown> = {
       Fecha: log.Timestamp,
       Actor: log.AdminNombre || log.AdminCarnet,
       Acción: log.Accion,
-      ID: log.EntidadId,
+      Registro: log.EntidadId,
       Detalle: this.resumenObs(log),
     };
 
@@ -369,6 +379,81 @@ export class AuditPanelComponent implements OnChanges {
       { value: '', label: 'Todas las acciones' },
       ...this.acciones.map((accion) => ({ value: accion, label: accion })),
     ];
+  }
+
+  private normalizarDetalle(
+    value: Record<string, unknown>,
+  ): AuditObservationDetail {
+    const detail = value as unknown as AuditObservationDetail;
+    const legacy =
+      typeof detail.texto === 'string'
+        ? this.parseLegacyLoanDetail(detail.texto)
+        : null;
+
+    if (legacy) return legacy;
+
+    const ignored = new Set([
+      'observacion',
+      'texto',
+      'equipos',
+      'usuarioNombre',
+      'usuarioCarnet',
+      'equiposPrestamo',
+      'fechaInicio',
+      'fechaDevolucion',
+      'cambios',
+    ]);
+    const datos = Object.entries(value)
+      .filter(([key]) => !ignored.has(key) && !this.esClaveSensible(key))
+      .map(([key, item]) => ({
+        etiqueta: this.etiquetaDato(key),
+        valor: this.formatearDato(item),
+      }))
+      .filter((item) => item.valor !== '');
+
+    return {
+      ...detail,
+      datos: datos.length ? datos : undefined,
+    };
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return !!value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  private esClaveSensible(key: string): boolean {
+    return /(contrasena|password|token|hash|secret|imagen|firma|googleid|refresh)/i.test(
+      key,
+    );
+  }
+
+  private etiquetaDato(key: string): string {
+    const labels: Record<string, string> = {
+      cuentaRecreada: 'Cuenta recreada',
+      aceptoTerminos: 'Aceptó términos',
+      versionTerminos: 'Versión de términos',
+      fechaAceptacion: 'Fecha de aceptación',
+      anterior: 'Valor anterior',
+    };
+
+    return (
+      labels[key] ??
+      key
+        .replace(/([a-záéíóúñ])([A-ZÁÉÍÓÚÑ])/g, '$1 $2')
+        .replace(/^./, (value) => value.toUpperCase())
+    );
+  }
+
+  private formatearDato(value: unknown): string {
+    if (value === null || value === undefined || value === '')
+      return 'Sin valor';
+    if (typeof value === 'boolean') return value ? 'Sí' : 'No';
+    if (typeof value === 'string' || typeof value === 'number')
+      return String(value);
+    if (Array.isArray(value) && value.every((item) => typeof item !== 'object'))
+      return value.join(', ');
+
+    return '';
   }
 
   private parseLegacyLoanDetail(detail: string): AuditObservationDetail | null {

@@ -529,12 +529,19 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
 
     public async Task<Result<object>> Delete(string carnet)
     {
+        var previous = await Repository.GetTrackedByCarnet(carnet);
+        var previousDto = previous == null ? null : _mapper.ToDto(previous);
         var deleteResult = await Repository.Delete(carnet);
 
         if (deleteResult.IsSuccess)
         {
             _ = await _cacheRepository.Remove(CacheKeys.Usuario(carnet));
-            await Audit!.Log(AuditAccion.Eliminar, typeof(UsuarioEntity).Name, carnet);
+            await Audit!.Log(
+                AuditAccion.Eliminar,
+                typeof(UsuarioEntity).Name,
+                carnet,
+                AuditChangeDetail.BuildDeleted(previousDto)
+            );
         }
 
         return deleteResult;

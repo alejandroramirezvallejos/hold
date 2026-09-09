@@ -49,4 +49,46 @@ internal class AuditChangeDetailTests
         detail.Should().NotContain("anterior@ucb.edu.bo");
         detail.Should().NotContain("nuevo@ucb.edu.bo");
     }
+
+    [Test]
+    public void BuildCreated_RecordsVisibleSnapshotWithoutSensitiveValues()
+    {
+        var detail = AuditChangeDetail.BuildCreated(new UsuarioDto
+        {
+            Nombre = "Ana",
+            Email = "ana@ucb.edu.bo",
+            ImagenFirma = [1, 2],
+            Rol = "docente",
+        });
+
+        using var json = JsonDocument.Parse(detail!);
+        var changes = json.RootElement.GetProperty("cambios").EnumerateArray().ToList();
+
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Nombre"
+            && change.GetProperty("nuevo").GetString() == "Ana"
+        );
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Email"
+            && change.GetProperty("protegido").GetBoolean()
+        );
+        detail.Should().NotContain("ana@ucb.edu.bo");
+    }
+
+    [Test]
+    public void BuildDeleted_RecordsOnlyPreviousVisibleValues()
+    {
+        var detail = AuditChangeDetail.BuildDeleted(new UsuarioDto
+        {
+            Nombre = "Ana",
+            Rol = "docente",
+        });
+
+        using var json = JsonDocument.Parse(detail!);
+        var name = json.RootElement.GetProperty("cambios").EnumerateArray()
+            .Single(change => change.GetProperty("campo").GetString() == "Nombre");
+
+        name.GetProperty("anterior").GetString().Should().Be("Ana");
+        name.GetProperty("nuevo").ValueKind.Should().Be(JsonValueKind.Null);
+    }
 }

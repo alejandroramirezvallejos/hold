@@ -36,7 +36,8 @@ public class GaveteroService : Service<GaveteroEntity, GaveteroRepository, Gavet
             await Audit!.Log(
                 AuditAccion.Crear,
                 typeof(GaveteroEntity).Name,
-                result.Value?.Id?.ToString(CultureInfo.InvariantCulture)
+                result.Value?.Id?.ToString(CultureInfo.InvariantCulture),
+                AuditChangeDetail.BuildCreated(result.Value)
             );
         }
 

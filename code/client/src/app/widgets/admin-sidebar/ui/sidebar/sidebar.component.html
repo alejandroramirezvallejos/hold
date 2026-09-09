@@ -1,16 +1,42 @@
 @if (sidebarService.isOpen()) {
-  <div class="sidebar-menu">
-    <div class="contenido">
-      @for (nav of contenido; track $index) {
-        <div
-          class="item"
-          [class.active]="nav === activeItem"
-          (click)="clickitem(nav)"
-        >
-          <i [class]="getIcon(nav)"></i>
-          <span class="item-text">{{ nav }}</span>
-        </div>
-      }
-    </div>
-  </div>
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    aria-label="Cerrar navegación administrativa"
+    (click)="sidebarService.close()"
+  ></button>
 }
+<aside
+  class="sidebar-menu"
+  [class.sidebar-menu--open]="sidebarService.isOpen()"
+  aria-label="Navegación administrativa"
+>
+  <header class="sidebar-header">
+    <div>
+      <strong>Administración</strong>
+      <span>Gestión del sistema</span>
+    </div>
+    <button
+      type="button"
+      class="sidebar-close"
+      aria-label="Cerrar navegación administrativa"
+      (click)="sidebarService.close()"
+    >
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </header>
+  <nav class="contenido" aria-label="Secciones de administración">
+    @for (nav of contenido; track nav) {
+      <button
+        type="button"
+        class="item"
+        [class.active]="nav === activeItem"
+        [attr.aria-current]="nav === activeItem ? 'page' : null"
+        (click)="clickitem(nav)"
+      >
+        <i [class]="getIcon(nav)" aria-hidden="true"></i>
+        <span class="item-text">{{ nav }}</span>
+      </button>
+    }
+  </nav>
+</aside>
