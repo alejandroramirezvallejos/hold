@@ -1715,10 +1715,10 @@ body select:not(.ng-select):not([multiple]):not([size]) {
   .obs-close,
   .modal-close-btn,
   .close-button {
-    width: 1.75rem !important;
-    height: 1.75rem !important;
-    min-width: unset !important;
-    min-height: unset !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
     top: 0.75rem !important;
     right: 0.75rem !important;
   }
@@ -1728,10 +1728,10 @@ body select:not(.ng-select):not([multiple]):not([size]) {
   .obs-close,
   .modal-close-btn,
   .close-button {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    min-width: unset !important;
-    min-height: unset !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
     top: 0.6rem !important;
     right: 0.6rem !important;
   }

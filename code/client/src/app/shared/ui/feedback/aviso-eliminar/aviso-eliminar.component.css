@@ -21,8 +21,9 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   text-align: center;
   animation: slideIn 0.3s ease-out;
-  min-width: 500px;
-  max-width: 90vw;
+  width: min(31.25rem, calc(100vw - 2rem));
+  min-width: 0;
+  max-width: none;
   border: none;
 }
 .modal-content p {
@@ -101,7 +102,8 @@
 }
 @media (max-width: 480px) {
   .modal-content {
-    min-width: 90vw;
+    width: calc(100vw - 1rem);
+    min-width: 0;
     padding: 1.5rem;
   }
   .modal-content p {
@@ -116,7 +118,8 @@
 }
 @media (max-width: 360px) {
   .modal-content {
-    min-width: 92vw;
+    width: calc(100vw - 0.75rem);
+    min-width: 0;
     padding: 1.2rem;
   }
   .modal-content p {

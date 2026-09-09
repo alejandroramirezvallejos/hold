@@ -37,7 +37,8 @@
 }
 
 .prestamo-atrasado {
-  border-left: 4px solid var(--error);
+  border-color: #fca5a5;
+  background: #fffafa;
 }
 
 .item-header {
@@ -241,6 +242,10 @@
 
   .usuario-nombre {
     font-size: 1rem;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .equipo-info {
@@ -292,6 +297,8 @@
   .fecha-valor {
     width: 100%;
     text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .botones {
@@ -302,6 +309,10 @@
   .botones > .btn,
   .botones-izquierda .btn {
     width: 100%;
+  }
+
+  .botones-izquierda {
+    flex-wrap: wrap;
   }
 
   .hist-empty {

@@ -4,10 +4,12 @@
     <p>Consulta el estado y las fechas de tus reservas de equipos.</p>
   </header>
 
-  <nav class="history-tabs" aria-label="Estados de préstamos">
+  <nav class="history-tabs" aria-label="Estados de préstamos" role="tablist">
     @for (estado of estados; track estado.value) {
       <button
         type="button"
+        role="tab"
+        [attr.aria-selected]="item === estado.value"
         [class.is-active]="item === estado.value"
         (click)="seleccionarEstado(estado.value)"
       >

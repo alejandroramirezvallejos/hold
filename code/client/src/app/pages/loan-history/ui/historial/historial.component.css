@@ -202,8 +202,14 @@
   display: flex;
   gap: 8px;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--border);
+}
+.history-tabs::-webkit-scrollbar {
+  display: none;
 }
 .history-tabs button {
   flex-shrink: 0;
@@ -220,4 +226,16 @@
   border-color: var(--primary, #ffd700);
   color: var(--ink);
   font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .history-tabs {
+    margin-inline: -0.75rem;
+    padding-inline: 0.75rem;
+    scroll-padding-inline: 0.75rem;
+  }
+
+  .history-tabs button {
+    padding-inline: 0.875rem;
+  }
 }
