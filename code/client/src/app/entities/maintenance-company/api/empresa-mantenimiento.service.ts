@@ -35,6 +35,7 @@ export class EmpresamantenimientoService {
             NombreResponsable: item.NombreResponsable,
             ApellidoResponsable: item.ApellidoResponsable,
             Telefono: item.Telefono,
+            Nit: item.Nit,
             Direccion: item.Direccion,
           })),
         ),

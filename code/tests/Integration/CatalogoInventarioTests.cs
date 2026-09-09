@@ -75,6 +75,23 @@ internal class CatalogoInventarioTests : ServiceTest<CatalogoInventarioRepositor
     }
 
     [Test]
+    public async Task Update_PersistsEditedName()
+    {
+        var created = await Sut.Create(new Ambiente { Nombre = "Sala inicial" });
+
+        var updated = await Sut.Update(new Ambiente
+        {
+            Id = created.Value.Id!.Value,
+            Nombre = "Sala actualizada"
+        });
+
+        updated.IsSuccess.Should().BeTrue();
+        Db.ChangeTracker.Clear();
+        Db.Ambientes.Single(ambiente => ambiente.Id == created.Value.Id)
+            .Nombre.Should().Be("Sala actualizada");
+    }
+
+    [Test]
     public async Task Delete_RejectsCatalogAssignedToFurniture()
     {
         var result = await Sut.Create(new Ambiente { Nombre = "Sala" });

@@ -509,6 +509,26 @@ internal class UsuarioServiceTests : ServiceTest<UsuarioService>
     }
 
     [Test]
+    public async Task Update_AdminEditingOtherUser_PersistsChanges()
+    {
+        await Sut.Create(BuildValidUsuario("U001", "u001@ucb.edu.bo"));
+        var edited = BuildValidUsuario("U001", "u001@ucb.edu.bo", contrasena: null);
+        edited.Nombre = "Nombre actualizado";
+
+        var result = await Sut.Update(
+            "U001",
+            edited,
+            callerCarnet: "U999",
+            isAdmin: true
+        );
+
+        result.IsSuccess.Should().BeTrue();
+        Db.ChangeTracker.Clear();
+        Db.Usuarios.Single(user => user.Carnet == "U001")
+            .Nombre.Should().Be("Nombre actualizado");
+    }
+
+    [Test]
     public async Task Update_NonAdminSendingRol_IsIgnored()
     {
         await Sut.Create(BuildValidUsuario("U001", "u001@ucb.edu.bo"));
