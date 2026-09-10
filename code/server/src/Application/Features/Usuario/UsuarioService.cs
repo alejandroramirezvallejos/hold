@@ -79,6 +79,7 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
         if (isLabAdmin && user.Rol is Core.Entities.TipoUsuario.Administrador or Core.Entities.TipoUsuario.Administrador_Laboratorio)
             return Result<object>.Forbidden();
 
+        var previousAuditState = new { user.Bloqueado, user.MotivoBloqueo };
         user.Bloqueado = isBlocked;
         user.MotivoBloqueo = isBlocked ? blockReason : null;
         await Repository.UpdateEntity(
@@ -91,7 +92,10 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
             isBlocked ? AuditAccion.Bloquear : AuditAccion.Desbloquear,
             typeof(UsuarioEntity).Name,
             carnet,
-            blockReason,
+            AuditChangeDetail.Build(
+                previousAuditState,
+                new { user.Bloqueado, user.MotivoBloqueo }
+            ),
             saveChanges: false
         );
 
@@ -299,6 +303,10 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
             return Result<UsuarioDto>.NotFound();
 
         var previous = _mapper.ToDto(existing);
+        previous.CarreraNombre = await _queries.GetCarreraName(
+            existing.IdCarrera,
+            cancellationToken
+        );
 
         if (!isAdmin)
             PreserveTraceableFields(dto, existing);

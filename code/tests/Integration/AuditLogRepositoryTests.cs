@@ -123,6 +123,30 @@ internal class AuditLogRepositoryTests : ServiceTest<AuditLogRepository>
         result.Single().EntidadNombre.Should().Be("Fernando Terrazas Llanos");
     }
 
+    [Test]
+    public async Task GetFiltered_ResolvesNamesFromSoftDeletedRecords()
+    {
+        Db.Categorias.Add(new Categoria
+        {
+            Id = 7,
+            Nombre = "Instrumentación",
+            EstadoEliminado = true,
+        });
+        Db.AuditLogs.Add(new AuditLog
+        {
+            Accion = "Eliminar",
+            Entidad = "Categoria",
+            EntidadId = "7",
+            AdminNombre = "Administrador",
+            AdminCarnet = "100",
+        });
+        await Db.SaveChangesAsync();
+
+        var result = await Sut.GetFiltered("Categoria", null, null, null, null);
+
+        result.Single().EntidadNombre.Should().Be("Instrumentación");
+    }
+
     private static AuditLog BuildLog(
         string action,
         string actorName,

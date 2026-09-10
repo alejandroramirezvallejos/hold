@@ -238,6 +238,14 @@ public class PrestamoService : Service<PrestamoEntity, PrestamoRepository, Prest
 
         }
 
+        var previousAuditState = new
+        {
+            loan.EstadoPrestamo,
+            loan.Observacion,
+            loan.MotivoRechazo,
+            loan.AutorizadoPor,
+            loan.EntregadoPor,
+        };
         loan.EstadoPrestamo = parsedState.Value;
         if (parsedState == EstadoPrestamo.Aprobado) loan.AutorizadoPor = actor;
         if (parsedState == EstadoPrestamo.Activo) loan.EntregadoPor = actor;
@@ -261,14 +269,25 @@ public class PrestamoService : Service<PrestamoEntity, PrestamoRepository, Prest
                 id,
                 observacion,
                 body,
+                previousAuditState.EstadoPrestamo,
                 cancellationToken
             );
             auditDetail = returnResult.AuditDetail;
             equipmentObservationMessage = returnResult.UserMessage;
             hasDamagedEquipment = returnResult.HasDamagedEquipment;
         }
-        else if (!string.IsNullOrWhiteSpace(observacion))
-            auditDetail = JsonSerializer.Serialize(new { observacion });
+        else
+            auditDetail = AuditChangeDetail.Build(
+                previousAuditState,
+                new
+                {
+                    loan.EstadoPrestamo,
+                    loan.Observacion,
+                    loan.MotivoRechazo,
+                    loan.AutorizadoPor,
+                    loan.EntregadoPor,
+                }
+            );
 
         var auditAction = parsedState.Value switch
         {
@@ -319,7 +338,10 @@ public class PrestamoService : Service<PrestamoEntity, PrestamoRepository, Prest
         loan.Observacion = observation?.Trim();
         await Repository.UpdateTracked(loan, token);
         await Audit!.Log(AuditAccion.Editar, typeof(PrestamoEntity).Name, id.ToString(CultureInfo.InvariantCulture),
-            JsonSerializer.Serialize(new { anterior = previous, observacion = loan.Observacion }));
+            AuditChangeDetail.Build(
+                new { Observacion = previous },
+                new { Observacion = loan.Observacion }
+            ));
         return await _queries.Get(id, token);
     }
 
@@ -488,11 +510,19 @@ public class PrestamoService : Service<PrestamoEntity, PrestamoRepository, Prest
         int id,
         string? observacion,
         PrestamoDto? body,
+        EstadoPrestamo previousState,
         CancellationToken cancellationToken
     )
     {
         if (body?.EquiposRetorno == null || body.EquiposRetorno.Count == 0)
-            return (null, null, false);
+            return (
+                AuditChangeDetail.Build(
+                    new { EstadoPrestamo = previousState },
+                    new { EstadoPrestamo = EstadoPrestamo.Finalizado }
+                ),
+                null,
+                false
+            );
 
         var statesByCodigoImt = new Dictionary<int, EstadoEquipo>();
 
@@ -515,6 +545,16 @@ public class PrestamoService : Service<PrestamoEntity, PrestamoRepository, Prest
             new
             {
                 observacion,
+                cambios = new[]
+                {
+                    new
+                    {
+                        campo = "Estado del préstamo",
+                        protegido = false,
+                        anterior = PrestamoState.ToText(previousState),
+                        nuevo = PrestamoState.ToText(EstadoPrestamo.Finalizado),
+                    },
+                },
                 equipos = appliedReturns.Select(appliedReturn => new
                 {
                     codigo = appliedReturn.CodigoImt,

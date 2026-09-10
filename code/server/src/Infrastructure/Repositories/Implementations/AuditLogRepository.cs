@@ -160,6 +160,7 @@ public class AuditLogRepository
         if (entity == nameof(Usuario))
             return await _db.Usuarios
                 .AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => entityIds.Contains(item.Carnet))
                 .ToDictionaryAsync(
                     item => item.Carnet,
@@ -176,46 +177,57 @@ public class AuditLogRepository
         var labels = entity switch
         {
             nameof(Ambiente) => await _db.Ambientes.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Procedencia) => await _db.Procedencias.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Carrera) => await _db.Carreras.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Categoria) => await _db.Categorias.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(GrupoEquipo) => await _db.GruposEquipos.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Mueble) => await _db.Muebles.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Gavetero) => await _db.Gaveteros.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Accesorio) => await _db.Accesorios.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Componente) => await _db.Componentes.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(EmpresaMantenimiento) => await _db.EmpresasMantenimiento.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(item.Id, item.Nombre))
                 .ToListAsync(),
             nameof(Equipo) => await _db.Equipos.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(
                     item.Id,
@@ -223,6 +235,7 @@ public class AuditLogRepository
                 ))
                 .ToListAsync(),
             nameof(Prestamo) => await _db.Prestamos.AsNoTracking()
+                .IgnoreQueryFilters()
                 .Where(item => ids.Contains(item.Id))
                 .Select(item => new EntityLabel(
                     item.Id,
@@ -233,7 +246,8 @@ public class AuditLogRepository
                 .ToListAsync(),
             nameof(Mantenimiento) => await (
                 from maintenance in _db.Mantenimientos.AsNoTracking()
-                join company in _db.EmpresasMantenimiento.AsNoTracking()
+                    .IgnoreQueryFilters()
+                join company in _db.EmpresasMantenimiento.AsNoTracking().IgnoreQueryFilters()
                     on maintenance.IdEmpresa equals company.Id
                 where ids.Contains(maintenance.Id)
                 select new EntityLabel(maintenance.Id, "Mantenimiento con " + company.Nombre)
