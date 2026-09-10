@@ -19,7 +19,9 @@ describe('SidebarComponent', () => {
   });
 
   it('keeps the desktop navigation available and closes after selection', () => {
-    component.contenido = ['Prestamos', 'Usuarios'];
+    component.groups = [
+      { label: 'Préstamos y personas', items: ['Prestamos', 'Usuarios'] },
+    ];
     component.activeItem = 'Prestamos';
     component.sidebarService.isOpen.set(true);
     spyOn(component.item, 'emit');
@@ -29,6 +31,7 @@ describe('SidebarComponent', () => {
     const buttons = aside.querySelectorAll('.item');
     expect(aside).not.toBeNull();
     expect(buttons.length).toBe(2);
+    expect(aside.textContent).not.toContain('Gestión del sistema');
     expect(buttons[0].getAttribute('aria-current')).toBe('page');
 
     buttons[1].click();

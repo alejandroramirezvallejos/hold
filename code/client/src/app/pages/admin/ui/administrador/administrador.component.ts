@@ -14,8 +14,39 @@ import { GaveterosTablaComponent } from '@features/admin-lockers';
 import { MantenimientosTablaComponent } from '@features/admin-maintenance';
 import { EmpresasMantenimientoTablaComponent } from '@features/admin-maintenance-companies';
 import { UsuariosTablaComponent } from '@features/admin-users';
-import { SidebarComponent } from '@widgets/admin-sidebar';
+import { AdminNavigationGroup, SidebarComponent } from '@widgets/admin-sidebar';
 import { AdminConfiguracionesComponent } from '../admin-configuraciones/admin-configuraciones.component';
+
+const GENERAL_ADMIN_NAVIGATION: AdminNavigationGroup[] = [
+  {
+    label: 'Préstamos y personas',
+    items: ['Prestamos', 'Usuarios', 'Carreras'],
+  },
+  {
+    label: 'Inventario',
+    items: [
+      'Grupos de Equipos',
+      'Equipos',
+      'Componentes',
+      'Accesorios',
+      'Categorias',
+    ],
+  },
+  {
+    label: 'Ubicaciones',
+    items: ['Ambientes', 'Muebles', 'Gaveteros', 'Procedencias'],
+  },
+  {
+    label: 'Mantenimiento',
+    items: ['Mantenimientos', 'Empresas de Mantenimiento'],
+  },
+  { label: 'Sistema', items: ['Configuraciones'] },
+];
+
+const LAB_ADMIN_NAVIGATION: AdminNavigationGroup[] = [
+  { label: 'Préstamos y personas', items: ['Prestamos', 'Usuarios'] },
+];
+
 @Component({
   selector: 'app-administrador',
   standalone: true,
@@ -40,23 +71,7 @@ import { AdminConfiguracionesComponent } from '../admin-configuraciones/admin-co
   styleUrls: ['./administrador.component.css'],
 })
 export class AdministradorComponent {
-  tablas: string[] = [
-    'Prestamos',
-    'Ambientes',
-    'Procedencias',
-    'Carreras',
-    'Usuarios',
-    'Categorias',
-    'Componentes',
-    'Empresas de Mantenimiento',
-    'Equipos',
-    'Gaveteros',
-    'Grupos de Equipos',
-    'Mantenimientos',
-    'Muebles',
-    'Accesorios',
-    'Configuraciones',
-  ];
+  navigationGroups: AdminNavigationGroup[] = [];
   item: string = 'Prestamos';
   constructor(
     public router: Router,
@@ -65,16 +80,19 @@ export class AdministradorComponent {
   ngOnInit() {
     const rol = this.usuario.obtenerUsuario().rol?.toLowerCase() ?? '';
 
-    if (rol === 'administrador_laboratorio') {
-      this.tablas = ['Prestamos', 'Usuarios'];
-    }
     if (this.usuario.estaVacio()) {
       this.router.navigate(['/login']);
     } else if (!['administrador', 'administrador_laboratorio'].includes(rol)) {
       this.router.navigate(['/inicio']);
+    } else {
+      this.navigationGroups =
+        rol === 'administrador_laboratorio'
+          ? LAB_ADMIN_NAVIGATION
+          : GENERAL_ADMIN_NAVIGATION;
     }
   }
   clickitem(item: string) {
-    if (this.tablas.includes(item)) this.item = item;
+    const allowedItems = this.navigationGroups.flatMap((group) => group.items);
+    if (allowedItems.includes(item)) this.item = item;
   }
 }

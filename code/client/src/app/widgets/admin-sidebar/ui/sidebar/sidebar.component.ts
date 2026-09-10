@@ -8,6 +8,11 @@ import {
 } from '@angular/core';
 import { SidebarService } from '../../model/sidebar.service';
 
+export interface AdminNavigationGroup {
+  label: string;
+  items: string[];
+}
+
 const ICONS: Record<string, string> = {
   Ambientes: 'fas fa-door-open',
   Procedencias: 'fas fa-truck',
@@ -34,7 +39,7 @@ const ICONS: Record<string, string> = {
   encapsulation: ViewEncapsulation.None,
 })
 export class SidebarComponent {
-  @Input() contenido: string[] = [];
+  @Input() groups: AdminNavigationGroup[] = [];
   @Output() item = new EventEmitter<string>();
   @Input() activeItem = '';
 
