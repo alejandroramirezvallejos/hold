@@ -3,11 +3,16 @@
 *::after {
   box-sizing: border-box;
 }
+:host {
+  display: block;
+  width: 100%;
+  padding-inline: var(--page-gutter);
+}
 .container-search {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: min(500px, 90%);
+  width: min(500px, 100%);
   margin: 20px auto 20px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -233,7 +238,7 @@
 
 @media (max-width: 768px) {
   .container-search {
-    width: 90%;
+    width: min(500px, 100%);
     max-width: none;
     margin: 20px auto 20px;
   }
@@ -257,7 +262,7 @@
 
 @media (max-width: 480px) {
   .container-search {
-    width: 95%;
+    width: 100%;
     margin: 15px auto 15px;
   }
   .search-input {

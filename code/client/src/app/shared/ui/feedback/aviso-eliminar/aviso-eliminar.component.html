@@ -1,10 +1,37 @@
-<div class="alerta-eliminar">
-  <div class="modal-content">
-    <button class="cerrar" (click)="onCancelar()" aria-label="Cerrar">
-      <img src="assets/x.png" alt="Cerrar" />
+<div class="confirm-overlay">
+  <section
+    class="confirm-dialog confirm-dialog--danger"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="delete-title"
+  >
+    <button
+      type="button"
+      class="confirm-dialog__close"
+      (click)="onCancelar()"
+      aria-label="Cerrar"
+    >
+      <img src="assets/x.png" alt="" />
     </button>
-    <p>{{ mensaje }}</p>
-    <button class="btn btn-confirm" (click)="onAceptar()">Sí</button>
-    <button class="btn btn-cancel" (click)="onCancelar()">No</button>
-  </div>
+    <header class="confirm-dialog__header">
+      <span class="confirm-dialog__icon" aria-hidden="true">
+        <i class="fas fa-trash-alt"></i>
+      </span>
+      <div>
+        <h2 id="delete-title">Confirmar eliminación</h2>
+        <p>Esta acción retirará el registro de las listas activas.</p>
+      </div>
+    </header>
+    <div class="confirm-dialog__body">
+      <p>{{ mensaje }}</p>
+    </div>
+    <footer class="confirm-dialog__actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancelar()">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-danger" (click)="onAceptar()">
+        Eliminar
+      </button>
+    </footer>
+  </section>
 </div>

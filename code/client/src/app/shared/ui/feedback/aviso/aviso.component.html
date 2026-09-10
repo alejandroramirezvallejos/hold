@@ -1,13 +1,37 @@
-<div class="container">
-  <button class="cerrar" (click)="click()" aria-label="Cerrar">
-    <img src="assets/x.png" alt="Cerrar" />
-  </button>
-  <h1>Aviso</h1>
-  <div class="mensaje-container">
-    <p>{{ mensaje }}</p>
-  </div>
-  <div class="botones-container">
-    <button type="button" class="volver-btn" (click)="click()">Cancelar</button>
-    <button type="button" class="aceptar" (click)="onAceptar()">Aceptar</button>
-  </div>
+<div class="confirm-overlay">
+  <section
+    class="confirm-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirm-title"
+  >
+    <button
+      type="button"
+      class="confirm-dialog__close"
+      (click)="click()"
+      aria-label="Cerrar"
+    >
+      <img src="assets/x.png" alt="" />
+    </button>
+    <header class="confirm-dialog__header">
+      <span class="confirm-dialog__icon" aria-hidden="true">
+        <i class="fas fa-circle-question"></i>
+      </span>
+      <div>
+        <h2 id="confirm-title">Confirmar acción</h2>
+        <p>Revisa la información antes de continuar.</p>
+      </div>
+    </header>
+    <div class="confirm-dialog__body">
+      <p>{{ mensaje }}</p>
+    </div>
+    <footer class="confirm-dialog__actions">
+      <button type="button" class="btn btn-secondary" (click)="click()">
+        Cancelar
+      </button>
+      <button type="button" class="btn btn-primary" (click)="onAceptar()">
+        Confirmar
+      </button>
+    </footer>
+  </section>
 </div>

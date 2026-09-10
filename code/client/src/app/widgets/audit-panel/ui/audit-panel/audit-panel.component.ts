@@ -9,7 +9,10 @@ import {
 import { FormsModule } from '@angular/forms';
 import { AuditLogDto } from '@entities/admin';
 import { AuditLogApiService } from '@entities/audit-log';
-import { FlatpickrDirective } from '@shared/lib/directives';
+import {
+  FlatpickrDirective,
+  StickyScrollDirective,
+} from '@shared/lib/directives';
 import { printTable, TablePaginationComponent } from '@shared/lib/admin-table';
 import { CustomSelectComponent, OpcionSelect } from '@shared/ui';
 import { parseJsonResult } from '@shared/lib/result';
@@ -50,6 +53,7 @@ const ACCIONES_POR_ENTIDAD: Record<string, string[]> = {
     DatePipe,
     FormsModule,
     FlatpickrDirective,
+    StickyScrollDirective,
     TablePaginationComponent,
     CustomSelectComponent,
   ],

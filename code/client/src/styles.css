@@ -917,6 +917,208 @@ app-administrador .table-responsive::-webkit-scrollbar-track {
   -webkit-overflow-scrolling: touch;
 }
 
+.sticky-scroll-host {
+  overflow-x: auto !important;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--scrollbar-thumb) transparent !important;
+  scrollbar-width: thin !important;
+}
+
+.sticky-scroll-host::-webkit-scrollbar {
+  display: block !important;
+  height: var(--scrollbar-size) !important;
+}
+
+.sticky-scroll-host--floating {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+}
+
+.sticky-scroll-host--floating::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.sticky-scroll-rail {
+  position: fixed;
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  z-index: 950;
+  height: 0.875rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--radius-full);
+  background: rgba(248, 250, 252, 0.92);
+  box-shadow: var(--shadow-sm);
+  scrollbar-color: var(--scrollbar-thumb-hover) transparent;
+  scrollbar-width: thin;
+}
+
+.sticky-scroll-rail[hidden] {
+  display: none;
+}
+
+.sticky-scroll-rail__spacer {
+  height: 1px;
+}
+
+.sticky-scroll-rail::-webkit-scrollbar {
+  display: block !important;
+  height: var(--scrollbar-size) !important;
+}
+
+.sticky-scroll-rail::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb-hover) !important;
+  border: 2px solid transparent !important;
+  border-radius: var(--radius-full) !important;
+  background-clip: content-box !important;
+}
+
+.sticky-scroll-rail::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  display: grid;
+  place-items: center;
+  padding: var(--sp-4);
+  background: rgba(15, 23, 42, 0.44);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: fadeIn 180ms ease-out both;
+}
+
+.confirm-dialog {
+  position: relative;
+  width: min(28rem, 100%);
+  max-height: min(85dvh, 40rem);
+  overflow-y: auto;
+  padding: var(--sp-6);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-xl);
+  color: var(--ink);
+  font-family: var(--font);
+  animation: modalIn 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.confirm-dialog__close {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0.625rem;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+}
+
+.confirm-dialog__close:hover {
+  background: var(--sidebar);
+}
+
+.confirm-dialog__close img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.confirm-dialog__header {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+  padding-right: 2.75rem;
+}
+
+.confirm-dialog__icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--interactive-subtle);
+  color: var(--brand-text);
+}
+
+.confirm-dialog--danger .confirm-dialog__icon {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.confirm-dialog__header h2,
+.confirm-dialog__header p,
+.confirm-dialog__body p {
+  margin: 0;
+}
+
+.confirm-dialog__header h2 {
+  font-size: 1.125rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.confirm-dialog__header p {
+  margin-top: var(--sp-1);
+  color: var(--ink-secondary);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.confirm-dialog__body {
+  margin-top: var(--sp-5);
+  padding: var(--sp-4);
+  border-radius: var(--radius-md);
+  background: var(--sidebar);
+}
+
+.confirm-dialog__body p {
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+@media (max-width: 480px) {
+  .confirm-overlay {
+    align-items: end;
+    padding: var(--sp-2);
+  }
+
+  .confirm-dialog {
+    width: 100%;
+    padding: var(--sp-5);
+    border-radius: var(--radius-lg) var(--radius-lg) var(--radius-sm)
+      var(--radius-sm);
+  }
+
+  .confirm-dialog__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .confirm-dialog__actions .btn {
+    width: 100%;
+  }
+}
+
 .admin-section-header {
   display: flex;
   align-items: center;
@@ -1720,6 +1922,7 @@ body select:not(.ng-select):not([multiple]):not([size]) {
 .btn-close,
 .cerrar,
 .close-button,
+.confirm-dialog__close,
 .modal-close-btn,
 .obs-close {
   display: inline-flex !important;
@@ -1746,6 +1949,7 @@ body select:not(.ng-select):not([multiple]):not([size]) {
   .btn-close:hover,
   .cerrar:hover,
   .close-button:hover,
+  .confirm-dialog__close:hover,
   .modal-close-btn:hover,
   .obs-close:hover {
     background: var(--interactive-subtle) !important;
@@ -1757,6 +1961,7 @@ body select:not(.ng-select):not([multiple]):not([size]) {
 .btn-close:active,
 .cerrar:active,
 .close-button:active,
+.confirm-dialog__close:active,
 .modal-close-btn:active,
 .obs-close:active {
   transform: scale(0.94) !important;
@@ -1764,6 +1969,7 @@ body select:not(.ng-select):not([multiple]):not([size]) {
 .btn-close img,
 .cerrar img,
 .close-button img,
+.confirm-dialog__close img,
 .modal-close-btn img,
 .obs-close img {
   width: 0.875rem !important;
@@ -1777,6 +1983,7 @@ body select:not(.ng-select):not([multiple]):not([size]) {
 
 @media (max-width: 768px) {
   .btn-close,
+  .confirm-dialog__close,
   .obs-close,
   .modal-close-btn,
   .close-button {
@@ -1790,6 +1997,7 @@ body select:not(.ng-select):not([multiple]):not([size]) {
 }
 @media (max-width: 480px) {
   .btn-close,
+  .confirm-dialog__close,
   .obs-close,
   .modal-close-btn,
   .close-button {

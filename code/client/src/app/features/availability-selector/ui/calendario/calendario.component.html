@@ -132,32 +132,62 @@
   </div>
 
   @if (!rangoValido) {
-    <p
-      class="availability-selector__message availability-selector__message--error"
+    <div
+      class="availability-selector__status availability-selector__status--error"
+      role="alert"
     >
-      {{ mensajeRangoInvalido }}
-    </p>
+      <span class="availability-selector__status-icon" aria-hidden="true">
+        <i class="fas fa-exclamation-triangle"></i>
+      </span>
+      <span class="availability-selector__status-copy">
+        <strong>Revisa el horario</strong>
+        <span>{{ mensajeRangoInvalido }}</span>
+      </span>
+    </div>
   } @else if (cargando) {
-    <p class="availability-selector__message">Consultando disponibilidad...</p>
+    <div class="availability-selector__status" role="status">
+      <span class="availability-selector__status-icon" aria-hidden="true">
+        <i class="fas fa-spinner fa-spin"></i>
+      </span>
+      <span class="availability-selector__status-copy">
+        <strong>Consultando disponibilidad</strong>
+        <span>Estamos verificando los equipos para este horario.</span>
+      </span>
+    </div>
   } @else if (consultado) {
-    <p
-      class="availability-selector__message"
-      [class.availability-selector__message--available]="hayDisponibilidad"
-      [class.availability-selector__message--unavailable]="!hayDisponibilidad"
+    <div
+      class="availability-selector__status"
+      [class.availability-selector__status--available]="hayDisponibilidad"
+      [class.availability-selector__status--unavailable]="!hayDisponibilidad"
+      role="status"
     >
-      @if (hayDisponibilidad) {
-        @if (disponibilidad.length === 1) {
-          {{ cantidadDisponible }} unidad{{
-            cantidadDisponible !== 1 ? "es" : ""
-          }}
-          disponible{{ cantidadDisponible !== 1 ? "s" : "" }} para este horario.
+      <span class="availability-selector__status-icon" aria-hidden="true">
+        <i
+          class="fas"
+          [class.fa-check-circle]="hayDisponibilidad"
+          [class.fa-times-circle]="!hayDisponibilidad"
+        ></i>
+      </span>
+      <span class="availability-selector__status-copy">
+        @if (hayDisponibilidad) {
+          @if (disponibilidad.length === 1) {
+            <strong>
+              {{ cantidadDisponible }} unidad{{
+                cantidadDisponible !== 1 ? "es" : ""
+              }}
+              disponible{{ cantidadDisponible !== 1 ? "s" : "" }}
+            </strong>
+            <span>Para el horario seleccionado.</span>
+          } @else {
+            <strong>Equipos disponibles</strong>
+            <span>Todos los equipos seleccionados admiten este horario.</span>
+          }
         } @else {
-          Los equipos seleccionados están disponibles para este horario.
+          <strong>Sin disponibilidad suficiente</strong>
+          <span>Cambia la fecha o la hora para continuar.</span>
         }
-      } @else {
-        No hay suficientes unidades disponibles para este horario.
-      }
-    </p>
+      </span>
+    </div>
     @if (soloAvisoFechasOcupadas && !hayDisponibilidad) {
       <button
         type="button"

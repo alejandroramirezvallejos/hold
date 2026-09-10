@@ -8,7 +8,7 @@
   background: rgba(241, 245, 249, 0.88);
   backdrop-filter: var(--glass-backdrop);
   -webkit-backdrop-filter: var(--glass-backdrop);
-  border-bottom: 1px solid rgba(203, 213, 225, 0.72);
+  border-bottom: 0;
   box-shadow: none;
   position: fixed;
   top: 0;

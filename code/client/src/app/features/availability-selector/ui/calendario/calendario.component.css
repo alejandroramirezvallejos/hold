@@ -261,22 +261,65 @@
   line-height: 1.4;
 }
 
-.availability-selector__message {
-  min-height: 1.25rem;
-  margin: var(--sp-4) 0 0;
+.availability-selector__status {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 4.25rem;
+  margin-top: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--sidebar);
   color: var(--ink-secondary);
-  font-size: 0.85rem;
-  font-weight: 600;
-  line-height: 1.45;
-  text-align: center;
 }
 
-.availability-selector__message--available {
+.availability-selector__status-icon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 2.25rem;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+
+.availability-selector__status-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.125rem;
+}
+
+.availability-selector__status-copy strong {
+  color: var(--ink);
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.availability-selector__status-copy > span {
+  color: var(--ink-secondary);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.availability-selector__status--available {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+}
+
+.availability-selector__status--available .availability-selector__status-icon {
   color: var(--success);
 }
 
-.availability-selector__message--unavailable,
-.availability-selector__message--error {
+.availability-selector__status--unavailable,
+.availability-selector__status--error {
+  border-color: var(--error-border);
+  background: var(--error-bg);
+}
+
+.availability-selector__status--unavailable .availability-selector__status-icon,
+.availability-selector__status--error .availability-selector__status-icon {
   color: var(--error);
 }
 
