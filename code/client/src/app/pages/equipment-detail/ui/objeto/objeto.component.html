@@ -43,93 +43,50 @@
         </div>
       </dl>
       <div class="seccion-compra">
-        @if (consultandoDisponibilidad) {
-          <div class="equipment-availability" role="status">
-            <span class="equipment-availability__icon" aria-hidden="true">
-              <i class="fas fa-spinner fa-spin"></i>
-            </span>
-            <div>
-              <strong>Consultando disponibilidad</strong>
-              <span>Estamos verificando las unidades operativas.</span>
-            </div>
-          </div>
-        } @else if (sinUnidadesOperativas) {
-          <div
-            class="equipment-availability equipment-availability--unavailable"
-            role="alert"
-          >
-            <span class="equipment-availability__icon" aria-hidden="true">
-              <i class="fas fa-times"></i>
-            </span>
-            <div>
-              <strong>Sin unidades operativas</strong>
-              <span>Consulta el calendario para encontrar otra fecha.</span>
-            </div>
-          </div>
-        } @else {
-          <div
-            class="equipment-availability equipment-availability--available"
-            role="status"
-          >
-            <span class="equipment-availability__icon" aria-hidden="true">
-              <i class="fas fa-check"></i>
-            </span>
-            <div>
-              <strong>
-                {{ cantidadDisponible }} unidad{{
-                  cantidadDisponible !== 1 ? "es" : ""
-                }}
-                disponible{{ cantidadDisponible !== 1 ? "s" : "" }}
-              </strong>
-              <span>Disponibilidad estimada para solicitar ahora.</span>
+        @if (!deshabilitarBoton) {
+          <div class="cantidad-selector">
+            <span class="cantidad-label">Cantidad:</span>
+            <div class="stepper">
+              <button
+                class="stepper-btn"
+                (click)="decrementar()"
+                [disabled]="cantidad <= minimumCartQuantity"
+                aria-label="Menos"
+              >
+                −
+              </button>
+              <span class="stepper-value">{{ cantidad }}</span>
+              <button
+                class="stepper-btn"
+                (click)="incrementar()"
+                [disabled]="cantidad >= cantidadDisponible"
+                aria-label="Más"
+              >
+                +
+              </button>
             </div>
           </div>
 
-          @if (!deshabilitarBoton) {
-            <div class="cantidad-selector">
-              <span class="cantidad-label">Cantidad:</span>
-              <div class="stepper">
-                <button
-                  class="stepper-btn"
-                  (click)="decrementar()"
-                  [disabled]="cantidad <= minimumCartQuantity"
-                  aria-label="Menos"
-                >
-                  −
-                </button>
-                <span class="stepper-value">{{ cantidad }}</span>
-                <button
-                  class="stepper-btn"
-                  (click)="incrementar()"
-                  [disabled]="cantidad >= cantidadDisponible"
-                  aria-label="Más"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <div class="acciones-compra">
-              <button
-                (click)="alternarProductoCarrito()"
-                class="boton-carrito"
-                [class.plomo]="addedToCart"
-              >
-                <i
-                  class="fas"
-                  [class.fa-cart-plus]="!addedToCart"
-                  [class.fa-cart-arrow-down]="addedToCart"
-                ></i>
-                {{ addedToCart ? "Quitar del carrito" : "Agregar al carrito" }}
-              </button>
-              <button
-                class="btn btn-secondary ver-disponibilidad-btn"
-                (click)="abrirCalendarioModal()"
-              >
-                <i class="fas fa-calendar-alt"></i> Ver disponibilidad
-              </button>
-            </div>
-          }
+          <div class="acciones-compra">
+            <button
+              (click)="alternarProductoCarrito()"
+              class="boton-carrito"
+              [class.plomo]="addedToCart"
+            >
+              <i
+                class="fas"
+                [class.fa-cart-plus]="!addedToCart"
+                [class.fa-cart-arrow-down]="addedToCart"
+              ></i>
+              {{ addedToCart ? "Quitar del carrito" : "Agregar al carrito" }}
+            </button>
+            <button
+              class="btn btn-secondary ver-disponibilidad-btn"
+              (click)="abrirCalendarioModal()"
+            >
+              <i class="fas fa-calendar-alt"></i> Ver disponibilidad
+            </button>
+          </div>
         }
       </div>
     </div>

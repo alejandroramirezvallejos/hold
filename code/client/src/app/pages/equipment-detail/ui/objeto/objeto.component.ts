@@ -13,10 +13,7 @@ import {
 import { ValidatedFormsModule } from '@shared/lib/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-import {
-  AvisoDisponibilidadService,
-  DisponibilidadService,
-} from '@entities/availability';
+import { AvisoDisponibilidadService } from '@entities/availability';
 import { Carrito } from '@entities/cart';
 import {
   ComentarioEquipo,
@@ -63,14 +60,11 @@ export class ObjetoComponent implements AfterViewInit, OnDestroy {
   id: string = '';
   producto: GrupoEquipo = new GrupoEquipo();
   cantidadDisponible: number = 0;
-  totalOperativo: number = 0;
   cargando: boolean = true;
-  consultandoDisponibilidad = false;
   addedToCart = false;
   error: WritableSignal<boolean> = signal(false);
   mensajeerror: string = '';
   deshabilitarBoton = false;
-  sinUnidadesOperativas: boolean = false;
 
   cantidad: number = 1;
 
@@ -121,7 +115,6 @@ export class ObjetoComponent implements AfterViewInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly servicio: GrupoequipoService,
     private readonly carrito: CarritoService,
-    private readonly disponibilidadService: DisponibilidadService,
     private readonly avisoDisponibilidad: AvisoDisponibilidadService,
     private readonly imageCache: ImageCacheService,
     private readonly ngZone: NgZone,
@@ -191,8 +184,9 @@ export class ObjetoComponent implements AfterViewInit, OnDestroy {
               tiempoMaximoPrestamoDias: this.producto.TiempoMaximoPrestamoDias,
             },
           };
+          this.cantidadDisponible =
+            this.producto.Cantidad ?? FALLBACK_MAXIMUM_QUANTITY;
           this.cargando = false;
-          this.obtenerDisponibilidad();
           this.cargarComentarios();
         } else {
           this.cargando = false;
@@ -206,35 +200,6 @@ export class ObjetoComponent implements AfterViewInit, OnDestroy {
         this.error.set(true);
       },
     });
-  }
-
-  obtenerDisponibilidad(): void {
-    const inicio = this.siguienteHorarioConsultable();
-    const fin = new Date(inicio.getTime() + 30 * 60 * 1000);
-    this.consultandoDisponibilidad = true;
-    this.disponibilidadService
-      .obtenerDisponibilidad(inicio, fin, [this.producto.id])
-      .subscribe({
-        next: (data) => {
-          if (data?.length > 0) {
-            this.cantidadDisponible = data[0].CantidadDisponible;
-            this.totalOperativo = data[0].TotalOperativo ?? 0;
-          }
-
-          if (this.totalOperativo === 0) {
-            this.sinUnidadesOperativas = true;
-            this.deshabilitarBoton = true;
-          }
-
-          this.consultandoDisponibilidad = false;
-        },
-        error: () => {
-          this.mensajeerror =
-            'No se pudo obtener la disponibilidad del equipo. Por favor, intenta más tarde.';
-          this.error.set(true);
-          this.consultandoDisponibilidad = false;
-        },
-      });
   }
 
   incrementar(): void {
@@ -540,36 +505,5 @@ export class ObjetoComponent implements AfterViewInit, OnDestroy {
       return;
 
     this.carrito.editarCantidad(this.producto.id, this.cantidad);
-  }
-
-  private siguienteHorarioConsultable(): Date {
-    const inicio = new Date();
-    inicio.setSeconds(0, 0);
-
-    if (inicio.getDay() === 0) {
-      inicio.setDate(inicio.getDate() + 1);
-      inicio.setHours(8, 0, 0, 0);
-      return inicio;
-    }
-
-    if (inicio.getHours() < 8) {
-      inicio.setHours(8, 0, 0, 0);
-      return inicio;
-    }
-
-    if (inicio.getHours() >= 18) {
-      inicio.setDate(inicio.getDate() + 1);
-      if (inicio.getDay() === 0) inicio.setDate(inicio.getDate() + 1);
-      inicio.setHours(8, 0, 0, 0);
-      return inicio;
-    }
-
-    inicio.setMinutes(Math.ceil((inicio.getMinutes() + 1) / 30) * 30);
-    if (inicio.getHours() >= 18) {
-      inicio.setDate(inicio.getDate() + 1);
-      if (inicio.getDay() === 0) inicio.setDate(inicio.getDate() + 1);
-      inicio.setHours(8, 0, 0, 0);
-    }
-    return inicio;
   }
 }

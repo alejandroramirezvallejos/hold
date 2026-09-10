@@ -50,13 +50,17 @@ describe('ObjetoComponent', () => {
     );
   });
 
-  it('consulta el lunes al cerrar el sábado', () => {
-    jasmine.clock().install();
-    jasmine.clock().mockDate(new Date(2026, 7, 22, 19, 0, 0));
+  it('no muestra disponibilidad antes de que el usuario seleccione fechas', () => {
+    component.cargando = false;
+    component.producto.nombre = 'Equipo de prueba';
+    component.cantidadDisponible = 6;
+    fixture.detectChanges();
 
-    const siguienteHorario = component['siguienteHorarioConsultable']();
-
-    expect(siguienteHorario).toEqual(new Date(2026, 7, 24, 8, 0, 0));
-    jasmine.clock().uninstall();
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Disponibilidad estimada para solicitar ahora',
+    );
+    expect(
+      fixture.nativeElement.querySelector('.equipment-availability'),
+    ).toBeNull();
   });
 });
