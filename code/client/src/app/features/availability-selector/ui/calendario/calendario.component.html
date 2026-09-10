@@ -76,10 +76,10 @@
           }
         }
       </div>
-      @if (campoActivo === "inicio" && disponibilidadDias.size > 0) {
+      @if (campoActivo === "inicio" && hayDiasNoDisponibles) {
         <p class="availability-selector__legend">
-          <span aria-hidden="true"></span> No disponible para los equipos
-          seleccionados
+          <span aria-hidden="true"></span> Las fechas tachadas no tienen
+          disponibilidad en este horario
         </p>
       }
     </div>

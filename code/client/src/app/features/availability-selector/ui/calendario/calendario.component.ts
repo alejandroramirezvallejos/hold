@@ -64,6 +64,8 @@ export class CalendarioComponent {
   mensajeerror = 'No se pudo consultar la disponibilidad.';
   horas: HoraOpcion[] = [];
   private minimoInicio!: Date;
+  private disponibilidadRequestId = 0;
+  private calendarioRequestId = 0;
 
   constructor(
     private readonly apiDisponibilidad: DisponibilidadService,
@@ -163,6 +165,12 @@ export class CalendarioComponent {
   get cantidadDisponible(): number {
     if (this.disponibilidad.length !== 1) return 0;
     return this.disponibilidad[0].CantidadDisponible;
+  }
+
+  get hayDiasNoDisponibles(): boolean {
+    return [...this.disponibilidadDias.values()].some(
+      (disponible) => !disponible,
+    );
   }
 
   get horasDisponibles(): HoraOpcion[] {
@@ -388,6 +396,7 @@ export class CalendarioComponent {
   }
 
   private consultarDisponibilidad(): void {
+    const requestId = ++this.disponibilidadRequestId;
     const inicio = this.fechaInicioSeleccionada();
     const fin = this.fechaFinSeleccionada();
     const ids = Object.keys(this.carrito).map(Number);
@@ -402,11 +411,13 @@ export class CalendarioComponent {
     this.error.set(false);
     this.apiDisponibilidad.obtenerDisponibilidad(inicio, fin, ids).subscribe({
       next: (data) => {
+        if (requestId !== this.disponibilidadRequestId) return;
         this.disponibilidad = data;
         this.consultado = true;
         this.cargando = false;
       },
       error: (error) => {
+        if (requestId !== this.disponibilidadRequestId) return;
         this.mensajeerror = extractErrorMessage(
           error,
           'No se pudo consultar la disponibilidad.',
@@ -425,6 +436,7 @@ export class CalendarioComponent {
   }
 
   private consultarDisponibilidadMes(): void {
+    const requestId = ++this.calendarioRequestId;
     const inicio = this.fechaInicioSeleccionada();
     const fin = this.fechaFinSeleccionada();
     const grupos = Object.entries(this.carrito)
@@ -449,6 +461,8 @@ export class CalendarioComponent {
       .find((dia) => dia !== null);
     if (!primerDia || !ultimoDia) return;
 
+    this.disponibilidadDias.clear();
+
     this.apiDisponibilidad
       .obtenerDisponibilidadCalendario(
         inicio,
@@ -458,8 +472,14 @@ export class CalendarioComponent {
         grupos,
       )
       .subscribe({
-        next: (dias) => this.actualizarDisponibilidadDias(dias),
-        error: () => this.disponibilidadDias.clear(),
+        next: (dias) => {
+          if (requestId !== this.calendarioRequestId) return;
+          this.actualizarDisponibilidadDias(dias);
+        },
+        error: () => {
+          if (requestId !== this.calendarioRequestId) return;
+          this.disponibilidadDias.clear();
+        },
       });
   }
 

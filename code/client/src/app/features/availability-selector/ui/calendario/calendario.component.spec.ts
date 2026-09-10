@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Disponibilidad, DisponibilidadService } from '@entities/availability';
 import { withDefaultTestingProviders } from '@shared/lib/testing';
+import { Subject } from 'rxjs';
 import { CalendarioComponent } from './calendario.component';
 describe('CalendarioComponent', () => {
   let component: CalendarioComponent;
@@ -82,6 +84,16 @@ describe('CalendarioComponent', () => {
 
     expect(component.esDiaSinDisponibilidad(unavailable)).toBeTrue();
     expect(component.esDiaDeshabilitado(unavailable)).toBeTrue();
+    expect(component.hayDiasNoDisponibles).toBeTrue();
+  });
+
+  it('does not show an unavailable legend when every returned day is available', () => {
+    component.disponibilidadDias = new Map([
+      ['2030-01-07', true],
+      ['2030-01-08', true],
+    ]);
+
+    expect(component.hayDiasNoDisponibles).toBeFalse();
   });
 
   it('disables dates and times beyond the selected groups maximum duration', () => {
@@ -107,5 +119,57 @@ describe('CalendarioComponent', () => {
     expect(component.rangoValido).toBeTrue();
     expect(component.esDiaDeshabilitado(new Date(2030, 0, 12))).toBeTrue();
     expect(component.horaDeshabilitada('fin', '08:30')).toBeTrue();
+  });
+
+  it('ignores a stale availability response after the selected time changes', () => {
+    const service = TestBed.inject(DisponibilidadService);
+    const firstResponse = new Subject<Disponibilidad[]>();
+    const secondResponse = new Subject<Disponibilidad[]>();
+    spyOn(service, 'obtenerDisponibilidad').and.returnValues(
+      firstResponse,
+      secondResponse,
+    );
+    component.carrito = {
+      1: {
+        nombre: 'Equipo',
+        modelo: '',
+        marca: '',
+        cantidad: 1,
+        fecha_inicio: null,
+        fecha_final: null,
+        imagen: '',
+        precio: 0,
+        cantidadMax: 2,
+        tiempoMaximoPrestamoDias: 1,
+      },
+    };
+    component.fechaInicioSeleccionada.set(new Date(2030, 0, 10, 8, 0));
+    component.fechaFinSeleccionada.set(new Date(2030, 0, 10, 8, 30));
+    const consultar = (
+      component as unknown as { consultarDisponibilidad: () => void }
+    ).consultarDisponibilidad.bind(component);
+
+    consultar();
+    component.fechaInicioSeleccionada.set(new Date(2030, 0, 10, 9, 0));
+    component.fechaFinSeleccionada.set(new Date(2030, 0, 10, 9, 30));
+    consultar();
+    secondResponse.next([
+      {
+        IdGrupoEquipo: 1,
+        CantidadDisponible: 2,
+        TotalOperativo: 2,
+        Fecha: null,
+      },
+    ]);
+    firstResponse.next([
+      {
+        IdGrupoEquipo: 1,
+        CantidadDisponible: 0,
+        TotalOperativo: 2,
+        Fecha: null,
+      },
+    ]);
+
+    expect(component.hayDisponibilidad).toBeTrue();
   });
 });

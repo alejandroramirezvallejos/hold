@@ -156,9 +156,14 @@
 }
 
 .availability-selector__day--unavailable {
-  color: #8a3430;
-  background: #fff0ef;
+  border-color: #d7a7a4;
+  color: #7b2f2a;
+  background: #fbeceb;
   text-decoration: line-through;
+}
+
+.availability-selector__day--unavailable:disabled {
+  opacity: 1;
 }
 
 .availability-selector__legend {
