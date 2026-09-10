@@ -63,7 +63,7 @@ public static class AuditChangeDetail
 
         var changes = typeof(T)
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .Where(property => property.CanRead && !IgnoredProperties.Contains(property.Name))
+            .Where(IsVisibleProperty)
             .Select(property => CreateChange(property, previous, current))
             .Where(change => change != null)
             .ToList();
@@ -89,7 +89,7 @@ public static class AuditChangeDetail
 
         var changes = typeof(T)
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .Where(property => property.CanRead && !IgnoredProperties.Contains(property.Name))
+            .Where(IsVisibleProperty)
             .Select(property => CreateSnapshot(property, value, created))
             .Where(change => change != null)
             .ToList();
@@ -170,6 +170,11 @@ public static class AuditChangeDetail
 
         return Equals(previous, current);
     }
+
+    private static bool IsVisibleProperty(PropertyInfo property) =>
+        property.CanRead
+        && !IgnoredProperties.Contains(property.Name)
+        && !property.Name.StartsWith("Id", StringComparison.OrdinalIgnoreCase);
 
     private static string FormatValue(object? value)
     {

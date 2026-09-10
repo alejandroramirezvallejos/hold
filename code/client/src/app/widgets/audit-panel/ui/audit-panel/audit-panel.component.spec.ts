@@ -74,12 +74,15 @@ describe('AuditPanelComponent', () => {
       Accion: 'Eliminar',
       Entidad: 'Equipo',
       EntidadId: '25',
+      EntidadNombre: 'IMT 240000025 · Osciloscopio',
     } as AuditLogDto;
 
     component.abrirObs(log);
 
     expect(component.obsLogAbierto).toBe(log);
-    expect(component.obsAbierta?.texto).toContain('equipo 25');
+    expect(component.obsAbierta?.texto).toContain(
+      'IMT 240000025 · Osciloscopio',
+    );
   });
 
   it('does not expose generic sensitive fields in structured details', () => {
@@ -99,12 +102,14 @@ describe('AuditPanelComponent', () => {
         Accion: 'Crear',
         Entidad: 'Equipo',
         EntidadId: '10',
+        EntidadNombre: 'IMT 10 · Equipo A',
       },
       {
         Id: 2,
         Accion: 'Editar',
         Entidad: 'Equipo',
         EntidadId: '11',
+        EntidadNombre: 'IMT 11 · Equipo B',
         Detalle: '{"texto":"Se modificó 1 campo."}',
       },
     ];
@@ -132,6 +137,7 @@ describe('AuditPanelComponent', () => {
             AdminCarnet: '900',
             Accion: 'Eliminar',
             EntidadId: '900',
+            EntidadNombre: 'Zeta',
             Detalle: 'Zeta',
           },
           {
@@ -141,6 +147,7 @@ describe('AuditPanelComponent', () => {
             AdminCarnet: '100',
             Accion: 'Crear',
             EntidadId: '100',
+            EntidadNombre: 'Alfa',
             Detalle: 'Alfa',
           },
         ] as AuditLogDto[];

@@ -43,6 +43,7 @@ export class AuditLogApiService {
               item.EntidadId === null || item.EntidadId === undefined
                 ? undefined
                 : String(item.EntidadId),
+            EntidadNombre: item.EntidadNombre ?? undefined,
             Detalle: item.Detalle ?? undefined,
             Timestamp: item.Timestamp ? new Date(item.Timestamp) : undefined,
           }));

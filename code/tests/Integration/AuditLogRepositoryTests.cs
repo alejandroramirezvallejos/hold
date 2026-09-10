@@ -66,6 +66,63 @@ internal class AuditLogRepositoryTests : ServiceTest<AuditLogRepository>
         Db.AuditLogs.Single().AdminNombre.Should().Be("Fernando Terrazas Llanos");
     }
 
+    [Test]
+    public async Task GetFiltered_ResolvesEquipmentToOperationalCodeAndName()
+    {
+        Db.GruposEquipos.Add(new GrupoEquipo
+        {
+            Id = 4,
+            Nombre = "Osciloscopio",
+            Modelo = "M1",
+            Marca = "Marca",
+        });
+        Db.Equipos.Add(new Equipo
+        {
+            Id = 15,
+            IdGrupoEquipo = 4,
+            CodigoImt = 240000015,
+        });
+        Db.AuditLogs.Add(new AuditLog
+        {
+            Accion = "Editar",
+            Entidad = "Equipo",
+            EntidadId = "15",
+            AdminNombre = "Administrador",
+            AdminCarnet = "100",
+        });
+        await Db.SaveChangesAsync();
+
+        var result = await Sut.GetFiltered("Equipo", null, null, null, null);
+
+        result.Should().ContainSingle();
+        result.Single().EntidadNombre.Should().Be("IMT 240000015 · Osciloscopio");
+    }
+
+    [Test]
+    public async Task GetFiltered_ResolvesUserWithoutExposingCarnetAsRecordName()
+    {
+        Db.Usuarios.Add(new Usuario
+        {
+            Carnet = "12890061",
+            Nombre = "Fernando",
+            ApellidoPaterno = "Terrazas",
+            ApellidoMaterno = "Llanos",
+        });
+        Db.AuditLogs.Add(new AuditLog
+        {
+            Accion = "Editar",
+            Entidad = "Usuario",
+            EntidadId = "12890061",
+            AdminNombre = "Administrador",
+            AdminCarnet = "100",
+        });
+        await Db.SaveChangesAsync();
+
+        var result = await Sut.GetFiltered("Usuario", null, null, null, null);
+
+        result.Single().EntidadNombre.Should().Be("Fernando Terrazas Llanos");
+    }
+
     private static AuditLog BuildLog(
         string action,
         string actorName,

@@ -2,6 +2,7 @@ using System.Text.Json;
 using FluentAssertions;
 using IMT_Reservas.Server.Application.Features.AuditLog;
 using IMT_Reservas.Server.Application.Features.Usuario;
+using IMT_Reservas.Server.Application.Features.Equipo;
 
 namespace IMT_Reservas.Tests.Unit;
 
@@ -90,5 +91,24 @@ internal class AuditChangeDetailTests
 
         name.GetProperty("anterior").GetString().Should().Be("Ana");
         name.GetProperty("nuevo").ValueKind.Should().Be(JsonValueKind.Null);
+    }
+
+    [Test]
+    public void Build_UsesRelatedNamesInsteadOfInternalIdentifiers()
+    {
+        var detail = AuditChangeDetail.Build(
+            new EquipoDto { IdAmbiente = 1, Ubicacion = "Laboratorio A" },
+            new EquipoDto { IdAmbiente = 2, Ubicacion = "Laboratorio B" }
+        );
+
+        using var json = JsonDocument.Parse(detail!);
+        var changes = json.RootElement.GetProperty("cambios").EnumerateArray().ToList();
+
+        changes.Should().ContainSingle(change =>
+            change.GetProperty("campo").GetString() == "Ubicacion"
+            && change.GetProperty("anterior").GetString() == "Laboratorio A"
+            && change.GetProperty("nuevo").GetString() == "Laboratorio B"
+        );
+        changes.Should().NotContain(change => change.GetProperty("campo").GetString() == "Ambiente");
     }
 }

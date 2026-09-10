@@ -8,6 +8,7 @@ public class AuditLogDto
     public string? Accion { get; set; }
     public string? Entidad { get; set; }
     public string? EntidadId { get; set; }
+    public string? EntidadNombre { get; set; }
     public string? Detalle { get; set; }
     public DateTime? Timestamp { get; set; }
 }

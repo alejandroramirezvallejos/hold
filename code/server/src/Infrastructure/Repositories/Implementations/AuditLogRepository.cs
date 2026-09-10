@@ -1,4 +1,5 @@
 using IMT_Reservas.Server.Application.Features.AuditLog;
+using IMT_Reservas.Server.Core.Entities;
 using IMT_Reservas.Server.Infrastructure.Config;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -112,7 +113,7 @@ public class AuditLogRepository
         if (hasta.HasValue)
             query = query.Where(a => a.Timestamp <= hasta.Value.ToUniversalTime());
 
-        return await query
+        var logs = await query
             .OrderByDescending(a => a.Timestamp)
             .Take(300)
             .Select(a => new AuditLogDto
@@ -127,7 +128,129 @@ public class AuditLogRepository
                 Timestamp = a.Timestamp,
             })
             .ToListAsync();
+
+        await PopulateEntityNames(logs);
+        return logs;
     }
+
+    private async Task PopulateEntityNames(List<AuditLogDto> logs)
+    {
+        foreach (var entityLogs in logs.GroupBy(log => log.Entidad ?? string.Empty))
+        {
+            var names = await GetEntityNames(
+                entityLogs.Key,
+                entityLogs.Select(log => log.EntidadId).OfType<string>().ToHashSet()
+            );
+
+            foreach (var log in entityLogs)
+                log.EntidadNombre = log.EntidadId != null
+                    ? names.GetValueOrDefault(log.EntidadId)
+                    : null;
+        }
+    }
+
+    private async Task<Dictionary<string, string>> GetEntityNames(
+        string entity,
+        HashSet<string> entityIds
+    )
+    {
+        if (entityIds.Count == 0)
+            return [];
+
+        if (entity == nameof(Usuario))
+            return await _db.Usuarios
+                .AsNoTracking()
+                .Where(item => entityIds.Contains(item.Carnet))
+                .ToDictionaryAsync(
+                    item => item.Carnet,
+                    item => (item.Nombre + " " + item.ApellidoPaterno + " " + item.ApellidoMaterno).Trim()
+                );
+
+        var ids = entityIds
+            .Select(value => int.TryParse(value, out var id) ? id : (int?)null)
+            .OfType<int>()
+            .ToHashSet();
+        if (ids.Count == 0)
+            return [];
+
+        var labels = entity switch
+        {
+            nameof(Ambiente) => await _db.Ambientes.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Procedencia) => await _db.Procedencias.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Carrera) => await _db.Carreras.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Categoria) => await _db.Categorias.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(GrupoEquipo) => await _db.GruposEquipos.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Mueble) => await _db.Muebles.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Gavetero) => await _db.Gaveteros.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Accesorio) => await _db.Accesorios.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Componente) => await _db.Componentes.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(EmpresaMantenimiento) => await _db.EmpresasMantenimiento.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(item.Id, item.Nombre))
+                .ToListAsync(),
+            nameof(Equipo) => await _db.Equipos.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(
+                    item.Id,
+                    "IMT " + item.CodigoImt + " · " + (item.GrupoEquipo != null ? item.GrupoEquipo.Nombre : "Equipo")
+                ))
+                .ToListAsync(),
+            nameof(Prestamo) => await _db.Prestamos.AsNoTracking()
+                .Where(item => ids.Contains(item.Id))
+                .Select(item => new EntityLabel(
+                    item.Id,
+                    item.Usuario != null
+                        ? "Préstamo de " + item.Usuario.Nombre + " " + item.Usuario.ApellidoPaterno
+                        : "Préstamo"
+                ))
+                .ToListAsync(),
+            nameof(Mantenimiento) => await (
+                from maintenance in _db.Mantenimientos.AsNoTracking()
+                join company in _db.EmpresasMantenimiento.AsNoTracking()
+                    on maintenance.IdEmpresa equals company.Id
+                where ids.Contains(maintenance.Id)
+                select new EntityLabel(maintenance.Id, "Mantenimiento con " + company.Nombre)
+            ).ToListAsync(),
+            nameof(ConfiguracionSistema) => ids
+                .Select(id => new EntityLabel(id, "Configuración del sistema"))
+                .ToList(),
+            _ => [],
+        };
+
+        return labels.ToDictionary(
+            item => item.Id.ToString(CultureInfo.InvariantCulture),
+            item => item.Name
+        );
+    }
+
+    private sealed record EntityLabel(int Id, string Name);
 
     private static AuditLogEntity BuildLog(
         AuditAccion accion,

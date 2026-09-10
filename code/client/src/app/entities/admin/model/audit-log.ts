@@ -5,6 +5,7 @@ export interface AuditLogDto {
   Accion?: string;
   Entidad?: string;
   EntidadId?: string;
+  EntidadNombre?: string;
   Detalle?: string;
   Timestamp?: Date;
 }

@@ -6,7 +6,7 @@
         type="text"
         [(ngModel)]="filtroAdmin"
         (keyup.enter)="cargar()"
-        placeholder="Buscar por persona, acción, ID, detalle o fecha..."
+        placeholder="Buscar por persona, acción, registro o fecha..."
         aria-label="Buscar en todos los datos de auditoría"
         class="admin-search"
       />
@@ -129,7 +129,6 @@
                 <span class="admin-name">{{
                   log.AdminNombre || log.AdminCarnet
                 }}</span>
-                <span class="admin-carnet">{{ log.AdminCarnet }}</span>
               </td>
               <td data-label="Acción">
                 <span [class]="'badge ' + badgeClass(log.Accion)">{{
@@ -137,11 +136,10 @@
                 }}</span>
               </td>
               <td class="id-col" data-label="Registro">
-                {{ log.EntidadId }}
+                {{ registroLabel(log) }}
               </td>
               <td class="detail-col" data-label="Detalle">
                 <div class="audit-detail-cell">
-                  <span>{{ resumenObs(log) }}</span>
                   <button
                     type="button"
                     class="audit-detail-button"
@@ -193,15 +191,12 @@
           </div>
           <div>
             <dt>Registro</dt>
-            <dd>{{ obsLogAbierto.EntidadId || "Sin identificador" }}</dd>
+            <dd>{{ registroLabel(obsLogAbierto) }}</dd>
           </div>
           <div>
             <dt>Realizado por</dt>
             <dd>
               {{ obsLogAbierto.AdminNombre || obsLogAbierto.AdminCarnet }}
-              <span class="obs-actor-carnet">{{
-                obsLogAbierto.AdminCarnet
-              }}</span>
             </dd>
           </div>
           <div>

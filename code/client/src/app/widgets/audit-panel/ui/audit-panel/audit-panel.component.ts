@@ -141,10 +141,10 @@ export class AuditPanelComponent implements OnChanges {
         : log.Timestamp,
       log.AdminNombre || log.AdminCarnet,
       log.Accion,
-      log.EntidadId,
+      this.registroLabel(log),
       this.resumenObs(log),
     ]);
-    const csv = [['Fecha', 'Actor', 'Acción', 'ID', 'Detalle'], ...rows]
+    const csv = [['Fecha', 'Actor', 'Acción', 'Registro', 'Detalle'], ...rows]
       .map((row) =>
         row
           .map((value) => `"${String(value ?? '').replaceAll('"', '""')}"`)
@@ -163,12 +163,12 @@ export class AuditPanelComponent implements OnChanges {
   imprimir(): void {
     printTable({
       title: `Auditoría: ${this.entidad}`,
-      headers: ['Fecha', 'Actor', 'Acción', 'ID', 'Detalle'],
+      headers: ['Fecha', 'Actor', 'Acción', 'Registro', 'Detalle'],
       rows: this.logs.map((log) => [
         formatBoliviaDateTime(log.Timestamp),
         log.AdminNombre || log.AdminCarnet,
         log.Accion,
-        log.EntidadId,
+        this.registroLabel(log),
         this.resumenObs(log),
       ]),
     });
@@ -324,9 +324,15 @@ export class AuditPanelComponent implements OnChanges {
     return labels[entidad ?? ''] ?? entidad ?? this.entidad;
   }
 
+  registroLabel(log: AuditLogDto): string {
+    if (log.EntidadNombre?.trim()) return log.EntidadNombre.trim();
+
+    return `${this.entidadLabel(log.Entidad)} sin nombre disponible`;
+  }
+
   descripcionAccion(log: AuditLogDto): string {
     const entidad = this.entidadLabel(log.Entidad).toLowerCase();
-    const registro = log.EntidadId ? ` ${log.EntidadId}` : '';
+    const registro = ` “${this.registroLabel(log)}”`;
     const action = log.Accion?.toLowerCase();
     const descriptions: Record<string, string> = {
       crear: `Se creó el registro de ${entidad}${registro}.`,
@@ -356,7 +362,7 @@ export class AuditPanelComponent implements OnChanges {
       Fecha: log.Timestamp,
       Actor: log.AdminNombre || log.AdminCarnet,
       Acción: log.Accion,
-      Registro: log.EntidadId,
+      Registro: this.registroLabel(log),
       Detalle: this.resumenObs(log),
     };
 
