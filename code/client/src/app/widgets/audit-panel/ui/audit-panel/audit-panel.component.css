@@ -229,8 +229,6 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -242,12 +240,11 @@
 .obs-modal {
   position: relative;
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   padding: 1.75rem;
   width: 100%;
-  max-width: 680px;
+  max-width: 720px;
   max-height: 85vh;
   overflow-y: auto;
   animation: slideUp 200ms ease-out both;
@@ -285,9 +282,11 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
+  width: 40px;
+  height: 40px;
+  padding: 0.5rem;
+  border-radius: var(--radius-full);
+  transition: background-color var(--t-fast);
 }
 .obs-close img {
   width: 100%;
@@ -297,24 +296,40 @@
 .obs-close:hover img {
   opacity: 0.8;
 }
+.obs-close:hover {
+  background: var(--sidebar);
+}
+.obs-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  margin: 0 3rem var(--sp-5) 0;
+}
+.obs-heading > .badge {
+  flex: 0 0 auto;
+  margin-top: 0.125rem;
+}
+.obs-heading > div {
+  min-width: 0;
+}
 .obs-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.1rem;
+  margin: 0;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--ink);
 }
-.obs-lead {
-  max-width: 65ch;
-  margin: 0 3rem var(--sp-4) 0;
+.obs-heading p {
+  margin: var(--sp-1) 0 0;
   color: var(--ink-secondary);
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 .obs-context {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sp-4);
-  margin: var(--sp-4) 0 var(--sp-5);
+  margin: 0 0 var(--sp-5);
   padding: var(--sp-4);
   border-radius: var(--radius-md);
   background: var(--sidebar);
@@ -413,13 +428,12 @@
   color: var(--ink-muted);
   font-size: 0.75rem;
 }
-.change-protected {
-  display: flex;
+.snapshot-value--protected strong {
+  display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  margin: 0;
-  color: var(--ink-secondary);
-  font-size: 0.8rem;
+  font-family: var(--font);
+  font-weight: 650;
 }
 .obs-text {
   margin: 0 0 1rem;
@@ -670,6 +684,12 @@
   .change-values,
   .obs-data-list {
     grid-template-columns: 1fr;
+  }
+
+  .obs-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--sp-2);
   }
 
   .change-values > i {

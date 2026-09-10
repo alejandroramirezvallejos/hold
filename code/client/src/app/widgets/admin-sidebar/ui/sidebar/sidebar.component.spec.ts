@@ -18,7 +18,8 @@ describe('SidebarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('keeps the desktop navigation available and closes after selection', () => {
+  it('keeps the desktop navigation open after selection', () => {
+    spyOnProperty(window, 'innerWidth').and.returnValue(1200);
     component.groups = [
       { label: 'Préstamos y personas', items: ['Prestamos', 'Usuarios'] },
     ];
@@ -37,6 +38,6 @@ describe('SidebarComponent', () => {
     buttons[1].click();
 
     expect(component.item.emit).toHaveBeenCalledWith('Usuarios');
-    expect(component.sidebarService.isOpen()).toBeFalse();
+    expect(component.sidebarService.isOpen()).toBeTrue();
   });
 });

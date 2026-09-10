@@ -51,6 +51,6 @@ export class SidebarComponent {
 
   clickitem(item: string) {
     this.item.emit(item);
-    this.sidebarService.close();
+    this.sidebarService.closeOnCompactViewport();
   }
 }

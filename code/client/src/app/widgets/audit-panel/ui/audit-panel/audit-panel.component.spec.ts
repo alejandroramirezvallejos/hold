@@ -139,18 +139,28 @@ describe('AuditPanelComponent', () => {
     expect(lastHeader.getAttribute('aria-sort')).toBeNull();
   });
 
-  it('summarizes the exact fields stored in an edit', () => {
+  it('shows a structured audit record without repeating its summary', () => {
     const log = {
-      Accion: 'Editar',
+      Id: 8,
+      Accion: 'Crear',
+      Entidad: 'Carrera',
+      EntidadNombre: 'prueba2',
+      AdminNombre: 'Administrador',
+      Timestamp: new Date('2026-09-10T12:00:00Z'),
       Detalle: JSON.stringify({
-        cambios: [
-          { campo: 'Nombre', anterior: 'Ana', nuevo: 'Andrea' },
-          { campo: 'Rol', anterior: 'Estudiante', nuevo: 'Docente' },
-        ],
+        texto: 'Se creó el registro de carrera “prueba2”.',
+        cambios: [{ campo: 'Nombre', nuevo: 'prueba2' }],
       }),
     } as AuditLogDto;
 
-    expect(component.resumenCambios(log)).toBe('Se modificaron: Nombre, Rol.');
+    component.cargando = false;
+    component.abrirObs(log);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.obs-lead')).toBeNull();
+    expect(
+      fixture.nativeElement.querySelectorAll('.snapshot-value').length,
+    ).toBe(1);
   });
 
   it('does not claim that a missing record name is unavailable', () => {

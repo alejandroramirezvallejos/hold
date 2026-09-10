@@ -178,26 +178,17 @@
       <button class="obs-close" (click)="cerrarObs()" aria-label="Cerrar">
         <img src="assets/x.png" alt="Cerrar" />
       </button>
-      <h3 class="obs-title">Detalle de auditoría</h3>
       @if (obsLogAbierto) {
-        <p class="obs-lead">{{ resumenCambios(obsLogAbierto) }}</p>
+        <header class="obs-heading">
+          <span [class]="'badge ' + badgeClass(obsLogAbierto.Accion)">
+            {{ accionLabel(obsLogAbierto.Accion) }}
+          </span>
+          <div>
+            <h3 class="obs-title">{{ entidadLabel(obsLogAbierto.Entidad) }}</h3>
+            <p>{{ registroLabel(obsLogAbierto) }}</p>
+          </div>
+        </header>
         <dl class="obs-context">
-          <div>
-            <dt>Acción</dt>
-            <dd>
-              <span [class]="'badge ' + badgeClass(obsLogAbierto.Accion)">
-                {{ accionLabel(obsLogAbierto.Accion) }}
-              </span>
-            </dd>
-          </div>
-          <div>
-            <dt>Módulo</dt>
-            <dd>{{ entidadLabel(obsLogAbierto.Entidad) }}</dd>
-          </div>
-          <div>
-            <dt>Registro</dt>
-            <dd>{{ registroLabel(obsLogAbierto) }}</dd>
-          </div>
           <div>
             <dt>Realizado por</dt>
             <dd>
@@ -217,10 +208,13 @@
             <section class="change-item">
               <h4>{{ cambio.campo }}</h4>
               @if (cambio.protegido) {
-                <p class="change-protected">
-                  <i class="fas fa-lock" aria-hidden="true"></i>
-                  Dato protegido actualizado
-                </p>
+                <div class="snapshot-value snapshot-value--protected">
+                  <span>Valor</span>
+                  <strong>
+                    <i class="fas fa-lock" aria-hidden="true"></i>
+                    Dato protegido actualizado
+                  </strong>
+                </div>
               } @else {
                 @if (obsLogAbierto?.Accion?.toLowerCase() === "crear") {
                   <div class="snapshot-value">

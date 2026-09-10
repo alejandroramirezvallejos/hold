@@ -72,6 +72,8 @@ export class GaveterosTablaComponent extends Tabla {
     this.botoncrear.set(true);
   }
   actualizarDatos(): void {
+    this.botoncrear.set(false);
+    this.botoneditar.set(false);
     this.cargarGaveteros();
     this.auditRefresh++;
   }

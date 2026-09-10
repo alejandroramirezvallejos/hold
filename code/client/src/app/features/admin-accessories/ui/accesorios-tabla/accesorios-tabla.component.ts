@@ -76,6 +76,8 @@ export class AccesoriosTablaComponent extends Tabla {
   }
 
   actualizarDatos(): void {
+    this.botoncrear.set(false);
+    this.botoneditar.set(false);
     this.cargarAccesorios();
     this.auditRefresh++;
   }

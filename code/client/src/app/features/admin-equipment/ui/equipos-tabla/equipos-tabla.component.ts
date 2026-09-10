@@ -115,6 +115,8 @@ export class EquiposTablaComponent extends Tabla {
     this.botoncrear.set(true);
   }
   actualizarDatos(): void {
+    this.botoncrear.set(false);
+    this.botoneditar.set(false);
     this.cargarEquipos();
     this.auditRefresh++;
   }

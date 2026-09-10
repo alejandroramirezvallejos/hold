@@ -67,6 +67,8 @@ export class CarrerasTablaComponent extends Tabla {
   }
 
   actualizarDatos(): void {
+    this.botoncrear.set(false);
+    this.botoneditar.set(false);
     this.cargarCarreras();
     this.auditRefresh++;
   }

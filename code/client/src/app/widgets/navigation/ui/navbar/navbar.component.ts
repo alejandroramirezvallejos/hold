@@ -298,6 +298,7 @@ export class NavbarComponent {
 
     if (
       this.sidebarService.isOpen() &&
+      window.innerWidth <= 900 &&
       !target.closest('.menu-button') &&
       !target.closest('.sidebar-menu')
     ) {

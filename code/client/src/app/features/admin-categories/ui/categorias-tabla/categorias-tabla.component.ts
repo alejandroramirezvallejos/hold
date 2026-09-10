@@ -67,6 +67,8 @@ export class CategoriasTablaComponent extends Tabla {
   }
 
   actualizarDatos(): void {
+    this.botoncrear.set(false);
+    this.botoneditar.set(false);
     this.cargarCategorias();
     this.auditRefresh++;
   }

@@ -228,6 +228,8 @@ export class UsuariosTablaComponent extends Tabla implements OnInit {
     });
   }
   actualizarTabla() {
+    this.botoncrear.set(false);
+    this.botoneditar.set(false);
     this.cargarUsuarios();
     this.auditRefresh++;
   }

@@ -236,12 +236,6 @@
   }
 }
 
-@media (min-width: 901px) {
-  .menu-button {
-    display: none;
-  }
-}
-
 @media (max-width: 480px) {
   .navbar-container {
     padding: 0 1rem;

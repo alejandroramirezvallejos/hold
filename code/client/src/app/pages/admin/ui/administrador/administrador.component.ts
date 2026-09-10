@@ -14,7 +14,11 @@ import { GaveterosTablaComponent } from '@features/admin-lockers';
 import { MantenimientosTablaComponent } from '@features/admin-maintenance';
 import { EmpresasMantenimientoTablaComponent } from '@features/admin-maintenance-companies';
 import { UsuariosTablaComponent } from '@features/admin-users';
-import { AdminNavigationGroup, SidebarComponent } from '@widgets/admin-sidebar';
+import {
+  AdminNavigationGroup,
+  SidebarComponent,
+  SidebarService,
+} from '@widgets/admin-sidebar';
 import { AdminConfiguracionesComponent } from '../admin-configuraciones/admin-configuraciones.component';
 
 const GENERAL_ADMIN_NAVIGATION: AdminNavigationGroup[] = [
@@ -76,6 +80,7 @@ export class AdministradorComponent {
   constructor(
     public router: Router,
     private usuario: UsuarioService,
+    public readonly sidebarService: SidebarService,
   ) {}
   ngOnInit() {
     const rol = this.usuario.obtenerUsuario().rol?.toLowerCase() ?? '';

@@ -74,6 +74,8 @@ export class ComponentesTablaComponent extends Tabla implements OnInit {
     this.botoncrear.set(true);
   }
   actualizarDatos(): void {
+    this.botoncrear.set(false);
+    this.botoneditar.set(false);
     this.cargarComponentes();
     this.auditRefresh++;
   }

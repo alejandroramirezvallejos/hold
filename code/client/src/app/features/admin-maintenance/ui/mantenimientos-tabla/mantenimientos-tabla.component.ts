@@ -86,6 +86,7 @@ export class MantenimientosTablaComponent extends Tabla implements OnInit {
     this.botoncrear.set(true);
   }
   actualizarDatos(): void {
+    this.botoncrear.set(false);
     this.cargarMantenimientos();
     this.auditRefresh++;
   }

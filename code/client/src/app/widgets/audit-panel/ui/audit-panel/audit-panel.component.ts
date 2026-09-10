@@ -1,5 +1,11 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuditLogDto } from '@entities/admin';
 import { AuditLogApiService } from '@entities/audit-log';
@@ -50,7 +56,7 @@ const ACCIONES_POR_ENTIDAD: Record<string, string[]> = {
   templateUrl: './audit-panel.component.html',
   styleUrl: './audit-panel.component.css',
 })
-export class AuditPanelComponent implements OnChanges {
+export class AuditPanelComponent implements OnChanges, OnDestroy {
   @Input() entidad!: string;
   @Input() refreshTrigger: number = 0;
 
@@ -71,6 +77,7 @@ export class AuditPanelComponent implements OnChanges {
     string,
     AuditObservationDetail | null
   >();
+  private refreshTimer?: ReturnType<typeof setInterval>;
 
   get acciones(): string[] {
     return (
@@ -82,6 +89,11 @@ export class AuditPanelComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['entidad']) this.actualizarOpcionesAccion();
     if (changes['entidad'] || changes['refreshTrigger']) this.cargar();
+    this.iniciarActualizacionAutomatica();
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshTimer) clearInterval(this.refreshTimer);
   }
 
   onFechaDesde(dates: Date[]) {
@@ -94,8 +106,9 @@ export class AuditPanelComponent implements OnChanges {
     this.cargar();
   }
 
-  cargar() {
-    this.cargando = true;
+  cargar(silencioso = false) {
+    if (!silencioso) this.cargando = true;
+    const paginaDestino = silencioso ? this.paginaActual : 1;
     this.auditService
       .getAuditLog(
         this.entidad,
@@ -109,13 +122,25 @@ export class AuditPanelComponent implements OnChanges {
           this.logs = data;
           this.detalleCache.clear();
           this.aplicarOrdenActual();
-          this.cambiarPagina(1);
+          const ultimaPagina = Math.max(
+            1,
+            Math.ceil(this.logs.length / this.filasPorPagina),
+          );
+          this.cambiarPagina(Math.min(paginaDestino, ultimaPagina));
           this.cargando = false;
         },
         error: () => {
           this.cargando = false;
         },
       });
+  }
+
+  private iniciarActualizacionAutomatica(): void {
+    if (this.refreshTimer) return;
+
+    this.refreshTimer = setInterval(() => {
+      if (!this.cargando && !this.obsAbierta) this.cargar(true);
+    }, 5000);
   }
 
   seleccionarAccion(a: string) {
@@ -343,27 +368,6 @@ export class AuditPanelComponent implements OnChanges {
     if (log.EntidadNombre?.trim()) return log.EntidadNombre.trim();
 
     return this.nombreDesdeDetalle(log) || this.entidadLabel(log.Entidad);
-  }
-
-  resumenCambios(log: AuditLogDto): string {
-    const detail = this.parseDetalle(log.Detalle);
-    const fields = detail?.cambios
-      ?.map((change) => change.campo?.trim())
-      .filter((field): field is string => !!field);
-
-    if (fields?.length) {
-      const uniqueFields = [...new Set(fields)];
-      const prefix: Record<string, string> = {
-        crear: 'Datos iniciales registrados',
-        editar: 'Se modificaron',
-        eliminar: 'Datos conservados antes de eliminar',
-      };
-      const summary =
-        prefix[log.Accion?.toLowerCase() ?? ''] ?? 'Cambios registrados';
-      return `${summary}: ${uniqueFields.join(', ')}.`;
-    }
-
-    return this.mensajeDetalleHistorico(log);
   }
 
   descripcionAccion(log: AuditLogDto): string {
