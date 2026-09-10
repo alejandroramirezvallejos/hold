@@ -3,7 +3,7 @@
   top: 6rem;
   display: flex;
   flex-direction: column;
-  width: 13.5rem;
+  width: 14.5rem;
   height: calc(100dvh - 7.5rem);
   min-height: 28rem;
   overflow: hidden;
@@ -129,7 +129,7 @@
 
 @media (max-width: 1280px) and (min-width: 901px) {
   .sidebar-menu {
-    width: 12.5rem;
+    width: 14rem;
   }
 }
 

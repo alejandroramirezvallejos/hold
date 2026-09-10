@@ -71,7 +71,7 @@ describe('AuditPanelComponent', () => {
   it('opens a useful detail view even when a legacy record has no detail', () => {
     const log = {
       Id: 3,
-      Accion: 'Eliminar',
+      Accion: 'Editar',
       Entidad: 'Equipo',
       EntidadId: '25',
       EntidadNombre: 'IMT 240000025 · Osciloscopio',
@@ -80,9 +80,7 @@ describe('AuditPanelComponent', () => {
     component.abrirObs(log);
 
     expect(component.obsLogAbierto).toBe(log);
-    expect(component.obsAbierta?.texto).toContain(
-      'IMT 240000025 · Osciloscopio',
-    );
+    expect(component.obsAbierta?.texto).toContain('registro histórico');
   });
 
   it('does not expose generic sensitive fields in structured details', () => {
@@ -122,10 +120,46 @@ describe('AuditPanelComponent', () => {
     );
 
     expect(buttons.length).toBe(2);
-    expect(buttons[0].textContent).toContain('Ver detalle');
+    expect(buttons[0].querySelector('.fa-eye')).not.toBeNull();
+    expect(buttons[0].textContent.trim()).toBe('');
   });
 
-  for (const column of ['Fecha', 'Actor', 'Acción', 'Registro', 'Detalle']) {
+  it('shows actions as a non-sortable column', () => {
+    component.cargando = false;
+    component.logs = [{ Id: 1, Accion: 'Editar' }] as AuditLogDto[];
+    component.logsPaginados = component.logs;
+    fixture.detectChanges();
+
+    const lastHeader = fixture.nativeElement.querySelector(
+      'thead th:last-child',
+    );
+
+    expect(lastHeader.textContent.trim()).toBe('Acciones');
+    expect(lastHeader.querySelector('button')).toBeNull();
+    expect(lastHeader.getAttribute('aria-sort')).toBeNull();
+  });
+
+  it('summarizes the exact fields stored in an edit', () => {
+    const log = {
+      Accion: 'Editar',
+      Detalle: JSON.stringify({
+        cambios: [
+          { campo: 'Nombre', anterior: 'Ana', nuevo: 'Andrea' },
+          { campo: 'Rol', anterior: 'Estudiante', nuevo: 'Docente' },
+        ],
+      }),
+    } as AuditLogDto;
+
+    expect(component.resumenCambios(log)).toBe('Se modificaron: Nombre, Rol.');
+  });
+
+  it('does not claim that a missing record name is unavailable', () => {
+    const log = { Entidad: 'Categoria' } as AuditLogDto;
+
+    expect(component.registroLabel(log)).toBe('Categoría');
+  });
+
+  for (const column of ['Fecha', 'Actor', 'Acción', 'Registro']) {
     it(
       'sorts audit rows by ' + column + ' and returns to the first page',
       async () => {

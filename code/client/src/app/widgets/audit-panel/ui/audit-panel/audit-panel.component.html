@@ -94,25 +94,31 @@
               <th
                 scope="col"
                 [attr.aria-sort]="
-                  esColumnaOrdenada(columna)
-                    ? sortDirection === 'asc'
-                      ? 'ascending'
-                      : 'descending'
-                    : 'none'
+                  !esColumnaOrdenable(columna)
+                    ? null
+                    : esColumnaOrdenada(columna)
+                      ? sortDirection === 'asc'
+                        ? 'ascending'
+                        : 'descending'
+                      : 'none'
                 "
               >
-                <button
-                  type="button"
-                  class="table-sort-button"
-                  (click)="ordenarPorColumna(columna)"
-                >
-                  {{ columna
-                  }}<i
-                    class="fas"
-                    [ngClass]="iconoOrdenColumna(columna)"
-                    aria-hidden="true"
-                  ></i>
-                </button>
+                @if (esColumnaOrdenable(columna)) {
+                  <button
+                    type="button"
+                    class="table-sort-button"
+                    (click)="ordenarPorColumna(columna)"
+                  >
+                    {{ columna
+                    }}<i
+                      class="fas"
+                      [ngClass]="iconoOrdenColumna(columna)"
+                      aria-hidden="true"
+                    ></i>
+                  </button>
+                } @else {
+                  <span class="table-static-header">{{ columna }}</span>
+                }
               </th>
             }
           </tr>
@@ -138,7 +144,7 @@
               <td class="id-col" data-label="Registro">
                 {{ registroLabel(log) }}
               </td>
-              <td class="detail-col" data-label="Detalle">
+              <td class="detail-col" data-label="Acciones">
                 <div class="audit-detail-cell">
                   <button
                     type="button"
@@ -149,7 +155,6 @@
                     "
                   >
                     <i class="fas fa-eye" aria-hidden="true"></i>
-                    Ver detalle
                   </button>
                 </div>
               </td>
@@ -175,7 +180,7 @@
       </button>
       <h3 class="obs-title">Detalle de auditoría</h3>
       @if (obsLogAbierto) {
-        <p class="obs-lead">{{ descripcionAccion(obsLogAbierto) }}</p>
+        <p class="obs-lead">{{ resumenCambios(obsLogAbierto) }}</p>
         <dl class="obs-context">
           <div>
             <dt>Acción</dt>

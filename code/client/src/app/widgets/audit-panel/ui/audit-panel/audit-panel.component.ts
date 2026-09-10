@@ -55,7 +55,7 @@ export class AuditPanelComponent implements OnChanges {
   @Input() refreshTrigger: number = 0;
 
   logs: AuditLogDto[] = [];
-  readonly columnas = ['Fecha', 'Actor', 'Acción', 'Registro', 'Detalle'];
+  readonly columnas = ['Fecha', 'Actor', 'Acción', 'Registro', 'Acciones'];
   sortColumn = '';
   sortDirection: 'asc' | 'desc' = 'asc';
   cargando = true;
@@ -177,7 +177,7 @@ export class AuditPanelComponent implements OnChanges {
   ordenarPorColumna(columna: string): void {
     const columnaOrdenable = columna.trim();
 
-    if (!columnaOrdenable) return;
+    if (!this.esColumnaOrdenable(columnaOrdenable)) return;
 
     this.sortDirection =
       this.sortColumn === columnaOrdenable && this.sortDirection === 'asc'
@@ -190,6 +190,10 @@ export class AuditPanelComponent implements OnChanges {
 
   esColumnaOrdenada(columna: string): boolean {
     return this.sortColumn === columna.trim();
+  }
+
+  esColumnaOrdenable(columna: string): boolean {
+    return columna.trim() !== 'Acciones';
   }
 
   iconoOrdenColumna(columna: string): string {
@@ -239,7 +243,7 @@ export class AuditPanelComponent implements OnChanges {
 
   abrirObs(log: AuditLogDto): void {
     this.obsAbierta = this.parseDetalle(log.Detalle) ?? {
-      texto: this.descripcionAccion(log),
+      texto: this.mensajeDetalleHistorico(log),
     };
     this.obsLogAbierto = log;
   }
@@ -316,8 +320,19 @@ export class AuditPanelComponent implements OnChanges {
   entidadLabel(entidad?: string): string {
     const labels: Record<string, string> = {
       Prestamo: 'Préstamo',
+      Usuario: 'Usuario',
+      Equipo: 'Equipo',
       GrupoEquipo: 'Grupo de equipos',
+      Accesorio: 'Accesorio',
+      Componente: 'Componente',
+      Gavetero: 'Gavetero',
+      Mueble: 'Mueble',
+      Mantenimiento: 'Mantenimiento',
       EmpresaMantenimiento: 'Empresa de mantenimiento',
+      Carrera: 'Carrera',
+      Categoria: 'Categoría',
+      Ambiente: 'Ambiente',
+      Procedencia: 'Procedencia',
       ConfiguracionSistema: 'Configuración del sistema',
     };
 
@@ -327,7 +342,28 @@ export class AuditPanelComponent implements OnChanges {
   registroLabel(log: AuditLogDto): string {
     if (log.EntidadNombre?.trim()) return log.EntidadNombre.trim();
 
-    return `${this.entidadLabel(log.Entidad)} sin nombre disponible`;
+    return this.nombreDesdeDetalle(log) || this.entidadLabel(log.Entidad);
+  }
+
+  resumenCambios(log: AuditLogDto): string {
+    const detail = this.parseDetalle(log.Detalle);
+    const fields = detail?.cambios
+      ?.map((change) => change.campo?.trim())
+      .filter((field): field is string => !!field);
+
+    if (fields?.length) {
+      const uniqueFields = [...new Set(fields)];
+      const prefix: Record<string, string> = {
+        crear: 'Datos iniciales registrados',
+        editar: 'Se modificaron',
+        eliminar: 'Datos conservados antes de eliminar',
+      };
+      const summary =
+        prefix[log.Accion?.toLowerCase() ?? ''] ?? 'Cambios registrados';
+      return `${summary}: ${uniqueFields.join(', ')}.`;
+    }
+
+    return this.mensajeDetalleHistorico(log);
   }
 
   descripcionAccion(log: AuditLogDto): string {
@@ -363,7 +399,6 @@ export class AuditPanelComponent implements OnChanges {
       Actor: log.AdminNombre || log.AdminCarnet,
       Acción: log.Accion,
       Registro: this.registroLabel(log),
-      Detalle: this.resumenObs(log),
     };
 
     return values[columna];
@@ -385,6 +420,55 @@ export class AuditPanelComponent implements OnChanges {
       { value: '', label: 'Todas las acciones' },
       ...this.acciones.map((accion) => ({ value: accion, label: accion })),
     ];
+  }
+
+  private nombreDesdeDetalle(log: AuditLogDto): string {
+    const detail = this.parseDetalle(log.Detalle);
+    if (!detail) return '';
+
+    if (detail.usuarioNombre?.trim()) {
+      return log.Entidad === 'Prestamo'
+        ? `Préstamo de ${detail.usuarioNombre.trim()}`
+        : detail.usuarioNombre.trim();
+    }
+
+    const changes = detail.cambios ?? [];
+    const valueFor = (field: string) => {
+      const change = changes.find(
+        (item) =>
+          item.campo?.localeCompare(field, undefined, {
+            sensitivity: 'base',
+          }) === 0,
+      );
+      return (change?.nuevo || change?.anterior || '').trim();
+    };
+
+    if (log.Entidad === 'Usuario') {
+      return [
+        valueFor('Nombre'),
+        valueFor('Apellido paterno'),
+        valueFor('Apellido materno'),
+      ]
+        .filter(Boolean)
+        .join(' ');
+    }
+
+    if (log.Entidad === 'Equipo') {
+      const code = valueFor('Código IMT');
+      const name = valueFor('Nombre') || valueFor('Grupo de equipos');
+      if (code && name) return `IMT ${code} · ${name}`;
+      if (code) return `IMT ${code}`;
+    }
+
+    return valueFor('Nombre');
+  }
+
+  private mensajeDetalleHistorico(log: AuditLogDto): string {
+    if (log.Accion?.toLowerCase() === 'editar') {
+      return 'Este registro histórico no conserva los valores anteriores y posteriores de la edición.';
+    }
+
+    return this.descripcionAccion(log);
   }
 
   private normalizarDetalle(
