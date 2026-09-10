@@ -148,7 +148,7 @@
                 <div class="audit-detail-cell">
                   <button
                     type="button"
-                    class="audit-detail-button"
+                    class="btn-icon btn-view audit-detail-button"
                     (click)="abrirObs(log)"
                     [attr.aria-label]="
                       'Ver detalle de ' + accionLabel(log.Accion)
@@ -180,13 +180,13 @@
       </button>
       @if (obsLogAbierto) {
         <header class="obs-heading">
-          <span [class]="'badge ' + badgeClass(obsLogAbierto.Accion)">
-            {{ accionLabel(obsLogAbierto.Accion) }}
-          </span>
           <div>
             <h3 class="obs-title">{{ entidadLabel(obsLogAbierto.Entidad) }}</h3>
             <p>{{ registroLabel(obsLogAbierto) }}</p>
           </div>
+          <span [class]="'badge ' + badgeClass(obsLogAbierto.Accion)">
+            {{ accionLabel(obsLogAbierto.Accion) }}
+          </span>
         </header>
         <dl class="obs-context">
           <div>
