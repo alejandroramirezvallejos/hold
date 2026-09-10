@@ -16,11 +16,7 @@ import { Aviso, MostrarerrorComponent, ToastService } from '@shared/ui';
 @Component({
   selector: 'app-carreras-editar',
   standalone: true,
-  imports: [
-    ValidatedFormsModule,
-    MostrarerrorComponent,
-    Aviso,
-  ],
+  imports: [ValidatedFormsModule, MostrarerrorComponent, Aviso],
   templateUrl: './carreras-editar.component.html',
   styleUrl: './carreras-editar.component.css',
 })

@@ -33,9 +33,7 @@ describe('UsuarioServiceAPI', () => {
         candidate.method === 'PUT' &&
         candidate.url.endsWith('/api/usuarios/1234567'),
     );
-    expect(request.request.body.CarreraNombre).toBe(
-      'Ingeniería de Sistemas',
-    );
+    expect(request.request.body.CarreraNombre).toBe('Ingeniería de Sistemas');
     expect(request.request.body.IdCarrera).toBeNull();
     request.flush({});
   });

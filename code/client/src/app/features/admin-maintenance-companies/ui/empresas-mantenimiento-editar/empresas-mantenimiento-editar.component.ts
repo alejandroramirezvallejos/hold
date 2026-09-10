@@ -15,11 +15,7 @@ import { extractErrorMessage } from '@shared/lib/error';
 import { Aviso, MostrarerrorComponent, ToastService } from '@shared/ui';
 @Component({
   selector: 'app-empresas-mantenimiento-editar',
-  imports: [
-    ValidatedFormsModule,
-    MostrarerrorComponent,
-    Aviso,
-  ],
+  imports: [ValidatedFormsModule, MostrarerrorComponent, Aviso],
   templateUrl: './empresas-mantenimiento-editar.component.html',
   styleUrl: './empresas-mantenimiento-editar.component.css',
 })
