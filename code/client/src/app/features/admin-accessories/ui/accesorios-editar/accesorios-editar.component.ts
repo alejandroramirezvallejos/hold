@@ -15,17 +15,16 @@ import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   Aviso,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
   OpcionSelect,
+  ToastService,
 } from '@shared/ui';
 @Component({
   selector: 'app-accesorios-editar',
   imports: [
     ValidatedFormsModule,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     Aviso,
     CustomSelectComponent,
   ],
@@ -47,6 +46,7 @@ export class AccesoriosEditarComponent extends BaseTablaComponent {
   constructor(
     private readonly accesorioapi: AccesoriosService,
     private equipoAPI: EquipoService,
+    private readonly toast: ToastService,
   ) {
     super();
   }
@@ -77,11 +77,13 @@ export class AccesoriosEditarComponent extends BaseTablaComponent {
   }
 
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.accesorioapi.editarAccesorio(this.accesorio).subscribe({
       next: (_response) => {
         this.actualizar.emit();
-        this.mensajeexito = 'Accesorio editado con éxito.';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Accesorio editado con éxito.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -90,6 +92,7 @@ export class AccesoriosEditarComponent extends BaseTablaComponent {
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

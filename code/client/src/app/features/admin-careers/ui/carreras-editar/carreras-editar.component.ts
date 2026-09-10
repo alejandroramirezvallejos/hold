@@ -12,7 +12,7 @@ import { Carrera } from '@entities/admin';
 import { CarreraService } from '@entities/career';
 import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
-import { Aviso, AvisoExitoComponent, MostrarerrorComponent } from '@shared/ui';
+import { Aviso, MostrarerrorComponent, ToastService } from '@shared/ui';
 @Component({
   selector: 'app-carreras-editar',
   standalone: true,
@@ -20,7 +20,6 @@ import { Aviso, AvisoExitoComponent, MostrarerrorComponent } from '@shared/ui';
     ValidatedFormsModule,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
   ],
   templateUrl: './carreras-editar.component.html',
   styleUrl: './carreras-editar.component.css',
@@ -29,7 +28,10 @@ export class CarrerasEditarComponent extends BaseTablaComponent {
   @Input() botoneditar: WritableSignal<boolean> = signal(true);
   @Output() actualizar: EventEmitter<void> = new EventEmitter<void>();
   @Input() carrera: Carrera = new Carrera();
-  constructor(private readonly carreraService: CarreraService) {
+  constructor(
+    private readonly carreraService: CarreraService,
+    private readonly toast: ToastService,
+  ) {
     super();
   }
   validaredicion() {
@@ -42,11 +44,13 @@ export class CarrerasEditarComponent extends BaseTablaComponent {
     this.aviso.set(true);
   }
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.carreraService.actualizarCarrera(this.carrera).subscribe({
       next: (_response) => {
         this.actualizar.emit();
-        this.mensajeexito = 'Carrera editada con éxito.';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Carrera editada con éxito.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -55,6 +59,7 @@ export class CarrerasEditarComponent extends BaseTablaComponent {
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

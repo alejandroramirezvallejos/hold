@@ -132,19 +132,16 @@
 @if (botoncrear()) {
   <app-componentes-crear
     [botoncrear]="botoncrear"
-    (Actualizar)="cargarComponentes()"
+    (Actualizar)="actualizarDatos()"
   ></app-componentes-crear>
 }
 @if (botoneditar()) {
   <app-componentes-editar
     [botoneditar]="botoneditar"
     [componente]="componenteSeleccionado"
-    (actualizar)="cargarComponentes()"
+    (actualizar)="actualizarDatos()"
   ></app-componentes-editar>
 }
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
-}
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
 }

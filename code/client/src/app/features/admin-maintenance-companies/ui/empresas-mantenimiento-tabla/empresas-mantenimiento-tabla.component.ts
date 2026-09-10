@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EmpresaMantenimiento } from '@entities/admin';
 import { EmpresamantenimientoService } from '@entities/maintenance-company';
@@ -9,8 +9,8 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { AuditPanelComponent } from '@widgets/audit-panel';
 import { EmpresasMantenimientoCrearComponent } from '../empresas-mantenimiento-crear/empresas-mantenimiento-crear.component';
@@ -26,7 +26,6 @@ import { EmpresasMantenimientoEditarComponent } from '../empresas-mantenimiento-
     EmpresasMantenimientoEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     AuditPanelComponent,
   ],
@@ -37,6 +36,7 @@ export class EmpresasMantenimientoTablaComponent
   extends Tabla
   implements OnInit
 {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -68,6 +68,11 @@ export class EmpresasMantenimientoTablaComponent
     this.botoneditar.set(false);
     this.botoncrear.set(true);
   }
+  actualizarDatos(): void {
+    this.cargarEmpresas();
+    this.auditRefresh++;
+  }
+
   cargarEmpresas() {
     this.empresaService.obtenerEmpresaMantenimiento().subscribe({
       next: (data: EmpresaMantenimiento[]) => {
@@ -163,9 +168,9 @@ export class EmpresasMantenimientoTablaComponent
         .subscribe({
           next: (_response) => {
             this.cargarEmpresas();
-            this.mensajeexito =
-              'Empresa de mantenimiento eliminada exitosamente.';
-            this.exito.set(true);
+            this.toast.success(
+              'Empresa de mantenimiento eliminada exitosamente.',
+            );
             this.auditRefresh++;
           },
           error: (error) => {

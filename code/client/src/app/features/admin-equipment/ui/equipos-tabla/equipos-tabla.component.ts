@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Equipos } from '@entities/admin';
 import { EquipoService } from '@entities/equipment';
@@ -9,10 +9,10 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
   OpcionSelect,
+  ToastService,
 } from '@shared/ui';
 import { HistorialEquipoInlineComponent } from '@widgets/admin-inline';
 import { AuditPanelComponent } from '@widgets/audit-panel';
@@ -31,7 +31,6 @@ import { EquiposEditarComponent } from '../equipos-editar/equipos-editar.compone
     EquiposEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     HistorialEquipoInlineComponent,
     AuditPanelComponent,
@@ -42,6 +41,7 @@ import { EquiposEditarComponent } from '../equipos-editar/equipos-editar.compone
   styleUrls: ['./equipos-tabla.component.css'],
 })
 export class EquiposTablaComponent extends Tabla {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -114,6 +114,11 @@ export class EquiposTablaComponent extends Tabla {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
   }
+  actualizarDatos(): void {
+    this.cargarEquipos();
+    this.auditRefresh++;
+  }
+
   cargarEquipos() {
     this.equiposapi.obtenerEquipos().subscribe({
       next: (data: Equipos[]) => {
@@ -206,8 +211,7 @@ export class EquiposTablaComponent extends Tabla {
   confirmarEliminacion() {
     this.equiposapi.eliminarEquipo(this.equipoSeleccionado.Id).subscribe({
       next: (_response) => {
-        this.mensajeexito = 'Equipo eliminado con éxito';
-        this.exito.set(true);
+        this.toast.success('Equipo eliminado con éxito.');
         this.auditRefresh++;
         this.cargarEquipos();
       },

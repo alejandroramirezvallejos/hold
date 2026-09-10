@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text.Json;
 using Ardalis.Result;
 using FluentValidation;
 using IMT_Reservas.Server.Application.Abstraction;
@@ -60,7 +59,7 @@ public class MantenimientoService
             AuditAccion.Crear,
             typeof(MantenimientoEntity).Name,
             result.Value?.Id?.ToString(CultureInfo.InvariantCulture),
-            BuildAuditDetail(dto)
+            AuditChangeDetail.BuildCreated(dto)
         );
 
         return result;
@@ -140,11 +139,4 @@ public class MantenimientoService
             excludedId
         );
 
-    private static string BuildAuditDetail(MantenimientoDto dto) =>
-        JsonSerializer.Serialize(
-            new
-            {
-                texto = $"Empresa: {dto.NombreEmpresaMantenimiento ?? dto.IdEmpresa?.ToString(CultureInfo.InvariantCulture) ?? "Sin empresa"}. Inicio: {dto.FechaMantenimiento:dd/MM/yyyy HH:mm}. Fin: {dto.FechaFinalMantenimiento:dd/MM/yyyy HH:mm}. Equipos IMT: {string.Join(", ", dto.CodigoImt ?? [])}.",
-            }
-        );
 }

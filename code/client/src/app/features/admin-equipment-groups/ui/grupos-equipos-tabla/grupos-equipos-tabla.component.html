@@ -146,7 +146,7 @@
   <app-grupos-equipos-crear
     [botoncrear]="botoncrear"
     [categorias]="categorias"
-    (Actualizar)="cargarGruposEquipos()"
+    (Actualizar)="actualizarDatos()"
   ></app-grupos-equipos-crear>
 }
 @if (botoneditar()) {
@@ -154,12 +154,9 @@
     [botoneditar]="botoneditar"
     [grupoequipo]="grupoEquipoSeleccionado"
     [categorias]="categorias"
-    (actualizar)="cargarGruposEquipos()"
+    (actualizar)="actualizarDatos()"
   ></app-grupos-equipos-editar>
 }
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
-}
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
 }

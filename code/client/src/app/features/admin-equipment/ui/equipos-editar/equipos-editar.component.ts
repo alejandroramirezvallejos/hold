@@ -17,10 +17,10 @@ import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   Aviso,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
   OpcionSelect,
+  ToastService,
 } from '@shared/ui';
 @Component({
   selector: 'app-equipos-editar',
@@ -29,7 +29,6 @@ import {
     CatalogoSelectorComponent,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
     CustomSelectComponent,
   ],
   templateUrl: './equipos-editar.component.html',
@@ -68,6 +67,7 @@ export class EquiposEditarComponent extends BaseTablaComponent {
     private readonly equipoapi: EquipoService,
     private grupoequipoAPI: GrupoequipoService,
     private gaveterosAPI: GaveteroService,
+    private readonly toast: ToastService,
   ) {
     super();
   }
@@ -115,6 +115,7 @@ export class EquiposEditarComponent extends BaseTablaComponent {
     this.aviso.set(true);
   }
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     if (this.grupoequipoSeleccionado) {
       this.equipo.IdGrupoEquipo = this.grupoequipoSeleccionado.id;
       this.equipo.NombreGrupoEquipo = this.grupoequipoSeleccionado.nombre;
@@ -125,8 +126,9 @@ export class EquiposEditarComponent extends BaseTablaComponent {
     this.equipoapi.editarEquipo(this.equipo).subscribe({
       next: () => {
         this.actualizar.emit();
-        this.mensajeexito = 'Equipo editado con exito';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Equipo editado con éxito.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -135,6 +137,7 @@ export class EquiposEditarComponent extends BaseTablaComponent {
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

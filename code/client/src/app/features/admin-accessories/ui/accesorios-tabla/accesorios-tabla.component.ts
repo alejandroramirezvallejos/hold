@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccesoriosService } from '@entities/accessory';
 import { Accesorio } from '@entities/admin';
@@ -10,8 +10,8 @@ import { extractErrorMessage } from '@shared/lib/error';
 import {
   Aviso,
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { AuditPanelComponent } from '@widgets/audit-panel';
 import { AccesoriosCrearComponent } from '../accesorios-crear/accesorios-crear.component';
@@ -28,9 +28,7 @@ import { AccesoriosEditarComponent } from '../accesorios-editar/accesorios-edita
     AccesoriosEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     Aviso,
-    AvisoExitoComponent,
     BuscadorComponent,
     AuditPanelComponent,
   ],
@@ -38,6 +36,7 @@ import { AccesoriosEditarComponent } from '../accesorios-editar/accesorios-edita
   styleUrls: ['./accesorios-tabla.component.css'],
 })
 export class AccesoriosTablaComponent extends Tabla {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -74,6 +73,11 @@ export class AccesoriosTablaComponent extends Tabla {
   crearaccesorio() {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
+  }
+
+  actualizarDatos(): void {
+    this.cargarAccesorios();
+    this.auditRefresh++;
   }
 
   cargarAccesorios() {
@@ -173,8 +177,7 @@ export class AccesoriosTablaComponent extends Tabla {
       .subscribe({
         next: (_response) => {
           this.cargarAccesorios();
-          this.mensajeexito = 'Accesorio eliminado exitosamente.';
-          this.exito.set(true);
+          this.toast.success('Accesorio eliminado exitosamente.');
           this.auditRefresh++;
         },
         error: (error) => {

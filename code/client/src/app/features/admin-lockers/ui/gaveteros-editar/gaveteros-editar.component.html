@@ -102,10 +102,3 @@
     (aceptar)="confirmar()"
   ></app-aviso>
 }
-@if (exito()) {
-  <app-aviso-exito
-    [exito]="exito"
-    [mensaje]="mensajeexito"
-    (accion)="cerrar()"
-  ></app-aviso-exito>
-}

@@ -15,10 +15,10 @@ import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   Aviso,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
   OpcionSelect,
+  ToastService,
 } from '@shared/ui';
 @Component({
   selector: 'app-componentes-editar',
@@ -26,7 +26,6 @@ import {
   imports: [
     ValidatedFormsModule,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     Aviso,
     CustomSelectComponent,
   ],
@@ -48,6 +47,7 @@ export class ComponentesEditarComponent extends BaseTablaComponent {
   constructor(
     private readonly componenteService: ComponenteService,
     private equiposAPI: EquipoService,
+    private readonly toast: ToastService,
   ) {
     super();
   }
@@ -74,11 +74,13 @@ export class ComponentesEditarComponent extends BaseTablaComponent {
     this.aviso.set(true);
   }
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.componenteService.actualizarComponente(this.componente).subscribe({
       next: (_response) => {
         this.actualizar.emit();
-        this.mensajeexito = 'Componente actualizado satisfactoriamente';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Componente actualizado satisfactoriamente.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -87,6 +89,7 @@ export class ComponentesEditarComponent extends BaseTablaComponent {
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

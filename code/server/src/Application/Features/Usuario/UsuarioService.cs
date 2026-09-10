@@ -265,20 +265,13 @@ public class UsuarioService : Service<UsuarioEntity, UsuarioRepository, UsuarioD
                 );
             }
             result.Value.CarreraNombre = await _queries.GetCarreraName(entity.IdCarrera);
+            var auditDetail = AuditChangeDetail.BuildCreated(result.Value);
             ClearProfileDocuments(result.Value);
             await Audit!.Log(
                 AuditAccion.Crear,
                 typeof(UsuarioEntity).Name,
                 entity.Carnet,
-                JsonSerializer.Serialize(new
-                {
-                    cuentaRecreada = deletedUser != null,
-                    aceptoTerminos = dto.AceptaTerminos == true,
-                    versionTerminos = dto.AceptaTerminos == true ? TermsVersion : null,
-                    fechaAceptacion = dto.AceptaTerminos == true
-                        ? (DateTime?)DateTime.UtcNow
-                        : null,
-                })
+                auditDetail
             );
         }
 

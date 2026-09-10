@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Muebles } from '@entities/admin';
 import { MuebleService } from '@entities/furniture';
@@ -9,8 +9,8 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { GaveterosInlineComponent } from '@widgets/admin-inline';
 import { AuditPanelComponent } from '@widgets/audit-panel';
@@ -29,7 +29,6 @@ import { MueblesEditarComponent } from '../muebles-editar/muebles-editar.compone
     MueblesEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     GaveterosInlineComponent,
     AuditPanelComponent,
@@ -38,6 +37,7 @@ import { MueblesEditarComponent } from '../muebles-editar/muebles-editar.compone
   styleUrl: './muebles-tabla.component.css',
 })
 export class MueblesTablaComponent extends Tabla implements OnInit {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -72,6 +72,11 @@ export class MueblesTablaComponent extends Tabla implements OnInit {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
   }
+  actualizarDatos(): void {
+    this.cargarMuebles();
+    this.auditRefresh++;
+  }
+
   cargarMuebles() {
     this.muebleapi.obtenerMuebles().subscribe({
       next: (data: Muebles[]) => {
@@ -188,8 +193,7 @@ export class MueblesTablaComponent extends Tabla implements OnInit {
   confirmarEliminacion() {
     this.muebleapi.eliminarMueble(this.muebleSeleccionado.Id).subscribe({
       next: (_response) => {
-        this.mensajeexito = 'Mueble eliminado exitosamente.';
-        this.exito.set(true);
+        this.toast.success('Mueble eliminado exitosamente.');
         this.auditRefresh++;
         this.cargarMuebles();
       },

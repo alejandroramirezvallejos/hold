@@ -166,21 +166,18 @@
 @if (botoncrear()) {
   <app-equipos-crear
     [botoncrear]="botoncrear"
-    (Actualizar)="cargarEquipos()"
+    (Actualizar)="actualizarDatos()"
   ></app-equipos-crear>
 }
 @if (botoneditar()) {
   <app-equipos-editar
     [botoneditar]="botoneditar"
     [equipo]="equipoSeleccionado"
-    (actualizar)="cargarEquipos()"
+    (actualizar)="actualizarDatos()"
   ></app-equipos-editar>
 }
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
-}
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
 }
 @if (obsHistorial !== null) {
   <div class="obs-overlay" (click)="cerrarObsHistorial()">

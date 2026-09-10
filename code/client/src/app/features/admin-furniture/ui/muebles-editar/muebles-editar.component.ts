@@ -15,7 +15,7 @@ import { Muebles } from '@entities/admin';
 import { MuebleService } from '@entities/furniture';
 import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
-import { Aviso, AvisoExitoComponent, MostrarerrorComponent } from '@shared/ui';
+import { Aviso, MostrarerrorComponent, ToastService } from '@shared/ui';
 @Component({
   selector: 'app-muebles-editar',
   standalone: true,
@@ -24,7 +24,6 @@ import { Aviso, AvisoExitoComponent, MostrarerrorComponent } from '@shared/ui';
     ValidatedFormsModule,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
   ],
   templateUrl: './muebles-editar.component.html',
   styleUrl: './muebles-editar.component.css',
@@ -51,6 +50,7 @@ export class MueblesEditarComponent
   constructor(
     private readonly muebleapi: MuebleService,
     private readonly catalogos: CatalogoInventarioService,
+    private readonly toast: ToastService,
   ) {
     super();
   }
@@ -62,11 +62,13 @@ export class MueblesEditarComponent
     this.aviso.set(true);
   }
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.muebleapi.actualizarMueble(this.mueble).subscribe({
       next: (_response) => {
         this.actualizar.emit();
-        this.mensajeexito = 'Mueble editado exitosamente.';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Mueble editado exitosamente.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -75,6 +77,7 @@ export class MueblesEditarComponent
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

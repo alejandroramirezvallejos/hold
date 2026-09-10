@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Gaveteros } from '@entities/admin';
 import { GaveteroService } from '@entities/locker';
@@ -9,8 +9,8 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { EquiposGaveteroInlineComponent } from '@widgets/admin-inline';
 import { AuditPanelComponent } from '@widgets/audit-panel';
@@ -28,7 +28,6 @@ import { GaveterosEditarComponent } from '../gaveteros-editar/gaveteros-editar.c
     GaveterosEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     EquiposGaveteroInlineComponent,
     AuditPanelComponent,
@@ -37,6 +36,7 @@ import { GaveterosEditarComponent } from '../gaveteros-editar/gaveteros-editar.c
   styleUrls: ['./gaveteros-tabla.component.css'],
 })
 export class GaveterosTablaComponent extends Tabla {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -71,6 +71,11 @@ export class GaveterosTablaComponent extends Tabla {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
   }
+  actualizarDatos(): void {
+    this.cargarGaveteros();
+    this.auditRefresh++;
+  }
+
   cargarGaveteros() {
     this.gaveterosapi.obtenerGaveteros().subscribe({
       next: (data: Gaveteros[]) => {
@@ -164,8 +169,7 @@ export class GaveterosTablaComponent extends Tabla {
   confirmarEliminacion() {
     this.gaveterosapi.eliminarGavetero(this.gaveteroSeleccionado.Id).subscribe({
       next: (_response) => {
-        this.mensajeexito = 'Gavetero eliminado con exito';
-        this.exito.set(true);
+        this.toast.success('Gavetero eliminado con éxito.');
         this.auditRefresh++;
         this.cargarGaveteros();
       },

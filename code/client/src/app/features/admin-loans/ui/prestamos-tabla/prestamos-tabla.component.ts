@@ -35,11 +35,11 @@ import { formatBoliviaDateTime } from '@shared/lib/date';
 import {
   Aviso,
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
   OpcionSelect,
   PantallaCargaComponent,
+  ToastService,
 } from '@shared/ui';
 import { AuditPanelComponent } from '@widgets/audit-panel';
 import { finalize } from 'rxjs';
@@ -59,7 +59,6 @@ import { VercontratoComponent } from '@entities/loan';
     AvisoEliminarComponent,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
     BuscadorComponent,
     AuditPanelComponent,
     CustomSelectComponent,
@@ -70,6 +69,7 @@ import { VercontratoComponent } from '@entities/loan';
   styleUrls: ['./prestamos-tabla.component.css'],
 })
 export class PrestamosTablaComponent extends Tabla implements OnInit {
+  private readonly toast = inject(ToastService);
   readonly esRoot =
     inject(UsuarioService).obtenerUsuario().rol?.toLowerCase() ===
     'administrador';
@@ -303,8 +303,7 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
       .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: (_response) => {
-          this.mensajeexito = 'Préstamo eliminado con éxito.';
-          this.exito.set(true);
+          this.toast.success('Préstamo eliminado con éxito.');
           this.auditRefresh++;
           this.cargarPrestamos();
         },
@@ -520,8 +519,7 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
         next: (_response) => {
           this.procesandoDecision = false;
           this.cerrarDecision();
-          this.mensajeexito = 'Préstamo aprobado con éxito.';
-          this.exito.set(true);
+          this.toast.success('Préstamo aprobado con éxito.');
           this.auditRefresh++;
           this.cargarPrestamos();
         },
@@ -551,8 +549,7 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
         next: (_response) => {
           this.procesandoDecision = false;
           this.cerrarDecision();
-          this.mensajeexito = 'Préstamo rechazado con éxito.';
-          this.exito.set(true);
+          this.toast.success('Préstamo rechazado con éxito.');
           this.auditRefresh++;
           this.cargarPrestamos();
         },
@@ -586,8 +583,7 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
       )
       .subscribe({
         next: (_response) => {
-          this.mensajeexito = 'Préstamo cancelado con éxito.';
-          this.exito.set(true);
+          this.toast.success('Préstamo cancelado con éxito.');
           this.auditRefresh++;
           this.cargarPrestamos();
         },
@@ -651,8 +647,7 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
       .cambiarEstadoPrestamo(this.prestamos.get(key)!.datosgrupo.Id, 'activo')
       .subscribe({
         next: (_response) => {
-          this.mensajeexito = 'Préstamo marcado como recogido con éxito.';
-          this.exito.set(true);
+          this.toast.success('Préstamo marcado como recogido con éxito.');
           this.auditRefresh++;
           this.cargarPrestamos();
         },
@@ -682,8 +677,7 @@ export class PrestamosTablaComponent extends Tabla implements OnInit {
       )
       .subscribe({
         next: (_response) => {
-          this.mensajeexito = 'Préstamo marcado como devuelto con éxito.';
-          this.exito.set(true);
+          this.toast.success('Préstamo marcado como devuelto con éxito.');
           this.auditRefresh++;
           if (this.bloquearAlDevolver) {
             this.bloquearUsuarioDevolucion(

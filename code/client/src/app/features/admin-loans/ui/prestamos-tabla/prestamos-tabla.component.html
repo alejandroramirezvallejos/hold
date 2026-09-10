@@ -368,9 +368,6 @@
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
 }
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
-}
 @if (decisionPrestamo) {
   <div class="devuelto-overlay">
     <section

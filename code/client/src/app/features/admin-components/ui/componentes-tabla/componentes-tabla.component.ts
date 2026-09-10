@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Componente } from '@entities/admin';
 import { ComponenteService } from '@entities/component';
@@ -9,8 +9,8 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { AuditPanelComponent } from '@widgets/audit-panel';
 import { ComponentesCrearComponent } from '../componentes-crear/componentes-crear.component';
@@ -26,7 +26,6 @@ import { ComponentesEditarComponent } from '../componentes-editar/componentes-ed
     ComponentesEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     AuditPanelComponent,
   ],
@@ -34,6 +33,7 @@ import { ComponentesEditarComponent } from '../componentes-editar/componentes-ed
   styleUrl: './componentes-tabla.component.css',
 })
 export class ComponentesTablaComponent extends Tabla implements OnInit {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -67,6 +67,11 @@ export class ComponentesTablaComponent extends Tabla implements OnInit {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
   }
+  actualizarDatos(): void {
+    this.cargarComponentes();
+    this.auditRefresh++;
+  }
+
   cargarComponentes() {
     this.componenteService.obtenerComponentes().subscribe({
       next: (data: Componente[]) => {
@@ -170,8 +175,7 @@ export class ComponentesTablaComponent extends Tabla implements OnInit {
         .subscribe({
           next: (_response) => {
             this.cargarComponentes();
-            this.mensajeexito = 'Componente eliminado exitosamente';
-            this.exito.set(true);
+            this.toast.success('Componente eliminado exitosamente.');
             this.auditRefresh++;
           },
           error: (error) => {

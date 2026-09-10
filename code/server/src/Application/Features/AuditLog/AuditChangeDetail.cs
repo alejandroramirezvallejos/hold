@@ -18,19 +18,11 @@ public static class AuditChangeDetail
 
     private static readonly HashSet<string> ProtectedProperties = new(StringComparer.OrdinalIgnoreCase)
     {
-        "Carnet",
-        "CarnetAdministrador",
         "Contrasena",
-        "Email",
-        "Telefono",
-        "NombreReferencia",
-        "TelefonoReferencia",
-        "EmailReferencia",
         "ImagenPerfil",
         "ImagenFrenteCarnet",
         "ImagenAtrasCarnet",
         "ImagenFirma",
-        "MotivoBloqueo",
         "RefreshToken",
         "GoogleId",
         "TokenVerificacionHash",

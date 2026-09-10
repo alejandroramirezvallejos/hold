@@ -318,10 +318,19 @@ internal class PrestamoServiceTests : ServiceTest<PrestamoService>
 
         var auditEntry = Db.AuditLogs.Single(entry => entry.Entidad == nameof(Prestamo));
         using var auditDetail = JsonDocument.Parse(auditEntry.Detalle!);
-        auditDetail.RootElement.GetProperty("usuarioNombre").GetString().Should().Be("Test User");
-        auditDetail.RootElement.GetProperty("usuarioCarnet").GetString().Should().Be(Carnet);
-        auditDetail.RootElement.GetProperty("equiposPrestamo").GetString().Should().Be("Grupo Test");
-        auditDetail.RootElement.TryGetProperty("texto", out _).Should().BeFalse();
+        var changes = auditDetail.RootElement.GetProperty("cambios").EnumerateArray().ToList();
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Usuario"
+            && change.GetProperty("nuevo").GetString() == "Test User"
+        );
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Carnet usuario"
+            && change.GetProperty("nuevo").GetString() == Carnet
+        );
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Equipos"
+            && change.GetProperty("nuevo").GetString() == "Grupo Test"
+        );
     }
 
     [Test]

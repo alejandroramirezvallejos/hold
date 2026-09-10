@@ -205,7 +205,7 @@ The global limit is 180 requests/minute per authenticated identity or anonymous 
 
 | Method | Route            | Purpose                                                                                                                          |
 | ------ | ---------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `GET`  | `/api/auditoria` | Query audit entries. Administrator only. Supports `buscar`, `entidad`, `actor` (name or carnet), `accion`, `desde`, and `hasta`. |
+| `GET`  | `/api/auditoria` | Query audit entries. Administrator only. Supports `buscar`, `entidad`, `actor` (name or carnet), `accion`, `desde`, and `hasta`; change details include previous and new values while credentials and stored identity documents remain protected. |
 | `GET`  | `/api/health`    | Health check for the API and database.                                                                                           |
 
 ## Business Rules

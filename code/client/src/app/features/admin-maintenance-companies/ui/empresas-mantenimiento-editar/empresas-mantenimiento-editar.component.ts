@@ -12,14 +12,13 @@ import { EmpresaMantenimiento } from '@entities/admin';
 import { EmpresamantenimientoService } from '@entities/maintenance-company';
 import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
-import { Aviso, AvisoExitoComponent, MostrarerrorComponent } from '@shared/ui';
+import { Aviso, MostrarerrorComponent, ToastService } from '@shared/ui';
 @Component({
   selector: 'app-empresas-mantenimiento-editar',
   imports: [
     ValidatedFormsModule,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
   ],
   templateUrl: './empresas-mantenimiento-editar.component.html',
   styleUrl: './empresas-mantenimiento-editar.component.css',
@@ -31,6 +30,7 @@ export class EmpresasMantenimientoEditarComponent extends BaseTablaComponent {
     new EmpresaMantenimiento();
   constructor(
     private readonly empresaMantenimientoapi: EmpresamantenimientoService,
+    private readonly toast: ToastService,
   ) {
     super();
   }
@@ -39,14 +39,17 @@ export class EmpresasMantenimientoEditarComponent extends BaseTablaComponent {
     this.aviso.set(true);
   }
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.empresaMantenimientoapi
       .actualizarEmpresaMantenimiento(this.empresaMantenimiento)
       .subscribe({
         next: () => {
           this.actualizar.emit();
-          this.mensajeexito =
-            'Empresa de Mantenimiento actualizada exitosamente.';
-          this.exito.set(true);
+          this.finalizarEnvio();
+          this.toast.success(
+            'Empresa de mantenimiento actualizada exitosamente.',
+          );
+          this.cerrar();
         },
         error: (error) => {
           const errorMsg = extractErrorMessage(
@@ -55,6 +58,7 @@ export class EmpresasMantenimientoEditarComponent extends BaseTablaComponent {
           );
           this.mensajeerror = errorMsg;
           this.error.set(true);
+          this.finalizarEnvio();
         },
       });
   }

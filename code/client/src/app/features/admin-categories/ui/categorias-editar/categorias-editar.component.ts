@@ -12,14 +12,13 @@ import { Categorias } from '@entities/admin';
 import { CategoriaService } from '@entities/category';
 import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
-import { Aviso, AvisoExitoComponent, MostrarerrorComponent } from '@shared/ui';
+import { Aviso, MostrarerrorComponent, ToastService } from '@shared/ui';
 @Component({
   selector: 'app-categorias-editar',
   standalone: true,
   imports: [
     ValidatedFormsModule,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     Aviso,
   ],
   templateUrl: './categorias-editar.component.html',
@@ -30,7 +29,10 @@ export class CategoriasEditarComponent extends BaseTablaComponent {
   @Output() actualizar: EventEmitter<void> = new EventEmitter<void>();
   @Input() categoria: Categorias = new Categorias();
 
-  constructor(private readonly categoriaService: CategoriaService) {
+  constructor(
+    private readonly categoriaService: CategoriaService,
+    private readonly toast: ToastService,
+  ) {
     super();
   }
 
@@ -45,11 +47,13 @@ export class CategoriasEditarComponent extends BaseTablaComponent {
   }
 
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.categoriaService.actualizarCategoria(this.categoria).subscribe({
       next: (_response) => {
         this.actualizar.emit();
-        this.mensajeexito = 'Categoría actualizada con éxito';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Categoría actualizada con éxito.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -58,6 +62,7 @@ export class CategoriasEditarComponent extends BaseTablaComponent {
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

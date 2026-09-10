@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Carrera } from '@entities/admin';
 import { CarreraService } from '@entities/career';
@@ -9,8 +9,8 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { AuditPanelComponent } from '@widgets/audit-panel';
 import { CarrerasCrearComponent } from '../carreras-crear/carreras-crear.component';
@@ -26,7 +26,6 @@ import { CarrerasEditarComponent } from '../carreras-editar/carreras-editar.comp
     CarrerasEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     AuditPanelComponent,
   ],
@@ -34,6 +33,7 @@ import { CarrerasEditarComponent } from '../carreras-editar/carreras-editar.comp
   styleUrl: './carreras-tabla.component.css',
 })
 export class CarrerasTablaComponent extends Tabla {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -64,6 +64,11 @@ export class CarrerasTablaComponent extends Tabla {
   crearCarrera(): void {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
+  }
+
+  actualizarDatos(): void {
+    this.cargarCarreras();
+    this.auditRefresh++;
   }
 
   cargarCarreras(): void {
@@ -135,8 +140,7 @@ export class CarrerasTablaComponent extends Tabla {
         .subscribe({
           next: () => {
             this.cargarCarreras();
-            this.mensajeexito = 'Carrera eliminada correctamente';
-            this.exito.set(true);
+            this.toast.success('Carrera eliminada correctamente.');
             this.auditRefresh++;
           },
           error: (error) => {

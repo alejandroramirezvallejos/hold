@@ -14,11 +14,11 @@ import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   Aviso,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
   OpcionSelect,
   PasswordInputComponent,
+  ToastService,
 } from '@shared/ui';
 @Component({
   selector: 'app-usuarios-editar',
@@ -26,7 +26,6 @@ import {
     ValidatedFormsModule,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
     CustomSelectComponent,
     PasswordInputComponent,
   ],
@@ -59,7 +58,10 @@ export class UsuariosEditarComponent extends BaseTablaComponent {
       this.sesion.obtenerUsuario().rol?.toLowerCase() === 'administrador' ||
       !rol.value.startsWith('administrador'),
   );
-  constructor(private readonly usuarioApi: UsuarioServiceAPI) {
+  constructor(
+    private readonly usuarioApi: UsuarioServiceAPI,
+    private readonly toast: ToastService,
+  ) {
     super();
   }
   validareditar() {
@@ -68,12 +70,13 @@ export class UsuariosEditarComponent extends BaseTablaComponent {
     this.aviso.set(true);
   }
   confirmar() {
-    if (!this.contrasenasValidas) return;
+    if (!this.contrasenasValidas || !this.iniciarEnvio()) return;
     this.usuarioApi.editarUsuario(this.usuario, this.contrasena).subscribe({
       next: (_response) => {
         this.actualizar.emit();
-        this.mensajeexito = 'Usuario editado con exito';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Usuario editado con éxito.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -82,6 +85,7 @@ export class UsuariosEditarComponent extends BaseTablaComponent {
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

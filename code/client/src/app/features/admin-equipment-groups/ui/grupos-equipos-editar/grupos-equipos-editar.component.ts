@@ -14,9 +14,9 @@ import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   Aviso,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 @Component({
   selector: 'app-grupos-equipos-editar',
@@ -25,7 +25,6 @@ import {
     ValidatedFormsModule,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
     CustomSelectComponent,
   ],
   templateUrl: './grupos-equipos-editar.component.html',
@@ -40,7 +39,10 @@ export class GruposEquiposEditarComponent
   @Input() categorias: string[] = [];
   @Input() grupoequipo: GrupoEquipo = new GrupoEquipo();
   grupoEquipo: GrupoEquipo = { ...this.grupoequipo };
-  constructor(private readonly grupoEquipoapi: GrupoequipoService) {
+  constructor(
+    private readonly grupoEquipoapi: GrupoequipoService,
+    private readonly toast: ToastService,
+  ) {
     super();
   }
   ngOnChanges() {
@@ -52,11 +54,13 @@ export class GruposEquiposEditarComponent
     this.aviso.set(true);
   }
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.grupoEquipoapi.editarGrupoEquipo(this.grupoEquipo).subscribe({
       next: (_response) => {
         this.actualizar.emit();
-        this.mensajeexito = 'Grupo de equipo editado exitosamente';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Grupo de equipo editado exitosamente.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -65,6 +69,7 @@ export class GruposEquiposEditarComponent
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

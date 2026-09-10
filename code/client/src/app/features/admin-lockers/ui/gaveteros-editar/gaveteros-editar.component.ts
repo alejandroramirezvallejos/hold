@@ -15,9 +15,9 @@ import { BaseTablaComponent } from '@shared/lib/admin-table';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   Aviso,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 @Component({
   selector: 'app-gaveteros-editar',
@@ -25,7 +25,6 @@ import {
     ValidatedFormsModule,
     MostrarerrorComponent,
     Aviso,
-    AvisoExitoComponent,
     CustomSelectComponent,
   ],
   templateUrl: './gaveteros-editar.component.html',
@@ -39,6 +38,7 @@ export class GaveterosEditarComponent extends BaseTablaComponent {
   constructor(
     private readonly gaveteroapi: GaveteroService,
     private mueblesAPI: MuebleService,
+    private readonly toast: ToastService,
   ) {
     super();
   }
@@ -65,11 +65,13 @@ export class GaveterosEditarComponent extends BaseTablaComponent {
     this.aviso.set(true);
   }
   confirmar() {
+    if (!this.iniciarEnvio()) return;
     this.gaveteroapi.editarGavetero(this.gavetero).subscribe({
       next: () => {
         this.actualizar.emit();
-        this.mensajeexito = 'Gavetero editado con éxito';
-        this.exito.set(true);
+        this.finalizarEnvio();
+        this.toast.success('Gavetero editado con éxito.');
+        this.cerrar();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(
@@ -78,6 +80,7 @@ export class GaveterosEditarComponent extends BaseTablaComponent {
         );
         this.mensajeerror = errorMsg;
         this.error.set(true);
+        this.finalizarEnvio();
       },
     });
   }

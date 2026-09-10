@@ -130,19 +130,16 @@
 @if (botoncrear()) {
   <app-empresas-mantenimiento-crear
     [botoncrear]="botoncrear"
-    (Actualizar)="cargarEmpresas()"
+    (Actualizar)="actualizarDatos()"
   ></app-empresas-mantenimiento-crear>
 }
 @if (botoneditar()) {
   <app-empresas-mantenimiento-editar
     [botoneditar]="botoneditar"
     [empresaMantenimiento]="empresaSeleccionada"
-    (actualizar)="cargarEmpresas()"
+    (actualizar)="actualizarDatos()"
   ></app-empresas-mantenimiento-editar>
 }
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
-}
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
 }

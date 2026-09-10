@@ -144,19 +144,16 @@
 @if (botoncrear()) {
   <app-gaveteros-crear
     [botoncrear]="botoncrear"
-    (Actualizar)="cargarGaveteros()"
+    (Actualizar)="actualizarDatos()"
   ></app-gaveteros-crear>
 }
 @if (botoneditar()) {
   <app-gaveteros-editar
     [botoneditar]="botoneditar"
     [gavetero]="gaveteroSeleccionado"
-    (actualizar)="cargarGaveteros()"
+    (actualizar)="actualizarDatos()"
   ></app-gaveteros-editar>
 }
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
-}
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
 }

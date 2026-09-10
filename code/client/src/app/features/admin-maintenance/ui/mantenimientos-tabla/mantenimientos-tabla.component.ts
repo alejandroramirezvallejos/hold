@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Mantenimientos } from '@entities/admin';
 import {
@@ -15,8 +15,8 @@ import {
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { AuditPanelComponent } from '@widgets/audit-panel';
 import { MantenimientosCrearComponent } from '../mantenimientos-crear/mantenimientos-crear.component';
@@ -33,7 +33,6 @@ import { DetallesMantenimientoComponent } from './detalles-mantenimiento/detalle
     DetallesMantenimientoComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     AuditPanelComponent,
     FlatpickrDirective,
@@ -43,6 +42,7 @@ import { DetallesMantenimientoComponent } from './detalles-mantenimiento/detalle
   styleUrl: './mantenimientos-tabla.component.css',
 })
 export class MantenimientosTablaComponent extends Tabla implements OnInit {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -79,6 +79,11 @@ export class MantenimientosTablaComponent extends Tabla implements OnInit {
   crearmantenimiento() {
     this.botoncrear.set(true);
   }
+  actualizarDatos(): void {
+    this.cargarMantenimientos();
+    this.auditRefresh++;
+  }
+
   cargarMantenimientos() {
     this.mantenimientoapi.obtenerMantenimientos().subscribe({
       next: (datos) => {
@@ -246,8 +251,7 @@ export class MantenimientosTablaComponent extends Tabla implements OnInit {
         next: () => {
           this.limpiarMantenimientoSeleccionado();
           this.alertaeliminar = false;
-          this.mensajeexito = 'Mantenimiento eliminado exitosamente';
-          this.exito.set(true);
+          this.toast.success('Mantenimiento eliminado exitosamente.');
           this.auditRefresh++;
           this.cargarMantenimientos();
         },

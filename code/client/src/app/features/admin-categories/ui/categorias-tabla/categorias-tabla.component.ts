@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, WritableSignal } from '@angular/core';
+import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Categorias } from '@entities/admin';
 import { CategoriaService } from '@entities/category';
@@ -9,8 +9,8 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { AuditPanelComponent } from '@widgets/audit-panel';
 import { CategoriasCrearComponent } from '../categorias-crear/categorias-crear.component';
@@ -26,7 +26,6 @@ import { CategoriasEditarComponent } from '../categorias-editar/categorias-edita
     CategoriasEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     AuditPanelComponent,
   ],
@@ -34,6 +33,7 @@ import { CategoriasEditarComponent } from '../categorias-editar/categorias-edita
   styleUrl: './categorias-tabla.component.css',
 })
 export class CategoriasTablaComponent extends Tabla {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -64,6 +64,11 @@ export class CategoriasTablaComponent extends Tabla {
   crearCategoria(): void {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
+  }
+
+  actualizarDatos(): void {
+    this.cargarCategorias();
+    this.auditRefresh++;
   }
 
   cargarCategorias(): void {
@@ -126,8 +131,7 @@ export class CategoriasTablaComponent extends Tabla {
         .subscribe({
           next: () => {
             this.cargarCategorias();
-            this.mensajeexito = 'Categoría eliminada con éxito';
-            this.exito.set(true);
+            this.toast.success('Categoría eliminada con éxito.');
             this.auditRefresh++;
           },
           error: (error) => {

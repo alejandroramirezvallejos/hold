@@ -195,7 +195,7 @@ export class UsuarioServiceAPI {
       Contrasena: contrasena,
       Rol: usuario.rol,
       CarreraNombre: usuario.carrera,
-      IdCarrera: usuario.carrera_Id || 0,
+      IdCarrera: null,
       Telefono: usuario.telefono,
       TelefonoReferencia: usuario.telefono_referencia,
       NombreReferencia: usuario.nombre_referencia,

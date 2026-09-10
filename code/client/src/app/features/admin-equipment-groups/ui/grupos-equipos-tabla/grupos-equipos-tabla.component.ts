@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Categorias } from '@entities/admin';
 import { CategoriaService } from '@entities/category';
@@ -10,8 +10,8 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   MostrarerrorComponent,
+  ToastService,
 } from '@shared/ui';
 import { EquiposInlineComponent } from '@widgets/admin-inline';
 import { AuditPanelComponent } from '@widgets/audit-panel';
@@ -29,7 +29,6 @@ import { GruposEquiposEditarComponent } from '../grupos-equipos-editar/grupos-eq
     GruposEquiposEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     EquiposInlineComponent,
     AuditPanelComponent,
@@ -38,6 +37,7 @@ import { GruposEquiposEditarComponent } from '../grupos-equipos-editar/grupos-eq
   styleUrl: './grupos-equipos-tabla.component.css',
 })
 export class GruposEquiposTablaComponent extends Tabla implements OnInit {
+  private readonly toast = inject(ToastService);
   expandedRowId: number | null = null;
   auditRefresh = 0;
 
@@ -92,6 +92,11 @@ export class GruposEquiposTablaComponent extends Tabla implements OnInit {
     this.botoneditar.set(false);
     this.botoncrear.set(true);
   }
+  actualizarDatos(): void {
+    this.cargarGruposEquipos();
+    this.auditRefresh++;
+  }
+
   cargarGruposEquipos() {
     this.grupoequipoapi.getGrupoEquipo('', '').subscribe({
       next: (data: GrupoEquipo[]) => {
@@ -214,8 +219,7 @@ export class GruposEquiposTablaComponent extends Tabla implements OnInit {
       .eliminarGrupoEquipo(this.grupoEquipoSeleccionado.id)
       .subscribe({
         next: (_response) => {
-          this.mensajeexito = 'Grupo de equipo eliminado exitosamente';
-          this.exito.set(true);
+          this.toast.success('Grupo de equipo eliminado exitosamente.');
           this.auditRefresh++;
           this.cargarGruposEquipos();
         },

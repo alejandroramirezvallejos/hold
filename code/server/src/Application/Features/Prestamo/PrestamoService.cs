@@ -126,15 +126,15 @@ public class PrestamoService : Service<PrestamoEntity, PrestamoRepository, Prest
             entity.Carnet!,
             cancellationToken
         );
-        var equipmentNames = createdLoan.Value.NombreGrupoEquipo
-            ?? string.Join(", ", dto.GrupoEquipoId ?? []);
-        var loanDetail = JsonSerializer.Serialize(new
+        var loanDetail = AuditChangeDetail.BuildCreated(new
         {
-            usuarioNombre = userDisplayName,
-            usuarioCarnet = entity.Carnet,
-            equiposPrestamo = equipmentNames,
-            fechaInicio = entity.FechaPrestamoEsperada,
-            fechaDevolucion = entity.FechaDevolucionEsperada,
+            Usuario = userDisplayName,
+            CarnetUsuario = entity.Carnet,
+            Equipos = createdLoan.Value.NombreGrupoEquipo,
+            FechaInicio = entity.FechaPrestamoEsperada,
+            FechaDevolucion = entity.FechaDevolucionEsperada,
+            entity.EstadoPrestamo,
+            entity.Observacion,
         });
 
         await Audit!.Log(
@@ -388,7 +388,10 @@ public class PrestamoService : Service<PrestamoEntity, PrestamoRepository, Prest
             AuditAccion.Desbloquear,
             "Usuario",
             carnet,
-            "Cuenta desbloqueada automáticamente al regularizar los préstamos atrasados"
+            AuditChangeDetail.Build(
+                new { Bloqueado = true, MotivoBloqueo = (string?)"Préstamos atrasados" },
+                new { Bloqueado = false, MotivoBloqueo = (string?)null }
+            )
         );
         await _notifications.Create(
             carnet,

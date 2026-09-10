@@ -129,25 +129,19 @@
 @if (botoncrear()) {
   <app-accesorios-crear
     [botoncrear]="botoncrear"
-    (Actualizar)="cargarAccesorios()"
+    (Actualizar)="actualizarDatos()"
   ></app-accesorios-crear>
 }
 @if (botoneditar()) {
   <app-accesorios-editar
     [botoneditar]="botoneditar"
     [accesorio]="accesorioSeleccionado"
-    (actualizar)="cargarAccesorios()"
+    (actualizar)="actualizarDatos()"
   ></app-accesorios-editar>
 }
 @if (error()) {
   <app-mostrarerror [error]="error" [mensaje]="mensajeerror"></app-mostrarerror>
 }
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
-}
 @if (aviso()) {
   <app-aviso [cerrar]="aviso" [mensaje]="mensajeaviso"></app-aviso>
-}
-@if (exito()) {
-  <app-aviso-exito [exito]="exito" [mensaje]="mensajeexito"></app-aviso-exito>
 }

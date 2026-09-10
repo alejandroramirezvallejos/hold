@@ -22,10 +22,10 @@ import { StickyScrollDirective } from '@shared/lib/directives';
 import { extractErrorMessage } from '@shared/lib/error';
 import {
   AvisoEliminarComponent,
-  AvisoExitoComponent,
   CustomSelectComponent,
   MostrarerrorComponent,
   OpcionSelect,
+  ToastService,
 } from '@shared/ui';
 import { PrestamosInlineComponent } from '@widgets/admin-inline';
 import { AuditPanelComponent } from '@widgets/audit-panel';
@@ -43,7 +43,6 @@ import { UsuariosEditarComponent } from '../usuarios-editar/usuarios-editar.comp
     UsuariosEditarComponent,
     AvisoEliminarComponent,
     MostrarerrorComponent,
-    AvisoExitoComponent,
     BuscadorComponent,
     PrestamosInlineComponent,
     AuditPanelComponent,
@@ -54,6 +53,7 @@ import { UsuariosEditarComponent } from '../usuarios-editar/usuarios-editar.comp
   styleUrls: ['./usuarios-tabla.component.css'],
 })
 export class UsuariosTablaComponent extends Tabla implements OnInit {
+  private readonly toast = inject(ToastService);
   readonly esRoot =
     inject(UsuarioService).obtenerUsuario().rol?.toLowerCase() ===
     'administrador';
@@ -164,10 +164,9 @@ export class UsuariosTablaComponent extends Tabla implements OnInit {
         next: () => {
           usuario.bloqueado = bloqueado;
           usuario.motivo_bloqueo = bloqueado ? motivo : null;
-          this.mensajeexito = bloqueado
-            ? 'Usuario bloqueado'
-            : 'Usuario desbloqueado';
-          this.exito.set(true);
+          this.toast.success(
+            bloqueado ? 'Usuario bloqueado.' : 'Usuario desbloqueado.',
+          );
           this.auditRefresh++;
           this.procesandoBloqueo = false;
           this.bloqueoModalVisible = false;
@@ -230,6 +229,7 @@ export class UsuariosTablaComponent extends Tabla implements OnInit {
   }
   actualizarTabla() {
     this.cargarUsuarios();
+    this.auditRefresh++;
   }
   aplicarFiltros(event?: [string, string]) {
     if (event) this.filtroBusqueda = event;
@@ -372,8 +372,7 @@ export class UsuariosTablaComponent extends Tabla implements OnInit {
 
     this.usuarioapi.eliminarUsuario(this.usuarioAEliminar.id || '').subscribe({
       next: () => {
-        this.mensajeexito = 'Usuario eliminado exitosamente.';
-        this.exito.set(true);
+        this.toast.success('Usuario eliminado exitosamente.');
         this.auditRefresh++;
         this.alertaeliminar = false;
         this.usuarioAEliminar = null;
