@@ -634,6 +634,11 @@ body {
   outline-offset: 2px;
 }
 
+:where(button, a, [role="button"]):focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(0, 69, 123, 0.14) !important;
+}
+
 input[type="date"] {
   appearance: none;
   -webkit-appearance: none;
@@ -1470,6 +1475,7 @@ app-administrador .table-responsive::-webkit-scrollbar-track {
 .table-responsive {
   width: 100%;
   max-width: 100%;
+  container-type: inline-size;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-inline: contain;
@@ -2152,6 +2158,15 @@ td.actions-column .btn-icon {
     width: 44px;
     height: 44px;
     min-width: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .empty-table > .empty-state {
+    left: 0;
+    width: 100cqw;
+    max-width: 100cqw;
+    margin-inline: 0;
   }
 }
 

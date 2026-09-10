@@ -17,11 +17,13 @@ import {
   GrupoequipoService,
 } from '@entities/equipment-group';
 import { Subscription, finalize } from 'rxjs';
+import { ImageCacheService } from '@shared/lib/image/image-cache.service';
+import { EquipmentImagePlaceholderComponent } from '@shared/ui';
 
 @Component({
   selector: 'app-inspeccion-equipo',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EquipmentImagePlaceholderComponent],
   template: `
     <dialog
       #modal
@@ -33,6 +35,7 @@ import { Subscription, finalize } from 'rxjs';
           {{ grupo?.nombre || 'Características del equipo' }}
         </h2>
         <button
+          type="button"
           class="modal-close-btn"
           (click)="cerrar.emit()"
           aria-label="Cerrar"
@@ -45,15 +48,17 @@ import { Subscription, finalize } from 'rxjs';
           <p role="alert">{{ error }}</p>
         }
         @if (grupo) {
-          @if (grupo.link) {
-            <img
-              [src]="grupo.link"
-              alt=""
-              width="180"
-              height="140"
-              (error)="$any($event.target).hidden = true"
-            />
-          }
+          <div class="inspection-image">
+            @if (obtenerImagenGrupo(); as imageUrl) {
+              <img
+                [src]="imageUrl"
+                [alt]="grupo.nombre || 'Equipo'"
+                (error)="ocultarImagenGrupo()"
+              />
+            } @else {
+              <app-equipment-image-placeholder></app-equipment-image-placeholder>
+            }
+          </div>
           <dl>
             <div>
               <dt>Modelo</dt>
@@ -98,7 +103,11 @@ import { Subscription, finalize } from 'rxjs';
           <p role="status">Cargando componentes...</p>
         }
         @if (hayMas && !cargando) {
-          <button class="btn btn-secondary" (click)="cargarComponentes()">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="cargarComponentes()"
+          >
             Ver más componentes
           </button>
         }
@@ -163,11 +172,22 @@ import { Subscription, finalize } from 'rxjs';
         padding: 24px;
         box-sizing: border-box;
       }
-      img {
+      .inspection-image {
+        width: min(17rem, 100%);
+        aspect-ratio: 4 / 3;
+        margin: 0 auto 20px;
+        overflow: hidden;
+        border-radius: var(--radius-md);
+        background: var(--sidebar);
+      }
+      .inspection-image img,
+      .inspection-image app-equipment-image-placeholder {
+        width: 100%;
+        height: 100%;
+      }
+      .inspection-image img {
         object-fit: contain;
         display: block;
-        margin: 0 auto 20px;
-        max-width: 100%;
       }
       dl {
         display: grid;
@@ -224,6 +244,7 @@ export class InspeccionEquipoComponent
   @Output() cerrar = new EventEmitter<void>();
   @ViewChild('modal') modal!: ElementRef<HTMLDialogElement>;
   private readonly api = inject(GrupoequipoService);
+  private readonly imageCache = inject(ImageCacheService);
   private readonly solicitudes = new Subscription();
   grupo?: GrupoEquipo;
   componentes: ComponenteGrupo[] = [];
@@ -262,6 +283,21 @@ export class InspeccionEquipoComponent
           },
         }),
     );
+  }
+  obtenerImagenGrupo(): string | null {
+    const imageUrl = this.grupo?.link?.trim();
+
+    if (!imageUrl) return null;
+    if (!this.imageCache.canDisplay(imageUrl)) return null;
+    if (this.imageCache.hasFailed(imageUrl)) return null;
+
+    return imageUrl;
+  }
+  ocultarImagenGrupo(): void {
+    if (!this.grupo?.link) return;
+
+    this.imageCache.markFailed(this.grupo.link);
+    this.grupo.link = null;
   }
   ngOnDestroy() {
     this.solicitudes.unsubscribe();

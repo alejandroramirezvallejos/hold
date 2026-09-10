@@ -240,9 +240,9 @@
 }
 
 .availability-selector__field-switch button.is-active {
-  border-color: #8a6d00;
-  background: #fff3b0;
-  box-shadow: 0 0 0 2px rgba(138, 109, 0, 0.2);
+  border-color: var(--brand-hover);
+  background: var(--warning-bg);
+  box-shadow: none;
 }
 
 .availability-selector__time-field {
@@ -340,8 +340,8 @@
 .availability-selector__day:focus-visible,
 .availability-selector__field-switch button:focus-visible,
 .availability-selector__watch:focus-visible {
-  outline: 2px solid var(--interactive-text);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 69, 123, 0.14);
 }
 
 @media (hover: hover) and (pointer: fine) {
