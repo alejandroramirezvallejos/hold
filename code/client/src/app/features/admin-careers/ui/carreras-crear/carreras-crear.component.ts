@@ -44,10 +44,10 @@ export class CarrerasCrearComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.carreraService.crearCarrera(this.nombreCarrera).subscribe({
       next: (_response) => {
-        this.Actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Carrera creada exitosamente.');
-        this.cerrar();
+        this.Actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

@@ -40,12 +40,12 @@ export class EmpresasMantenimientoEditarComponent extends BaseTablaComponent {
       .actualizarEmpresaMantenimiento(this.empresaMantenimiento)
       .subscribe({
         next: () => {
-          this.actualizar.emit();
+          this.cerrar();
           this.finalizarEnvio();
           this.toast.success(
             'Empresa de mantenimiento actualizada exitosamente.',
           );
-          this.cerrar();
+          this.actualizar.emit();
         },
         error: (error) => {
           const errorMsg = extractErrorMessage(

@@ -68,10 +68,10 @@ export class GaveterosEditarComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.gaveteroapi.editarGavetero(this.gavetero).subscribe({
       next: () => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Gavetero editado con éxito.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

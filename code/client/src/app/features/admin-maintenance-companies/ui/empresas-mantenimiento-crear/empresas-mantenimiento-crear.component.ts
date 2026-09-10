@@ -40,10 +40,10 @@ export class EmpresasMantenimientoCrearComponent extends BaseTablaComponent {
       .crearEmpresaMantenimiento(this.empresaMantenimiento)
       .subscribe({
         next: () => {
-          this.Actualizar.emit();
+          this.cerrar();
           this.finalizarEnvio();
           this.toast.success('Empresa de mantenimiento creada correctamente.');
-          this.cerrar();
+          this.Actualizar.emit();
         },
         error: (error) => {
           const errorMsg = extractErrorMessage(

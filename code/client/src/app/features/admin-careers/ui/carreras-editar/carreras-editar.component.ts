@@ -43,10 +43,10 @@ export class CarrerasEditarComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.carreraService.actualizarCarrera(this.carrera).subscribe({
       next: (_response) => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Carrera editada con éxito.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

@@ -76,10 +76,10 @@ export class ComponentesCrearComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.componenteService.crearComponente(this.componente).subscribe({
       next: (_response) => {
-        this.Actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Componente creado con éxito.');
-        this.cerrar();
+        this.Actualizar.emit();
       },
       error: (_error) => {
         this.mensajeerror = 'Error al crear el componente , Intente mas tarde ';

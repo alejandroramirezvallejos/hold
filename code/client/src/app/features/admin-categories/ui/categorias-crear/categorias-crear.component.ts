@@ -45,10 +45,10 @@ export class CategoriasCrearComponent extends BaseTablaComponent {
     };
     this.categoriaService.crearCategoria(categoria).subscribe({
       next: (_response) => {
-        this.Actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Categoría creada exitosamente.');
-        this.cerrar();
+        this.Actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

@@ -185,10 +185,10 @@ export class MantenimientosCrearComponent extends BaseTablaComponent {
       )
       .subscribe({
         next: (_response) => {
-          this.Actualizar.emit();
+          this.cerrar();
           this.finalizarEnvio();
           this.toast.success('Mantenimiento creado con éxito.');
-          this.cerrar();
+          this.Actualizar.emit();
         },
         error: (error) => {
           const errorMsg = extractErrorMessage(

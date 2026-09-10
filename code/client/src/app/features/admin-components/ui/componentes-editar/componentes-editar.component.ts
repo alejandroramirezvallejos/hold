@@ -77,10 +77,10 @@ export class ComponentesEditarComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.componenteService.actualizarComponente(this.componente).subscribe({
       next: (_response) => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Componente actualizado satisfactoriamente.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

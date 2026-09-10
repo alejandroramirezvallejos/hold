@@ -46,10 +46,10 @@ export class CategoriasEditarComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.categoriaService.actualizarCategoria(this.categoria).subscribe({
       next: (_response) => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Categoría actualizada con éxito.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

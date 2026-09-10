@@ -57,10 +57,10 @@ export class GruposEquiposEditarComponent
     if (!this.iniciarEnvio()) return;
     this.grupoEquipoapi.editarGrupoEquipo(this.grupoEquipo).subscribe({
       next: (_response) => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Grupo de equipo editado exitosamente.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

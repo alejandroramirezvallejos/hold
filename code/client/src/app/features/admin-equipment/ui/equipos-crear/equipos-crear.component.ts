@@ -121,11 +121,11 @@ export class EquiposCrearComponent extends BaseTablaComponent {
     this.equipo.Modelo = this.grupoequipoSeleccionado!.modelo ?? null;
     this.equipoapi.crearEquipo(this.equipo).subscribe({
       next: () => {
-        this.Actualizar.emit();
+        this.cerrar();
         this.grupoequipoSeleccionado = null;
         this.finalizarEnvio();
         this.toast.success('Equipo creado con éxito.');
-        this.cerrar();
+        this.Actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

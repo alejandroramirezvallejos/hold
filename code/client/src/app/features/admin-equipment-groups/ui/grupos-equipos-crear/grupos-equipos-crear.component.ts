@@ -80,10 +80,10 @@ export class GruposEquiposCrearComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.grupoEquipoapi.crearGrupoEquipo(this.grupoEquipo).subscribe({
       next: (_response) => {
-        this.Actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Grupo de equipo registrado exitosamente.');
-        this.cerrar();
+        this.Actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

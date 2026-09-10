@@ -75,10 +75,10 @@ export class UsuariosCrearComponent extends BaseTablaComponent {
       .registrarCuenta(this.usuario, this.contrasena, this.usuario.rol!)
       .subscribe({
         next: (_response) => {
-          this.Actualizar.emit();
+          this.cerrar();
           this.finalizarEnvio();
           this.toast.success('Usuario creado exitosamente.');
-          this.cerrar();
+          this.Actualizar.emit();
         },
         error: (error) => {
           const errorMsg = extractErrorMessage(

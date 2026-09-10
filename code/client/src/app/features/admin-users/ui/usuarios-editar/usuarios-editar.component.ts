@@ -73,10 +73,10 @@ export class UsuariosEditarComponent extends BaseTablaComponent {
     if (!this.contrasenasValidas || !this.iniciarEnvio()) return;
     this.usuarioApi.editarUsuario(this.usuario, this.contrasena).subscribe({
       next: (_response) => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Usuario editado con éxito.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

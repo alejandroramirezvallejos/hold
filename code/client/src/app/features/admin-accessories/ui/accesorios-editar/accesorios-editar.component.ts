@@ -80,10 +80,10 @@ export class AccesoriosEditarComponent extends BaseTablaComponent {
     if (!this.iniciarEnvio()) return;
     this.accesorioapi.editarAccesorio(this.accesorio).subscribe({
       next: (_response) => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Accesorio editado con éxito.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

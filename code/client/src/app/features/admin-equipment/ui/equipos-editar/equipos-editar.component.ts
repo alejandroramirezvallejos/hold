@@ -125,10 +125,10 @@ export class EquiposEditarComponent extends BaseTablaComponent {
     this.equipo.IdGavetero = this.gaveteroSeleccionado?.Id ?? null;
     this.equipoapi.editarEquipo(this.equipo).subscribe({
       next: () => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Equipo editado con éxito.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

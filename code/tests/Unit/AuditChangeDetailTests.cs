@@ -16,6 +16,7 @@ internal class AuditChangeDetailTests
         {
             Nombre = "Ana",
             Email = "anterior@ucb.edu.bo",
+            NombreReferencia = "María Pérez",
             ImagenFirma = [1, 2],
             Rol = "estudiante",
         };
@@ -23,6 +24,7 @@ internal class AuditChangeDetailTests
         {
             Nombre = "Andrea",
             Email = "nuevo@ucb.edu.bo",
+            NombreReferencia = "Carlos Rojas",
             ImagenFirma = [3, 4],
             Rol = "docente",
         };
@@ -42,6 +44,12 @@ internal class AuditChangeDetailTests
             && !change.GetProperty("protegido").GetBoolean()
             && change.GetProperty("anterior").GetString() == "anterior@ucb.edu.bo"
             && change.GetProperty("nuevo").GetString() == "nuevo@ucb.edu.bo"
+        );
+        changes.Should().Contain(change =>
+            change.GetProperty("campo").GetString() == "Nombre referencia"
+            && !change.GetProperty("protegido").GetBoolean()
+            && change.GetProperty("anterior").GetString() == "María Pérez"
+            && change.GetProperty("nuevo").GetString() == "Carlos Rojas"
         );
         changes.Should().Contain(change =>
             change.GetProperty("campo").GetString() == "Firma"
@@ -114,14 +122,14 @@ internal class AuditChangeDetailTests
     public void Build_NeverExposesAuthenticationSecrets()
     {
         var detail = AuditChangeDetail.Build(
-            new CredentialAudit("hash-anterior", "refresh-anterior", "token-anterior"),
-            new CredentialAudit("hash-nuevo", "refresh-nuevo", "token-nuevo")
+            new CredentialAudit("1234567", "hash-anterior", "refresh-anterior", "token-anterior"),
+            new CredentialAudit("7654321", "hash-nuevo", "refresh-nuevo", "token-nuevo")
         );
 
         using var json = JsonDocument.Parse(detail!);
         var changes = json.RootElement.GetProperty("cambios").EnumerateArray().ToList();
 
-        changes.Should().HaveCount(3);
+        changes.Should().HaveCount(4);
         changes.Should().OnlyContain(change => change.GetProperty("protegido").GetBoolean());
         detail.Should().NotContain("hash-anterior");
         detail.Should().NotContain("hash-nuevo");
@@ -132,6 +140,7 @@ internal class AuditChangeDetailTests
     }
 
     private sealed record CredentialAudit(
+        string Carnet,
         string Contrasena,
         string RefreshToken,
         string TokenVerificacionHash

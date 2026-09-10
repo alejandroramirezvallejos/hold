@@ -65,10 +65,10 @@ export class MueblesEditarComponent
     if (!this.iniciarEnvio()) return;
     this.muebleapi.actualizarMueble(this.mueble).subscribe({
       next: (_response) => {
-        this.actualizar.emit();
+        this.cerrar();
         this.finalizarEnvio();
         this.toast.success('Mueble editado exitosamente.');
-        this.cerrar();
+        this.actualizar.emit();
       },
       error: (error) => {
         const errorMsg = extractErrorMessage(

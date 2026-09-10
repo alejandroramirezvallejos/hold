@@ -18,6 +18,8 @@ public static class AuditChangeDetail
 
     private static readonly HashSet<string> ProtectedProperties = new(StringComparer.OrdinalIgnoreCase)
     {
+        "Carnet",
+        "CarnetAdministrador",
         "Contrasena",
         "ImagenPerfil",
         "ImagenFrenteCarnet",
